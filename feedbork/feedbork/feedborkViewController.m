@@ -7,6 +7,7 @@
 //
 
 #import "feedborkViewController.h"
+#import "opencv/cv.h"
 
 @implementation feedborkViewController
 
