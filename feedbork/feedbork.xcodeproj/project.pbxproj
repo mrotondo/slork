@@ -16,6 +16,10 @@
 		D52B9B2013469E8800BF4E99 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = D52B9B1E13469E8800BF4E99 /* MainWindow.xib */; };
 		D52B9B2313469E8800BF4E99 /* feedborkViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D52B9B2213469E8800BF4E99 /* feedborkViewController.m */; };
 		D52B9B2613469E8800BF4E99 /* feedborkViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = D52B9B2413469E8800BF4E99 /* feedborkViewController.xib */; };
+		D52B9B3A13469F9600BF4E99 /* libcv.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D52B9B3613469F9600BF4E99 /* libcv.a */; };
+		D52B9B3B13469F9600BF4E99 /* libcvaux.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D52B9B3713469F9600BF4E99 /* libcvaux.a */; };
+		D52B9B3C13469F9600BF4E99 /* libcxcore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D52B9B3813469F9600BF4E99 /* libcxcore.a */; };
+		D52B9B3D13469F9600BF4E99 /* libml.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D52B9B3913469F9600BF4E99 /* libml.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -33,6 +37,10 @@
 		D52B9B2113469E8800BF4E99 /* feedborkViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = feedborkViewController.h; sourceTree = "<group>"; };
 		D52B9B2213469E8800BF4E99 /* feedborkViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = feedborkViewController.m; sourceTree = "<group>"; };
 		D52B9B2513469E8800BF4E99 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/feedborkViewController.xib; sourceTree = "<group>"; };
+		D52B9B3613469F9600BF4E99 /* libcv.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcv.a; sourceTree = "<group>"; };
+		D52B9B3713469F9600BF4E99 /* libcvaux.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcvaux.a; sourceTree = "<group>"; };
+		D52B9B3813469F9600BF4E99 /* libcxcore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcxcore.a; sourceTree = "<group>"; };
+		D52B9B3913469F9600BF4E99 /* libml.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libml.a; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -43,6 +51,10 @@
 				D52B9B0D13469E8800BF4E99 /* UIKit.framework in Frameworks */,
 				D52B9B0F13469E8800BF4E99 /* Foundation.framework in Frameworks */,
 				D52B9B1113469E8800BF4E99 /* CoreGraphics.framework in Frameworks */,
+				D52B9B3A13469F9600BF4E99 /* libcv.a in Frameworks */,
+				D52B9B3B13469F9600BF4E99 /* libcvaux.a in Frameworks */,
+				D52B9B3C13469F9600BF4E99 /* libcxcore.a in Frameworks */,
+				D52B9B3D13469F9600BF4E99 /* libml.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -52,6 +64,7 @@
 		D52B9AFD13469E8800BF4E99 = {
 			isa = PBXGroup;
 			children = (
+				D52B9B3513469F9600BF4E99 /* libcv */,
 				D52B9B1213469E8800BF4E99 /* feedbork */,
 				D52B9B0B13469E8800BF4E99 /* Frameworks */,
 				D52B9B0913469E8800BF4E99 /* Products */,
@@ -99,6 +112,18 @@
 				D52B9B1913469E8800BF4E99 /* main.m */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		D52B9B3513469F9600BF4E99 /* libcv */ = {
+			isa = PBXGroup;
+			children = (
+				D52B9B3613469F9600BF4E99 /* libcv.a */,
+				D52B9B3713469F9600BF4E99 /* libcvaux.a */,
+				D52B9B3813469F9600BF4E99 /* libcxcore.a */,
+				D52B9B3913469F9600BF4E99 /* libml.a */,
+			);
+			name = libcv;
+			path = lib;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -240,6 +265,11 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "feedbork/feedbork-Prefix.pch";
 				INFOPLIST_FILE = "feedbork/feedbork-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../iphone_opencv_test/build_device/lib\"",
+					"\"$(SRCROOT)/lib\"",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -253,6 +283,11 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "feedbork/feedbork-Prefix.pch";
 				INFOPLIST_FILE = "feedbork/feedbork-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../../iphone_opencv_test/build_device/lib\"",
+					"\"$(SRCROOT)/lib\"",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				VALIDATE_PRODUCT = YES;
 				WRAPPER_EXTENSION = app;
