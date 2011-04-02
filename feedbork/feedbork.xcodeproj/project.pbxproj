@@ -1,0 +1,285 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		D52B9B0D13469E8800BF4E99 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D52B9B0C13469E8800BF4E99 /* UIKit.framework */; };
+		D52B9B0F13469E8800BF4E99 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D52B9B0E13469E8800BF4E99 /* Foundation.framework */; };
+		D52B9B1113469E8800BF4E99 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D52B9B1013469E8800BF4E99 /* CoreGraphics.framework */; };
+		D52B9B1713469E8800BF4E99 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = D52B9B1513469E8800BF4E99 /* InfoPlist.strings */; };
+		D52B9B1A13469E8800BF4E99 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D52B9B1913469E8800BF4E99 /* main.m */; };
+		D52B9B1D13469E8800BF4E99 /* feedborkAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = D52B9B1C13469E8800BF4E99 /* feedborkAppDelegate.m */; };
+		D52B9B2013469E8800BF4E99 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = D52B9B1E13469E8800BF4E99 /* MainWindow.xib */; };
+		D52B9B2313469E8800BF4E99 /* feedborkViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = D52B9B2213469E8800BF4E99 /* feedborkViewController.m */; };
+		D52B9B2613469E8800BF4E99 /* feedborkViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = D52B9B2413469E8800BF4E99 /* feedborkViewController.xib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		D52B9B0813469E8800BF4E99 /* feedbork.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = feedbork.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D52B9B0C13469E8800BF4E99 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		D52B9B0E13469E8800BF4E99 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		D52B9B1013469E8800BF4E99 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		D52B9B1413469E8800BF4E99 /* feedbork-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "feedbork-Info.plist"; sourceTree = "<group>"; };
+		D52B9B1613469E8800BF4E99 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		D52B9B1813469E8800BF4E99 /* feedbork-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "feedbork-Prefix.pch"; sourceTree = "<group>"; };
+		D52B9B1913469E8800BF4E99 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		D52B9B1B13469E8800BF4E99 /* feedborkAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = feedborkAppDelegate.h; sourceTree = "<group>"; };
+		D52B9B1C13469E8800BF4E99 /* feedborkAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = feedborkAppDelegate.m; sourceTree = "<group>"; };
+		D52B9B1F13469E8800BF4E99 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainWindow.xib; sourceTree = "<group>"; };
+		D52B9B2113469E8800BF4E99 /* feedborkViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = feedborkViewController.h; sourceTree = "<group>"; };
+		D52B9B2213469E8800BF4E99 /* feedborkViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = feedborkViewController.m; sourceTree = "<group>"; };
+		D52B9B2513469E8800BF4E99 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/feedborkViewController.xib; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D52B9B0513469E8800BF4E99 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D52B9B0D13469E8800BF4E99 /* UIKit.framework in Frameworks */,
+				D52B9B0F13469E8800BF4E99 /* Foundation.framework in Frameworks */,
+				D52B9B1113469E8800BF4E99 /* CoreGraphics.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		D52B9AFD13469E8800BF4E99 = {
+			isa = PBXGroup;
+			children = (
+				D52B9B1213469E8800BF4E99 /* feedbork */,
+				D52B9B0B13469E8800BF4E99 /* Frameworks */,
+				D52B9B0913469E8800BF4E99 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D52B9B0913469E8800BF4E99 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D52B9B0813469E8800BF4E99 /* feedbork.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D52B9B0B13469E8800BF4E99 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				D52B9B0C13469E8800BF4E99 /* UIKit.framework */,
+				D52B9B0E13469E8800BF4E99 /* Foundation.framework */,
+				D52B9B1013469E8800BF4E99 /* CoreGraphics.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		D52B9B1213469E8800BF4E99 /* feedbork */ = {
+			isa = PBXGroup;
+			children = (
+				D52B9B1B13469E8800BF4E99 /* feedborkAppDelegate.h */,
+				D52B9B1C13469E8800BF4E99 /* feedborkAppDelegate.m */,
+				D52B9B1E13469E8800BF4E99 /* MainWindow.xib */,
+				D52B9B2113469E8800BF4E99 /* feedborkViewController.h */,
+				D52B9B2213469E8800BF4E99 /* feedborkViewController.m */,
+				D52B9B2413469E8800BF4E99 /* feedborkViewController.xib */,
+				D52B9B1313469E8800BF4E99 /* Supporting Files */,
+			);
+			path = feedbork;
+			sourceTree = "<group>";
+		};
+		D52B9B1313469E8800BF4E99 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				D52B9B1413469E8800BF4E99 /* feedbork-Info.plist */,
+				D52B9B1513469E8800BF4E99 /* InfoPlist.strings */,
+				D52B9B1813469E8800BF4E99 /* feedbork-Prefix.pch */,
+				D52B9B1913469E8800BF4E99 /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		D52B9B0713469E8800BF4E99 /* feedbork */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D52B9B2913469E8800BF4E99 /* Build configuration list for PBXNativeTarget "feedbork" */;
+			buildPhases = (
+				D52B9B0413469E8800BF4E99 /* Sources */,
+				D52B9B0513469E8800BF4E99 /* Frameworks */,
+				D52B9B0613469E8800BF4E99 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = feedbork;
+			productName = feedbork;
+			productReference = D52B9B0813469E8800BF4E99 /* feedbork.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D52B9AFF13469E8800BF4E99 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = D52B9B0213469E8800BF4E99 /* Build configuration list for PBXProject "feedbork" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = D52B9AFD13469E8800BF4E99;
+			productRefGroup = D52B9B0913469E8800BF4E99 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D52B9B0713469E8800BF4E99 /* feedbork */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D52B9B0613469E8800BF4E99 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D52B9B1713469E8800BF4E99 /* InfoPlist.strings in Resources */,
+				D52B9B2013469E8800BF4E99 /* MainWindow.xib in Resources */,
+				D52B9B2613469E8800BF4E99 /* feedborkViewController.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D52B9B0413469E8800BF4E99 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D52B9B1A13469E8800BF4E99 /* main.m in Sources */,
+				D52B9B1D13469E8800BF4E99 /* feedborkAppDelegate.m in Sources */,
+				D52B9B2313469E8800BF4E99 /* feedborkViewController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		D52B9B1513469E8800BF4E99 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D52B9B1613469E8800BF4E99 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		D52B9B1E13469E8800BF4E99 /* MainWindow.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D52B9B1F13469E8800BF4E99 /* en */,
+			);
+			name = MainWindow.xib;
+			sourceTree = "<group>";
+		};
+		D52B9B2413469E8800BF4E99 /* feedborkViewController.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D52B9B2513469E8800BF4E99 /* en */,
+			);
+			name = feedborkViewController.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		D52B9B2713469E8800BF4E99 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_UNIVERSAL_IPHONE_OS)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 2;
+			};
+			name = Debug;
+		};
+		D52B9B2813469E8800BF4E99 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_UNIVERSAL_IPHONE_OS)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 2;
+			};
+			name = Release;
+		};
+		D52B9B2A13469E8800BF4E99 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "feedbork/feedbork-Prefix.pch";
+				INFOPLIST_FILE = "feedbork/feedbork-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		D52B9B2B13469E8800BF4E99 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "feedbork/feedbork-Prefix.pch";
+				INFOPLIST_FILE = "feedbork/feedbork-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALIDATE_PRODUCT = YES;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D52B9B0213469E8800BF4E99 /* Build configuration list for PBXProject "feedbork" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D52B9B2713469E8800BF4E99 /* Debug */,
+				D52B9B2813469E8800BF4E99 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D52B9B2913469E8800BF4E99 /* Build configuration list for PBXNativeTarget "feedbork" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D52B9B2A13469E8800BF4E99 /* Debug */,
+				D52B9B2B13469E8800BF4E99 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D52B9AFF13469E8800BF4E99 /* Project object */;
+}
