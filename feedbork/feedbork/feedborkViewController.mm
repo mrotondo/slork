@@ -124,7 +124,7 @@
 	[self.view.layer addSublayer: self.previewLayer];
 
     self.imageView = [[UIImageView alloc] init];
-	self.imageView.frame = self.view.bounds;//CGRectMake(0, 0, 153, 204);
+	self.imageView.frame = CGRectMake(0, 0, 153, 204);
     [self.view addSubview:self.imageView];
     // bring menu to front again and then hide it
     [self.view bringSubviewToFront:menuView];
@@ -213,7 +213,7 @@
 }
 
 - (IBAction)lockExposure
-{
+{    
     // grab all inputs
     NSArray * inputs = captureSession.inputs;
     // if inputs exist, we'll proceed to try locking
@@ -224,8 +224,11 @@
         NSError * outError;
         // attempt to lock camera for config
         if ( [inputDevice.device lockForConfiguration:&outError] )
+        {
             inputDevice.device.exposureMode = (inputDevice.device.exposureMode == AVCaptureExposureModeLocked) ? 
             AVCaptureExposureModeContinuousAutoExposure : AVCaptureExposureModeLocked;
+            [exposureLockButton updateState];
+        }
     }
 
 }
@@ -454,4 +457,45 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     return YES;
 }
 
+@end
+
+@implementation UIToggleButton
+@synthesize isOn;
+
+- (id) initWithCoder:(NSCoder *)aDecoder
+{
+    if ( (self = [super initWithCoder:aDecoder]) )
+    {
+        indicator = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"switchUp.png"]];
+        indicator.frame = CGRectMake(0.0, 0.0, self.frame.size.height/2.5, self.frame.size.height/2.5);
+        indicator.center = CGPointMake(indicator.frame.size.width, self.frame.size.height/2.0);
+        [self addSubview:indicator];
+        isOn = NO;
+    }
+    return self;
+}
+
+- (void)turnOn
+{
+    indicator.image = [UIImage imageNamed:@"switchDown.png"];
+    isOn = YES;
+}
+
+- (void)turnOff
+{
+    indicator.image = [UIImage imageNamed:@"switchUp.png"];
+    isOn = NO;
+}
+
+- (void)updateState
+{
+    if (isOn) [self turnOff];
+    else [self turnOn];
+}
+
+- (void)dealloc
+{
+    [indicator release];
+    [super dealloc];
+}
 @end

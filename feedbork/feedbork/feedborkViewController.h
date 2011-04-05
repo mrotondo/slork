@@ -14,6 +14,7 @@
 #import "opencv/cv.h"
 
 @class feedborkOSC;
+@class UIToggleButton;
 #define IP_ADD @"192.168.188.26"
 #define PORT 9999
 
@@ -27,6 +28,7 @@
     // menu stuff
     IBOutlet UIView *menuView;
     IBOutlet UITextField *IPTextField;
+    IBOutlet UIToggleButton * exposureLockButton;
 }
 
 @property (nonatomic, retain) AVCaptureSession *captureSession;
@@ -43,5 +45,19 @@
 - (IBAction)closeMenu;
 - (IBAction)changeIP:(UITextField*)sender;
 - (IBAction)lockExposure;
+
+@end
+
+@interface UIToggleButton : UIButton
+{
+    UIImageView *indicator;
+    bool isOn;
+}
+
+- (void)updateState;
+- (void)turnOn;
+- (void)turnOff;
+
+@property (assign,readwrite) bool isOn;
 
 @end

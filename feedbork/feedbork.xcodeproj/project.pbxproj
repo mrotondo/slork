@@ -20,6 +20,8 @@
 		B24001AA134AD938001C4090 /* OscReceivedElements.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B240019E134AD938001C4090 /* OscReceivedElements.cpp */; };
 		B24001AB134AD938001C4090 /* OscTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B24001A0134AD938001C4090 /* OscTypes.cpp */; };
 		B24001C3134ADACA001C4090 /* feedborkOSC.mm in Sources */ = {isa = PBXBuildFile; fileRef = B24001C2134ADACA001C4090 /* feedborkOSC.mm */; };
+		B24001CE134BB38D001C4090 /* switchDown.png in Resources */ = {isa = PBXBuildFile; fileRef = B24001CC134BB38D001C4090 /* switchDown.png */; };
+		B24001CF134BB38D001C4090 /* switchUp.png in Resources */ = {isa = PBXBuildFile; fileRef = B24001CD134BB38D001C4090 /* switchUp.png */; };
 		D52B9B0D13469E8800BF4E99 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D52B9B0C13469E8800BF4E99 /* UIKit.framework */; };
 		D52B9B0F13469E8800BF4E99 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D52B9B0E13469E8800BF4E99 /* Foundation.framework */; };
 		D52B9B1113469E8800BF4E99 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D52B9B1013469E8800BF4E99 /* CoreGraphics.framework */; };
@@ -68,6 +70,8 @@
 		B24001A1134AD938001C4090 /* OscTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OscTypes.h; sourceTree = "<group>"; };
 		B24001C1134ADACA001C4090 /* feedborkOSC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = feedborkOSC.h; sourceTree = "<group>"; };
 		B24001C2134ADACA001C4090 /* feedborkOSC.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = feedborkOSC.mm; sourceTree = "<group>"; };
+		B24001CC134BB38D001C4090 /* switchDown.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = switchDown.png; sourceTree = "<group>"; };
+		B24001CD134BB38D001C4090 /* switchUp.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = switchUp.png; sourceTree = "<group>"; };
 		D52B9B0813469E8800BF4E99 /* feedbork.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = feedbork.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D52B9B0C13469E8800BF4E99 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		D52B9B0E13469E8800BF4E99 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -112,6 +116,8 @@
 		B2400175134AD269001C4090 /* pics */ = {
 			isa = PBXGroup;
 			children = (
+				B24001CC134BB38D001C4090 /* switchDown.png */,
+				B24001CD134BB38D001C4090 /* switchUp.png */,
 				B2400176134AD269001C4090 /* icon.png */,
 			);
 			path = pics;
@@ -304,6 +310,8 @@
 				D52B9B2013469E8800BF4E99 /* MainWindow.xib in Resources */,
 				D52B9B2613469E8800BF4E99 /* feedborkViewController.xib in Resources */,
 				B2400177134AD269001C4090 /* icon.png in Resources */,
+				B24001CE134BB38D001C4090 /* switchDown.png in Resources */,
+				B24001CF134BB38D001C4090 /* switchUp.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
