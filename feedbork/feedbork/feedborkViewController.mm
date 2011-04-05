@@ -7,6 +7,7 @@
 //
 
 #import "feedborkViewController.h"
+#import "feedborkOSC.h"
 
 @implementation feedborkViewController
 @synthesize captureSession, previewLayer, imageView;
@@ -27,6 +28,8 @@
 {
     [super viewDidLoad];
     [self initCapture];
+    [self initMenu];
+    osc = [[feedborkOSC alloc] initWithIP:IPTextField.text port:PORT];
 }
 
 - (AVCaptureDevice *)frontFacingCameraIfAvailable
@@ -121,8 +124,94 @@
     self.imageView = [[UIImageView alloc] init];
 	self.imageView.frame = CGRectMake(0, 0, 153, 204);
     [self.view addSubview:self.imageView];
+    // bring menu to front again and then hide it
+    [self.view bringSubviewToFront:menuView];
+    menuView.transform = CGAffineTransformMakeTranslation(-1000.0, 0.0);
     
 	[self.captureSession startRunning];
+}
+
+- (void)initMenu
+{
+    // set up the IP Text Field stuff
+    if ( [[NSUserDefaults standardUserDefaults] stringForKey:@"IP"] )
+        [IPTextField setText:[[NSUserDefaults standardUserDefaults] stringForKey:@"IP"]];
+    else
+    {
+        [IPTextField setText:IP_ADD];
+        [[NSUserDefaults standardUserDefaults] setObject:IPTextField.text forKey:@"IP"];
+    }
+    
+    // Create a swipe gesture recognizer to recognize right swipes, three finger
+    UISwipeGestureRecognizer *recognizer;
+    recognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeFrom:)];
+    [recognizer setNumberOfTouchesRequired:3];
+    recognizer.direction = UISwipeGestureRecognizerDirectionRight;
+    [self.view addGestureRecognizer:recognizer];
+    // once we add its properties we don't need it
+    [recognizer release];
+    // now create one for the left swipe, also three finger
+    recognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeFrom:)];
+    [recognizer setNumberOfTouchesRequired:3];
+    recognizer.direction = UISwipeGestureRecognizerDirectionLeft;
+    [self.view addGestureRecognizer:recognizer];
+    [recognizer release];
+}
+
+// handle received swipe gestures 
+- (void)handleSwipeFrom:(UISwipeGestureRecognizer *)recognizer 
+{    
+    // move it away if we're centered already
+    if ( CGAffineTransformIsIdentity(menuView.transform) ) 
+    {
+        [UIView beginAnimations:nil context:nil];
+        [UIView setAnimationDuration:0.5];
+        if ( recognizer.direction == UISwipeGestureRecognizerDirectionRight )
+            menuView.transform = CGAffineTransformMakeTranslation(1000.0, 0.0);
+        else
+            menuView.transform = CGAffineTransformMakeTranslation(-1000.0, 0.0);
+        [UIView commitAnimations];
+        
+        [IPTextField resignFirstResponder];
+        
+    }
+    
+    // center it if we're moved away already
+    else
+    {
+        if ( recognizer.direction == UISwipeGestureRecognizerDirectionRight )
+            menuView.transform = CGAffineTransformMakeTranslation(-1000.0, 0.0);
+        else
+            menuView.transform = CGAffineTransformMakeTranslation(1000.0, 0.0);
+        
+        [UIView beginAnimations:nil context:nil];
+        [UIView setAnimationDuration:0.5];
+        menuView.transform = CGAffineTransformIdentity;
+        [UIView commitAnimations];
+    }
+    
+    // TESTING TESTING 1 2 3
+    [osc sendValue:(rand() % 10000) withKey:@"test"];
+
+}
+
+- (IBAction)closeMenu
+{
+    [UIView beginAnimations:nil context:nil];
+    [UIView setAnimationDuration:0.5];
+    menuView.transform = CGAffineTransformMakeTranslation(-1000.0, 0.0);
+    [UIView commitAnimations];
+    
+    [IPTextField resignFirstResponder];
+}
+
+- (IBAction)changeIP:(UITextField*)sender
+{
+    [IPTextField resignFirstResponder];
+    [osc changeIP:IPTextField.text];
+    
+    [[NSUserDefaults standardUserDefaults] setObject:IPTextField.text forKey:@"IP"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 // rotation helper function
@@ -335,6 +424,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
 - (void)dealloc {
 	[self.captureSession release];
+    [osc release];
     [super dealloc];
 }
 
