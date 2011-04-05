@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B2400177134AD269001C4090 /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = B2400176134AD269001C4090 /* icon.png */; };
 		D52B9B0D13469E8800BF4E99 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D52B9B0C13469E8800BF4E99 /* UIKit.framework */; };
 		D52B9B0F13469E8800BF4E99 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D52B9B0E13469E8800BF4E99 /* Foundation.framework */; };
 		D52B9B1113469E8800BF4E99 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D52B9B1013469E8800BF4E99 /* CoreGraphics.framework */; };
@@ -24,6 +25,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B2400176134AD269001C4090 /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = icon.png; sourceTree = "<group>"; };
 		D52B9B0813469E8800BF4E99 /* feedbork.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = feedbork.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D52B9B0C13469E8800BF4E99 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		D52B9B0E13469E8800BF4E99 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -64,6 +66,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		B2400175134AD269001C4090 /* pics */ = {
+			isa = PBXGroup;
+			children = (
+				B2400176134AD269001C4090 /* icon.png */,
+			);
+			path = pics;
+			sourceTree = "<group>";
+		};
 		D52B9AFD13469E8800BF4E99 = {
 			isa = PBXGroup;
 			children = (
@@ -75,6 +85,7 @@
 				D52B9B1213469E8800BF4E99 /* feedbork */,
 				D52B9B0B13469E8800BF4E99 /* Frameworks */,
 				D52B9B0913469E8800BF4E99 /* Products */,
+				B2400175134AD269001C4090 /* pics */,
 			);
 			sourceTree = "<group>";
 		};
@@ -171,6 +182,7 @@
 				D52B9B1713469E8800BF4E99 /* InfoPlist.strings in Resources */,
 				D52B9B2013469E8800BF4E99 /* MainWindow.xib in Resources */,
 				D52B9B2613469E8800BF4E99 /* feedborkViewController.xib in Resources */,
+				B2400177134AD269001C4090 /* icon.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
