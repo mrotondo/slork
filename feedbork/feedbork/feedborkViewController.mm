@@ -97,7 +97,7 @@
     AVCaptureDeviceInput *captureInput = [AVCaptureDeviceInput 
 										  deviceInputWithDevice:[self frontFacingCameraIfAvailable] 
 										  error:nil];
-
+    
     AVCaptureVideoDataOutput *captureOutput = [[AVCaptureVideoDataOutput alloc] init];
     captureOutput.alwaysDiscardsLateVideoFrames = YES; 
     captureOutput.minFrameDuration = CMTimeMake(1, 10);
@@ -115,6 +115,8 @@
     self.captureSession = [[AVCaptureSession alloc] init];
 	[self.captureSession addInput:captureInput];
 	[self.captureSession addOutput:captureOutput];
+    
+    captureSession.sessionPreset = AVCaptureSessionPresetPhoto;
 
     self.previewLayer = [AVCaptureVideoPreviewLayer layerWithSession: self.captureSession];
 	self.previewLayer.frame = self.view.bounds;
@@ -122,7 +124,7 @@
 	[self.view.layer addSublayer: self.previewLayer];
 
     self.imageView = [[UIImageView alloc] init];
-	self.imageView.frame = CGRectMake(0, 0, 153, 204);
+	self.imageView.frame = self.view.bounds;//CGRectMake(0, 0, 153, 204);
     [self.view addSubview:self.imageView];
     // bring menu to front again and then hide it
     [self.view bringSubviewToFront:menuView];
@@ -189,10 +191,6 @@
         menuView.transform = CGAffineTransformIdentity;
         [UIView commitAnimations];
     }
-    
-    // TESTING TESTING 1 2 3
-    [osc sendValue:(rand() % 10000) withKey:@"test"];
-
 }
 
 - (IBAction)closeMenu
@@ -212,6 +210,24 @@
     
     [[NSUserDefaults standardUserDefaults] setObject:IPTextField.text forKey:@"IP"];
     [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+- (IBAction)lockExposure
+{
+    // grab all inputs
+    NSArray * inputs = captureSession.inputs;
+    // if inputs exist, we'll proceed to try locking
+    if ( [inputs count] ) 
+    {
+        AVCaptureDeviceInput * inputDevice = [inputs objectAtIndex:0];
+
+        NSError * outError;
+        // attempt to lock camera for config
+        if ( [inputDevice.device lockForConfiguration:&outError] )
+            inputDevice.device.exposureMode = (inputDevice.device.exposureMode == AVCaptureExposureModeLocked) ? 
+            AVCaptureExposureModeContinuousAutoExposure : AVCaptureExposureModeLocked;
+    }
+
 }
 
 // rotation helper function
@@ -352,13 +368,16 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     cvCvtColor(img_color, img_greyscale, CV_BGR2GRAY);
     IplImage *img_binary = cvCreateImage(cvGetSize(img_greyscale), IPL_DEPTH_8U, 1);
 
-    cvThreshold(img_greyscale, img_binary, 20, 255, CV_THRESH_BINARY);
+    cvThreshold(img_greyscale, img_binary, 20, 255, CV_THRESH_TOZERO);
     
     CvMemStorage* storage = cvCreateMemStorage(0);
     CvSeq* contours;
     int numContours = cvFindContours( img_binary , storage, &contours, sizeof(CvContour),
                                      CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, cvPoint(0,0) );
     NSLog(@"Got %d contours!", numContours);
+    
+    [osc sendValue:numContours * 10 withKey:@"test"];
+
     
     while( contours )
     {
@@ -376,7 +395,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     }
     
     //ipl_result
-    UIImage * rotatedImage = [self rotate:[self UIImageFromIplImage:img_color] to:UIImageOrientationRightMirrored];
+    UIImage * rotatedImage = [self rotate:[self UIImageFromIplImage:ipl_result] to:UIImageOrientationRightMirrored];
     
 
     [self.imageView performSelectorOnMainThread:@selector(setImage:) withObject:rotatedImage waitUntilDone:YES];

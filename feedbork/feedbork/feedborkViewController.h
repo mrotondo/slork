@@ -42,5 +42,6 @@
 // menu functions
 - (IBAction)closeMenu;
 - (IBAction)changeIP:(UITextField*)sender;
+- (IBAction)lockExposure;
 
 @end
