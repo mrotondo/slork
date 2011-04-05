@@ -163,7 +163,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     IplImage *img_greyscale = cvCreateImage(cvGetSize(img_color), IPL_DEPTH_8U, 1);
     cvCvtColor(img_color, img_greyscale, CV_BGR2GRAY);
     IplImage *img_binary = cvCreateImage(cvGetSize(img_greyscale), IPL_DEPTH_8U, 1);
-    cvThreshold(img_greyscale, img_binary, 20, 255, CV_THRESH_BINARY);
+    cvThreshold(img_greyscale, img_binary, 100, 255, CV_THRESH_BINARY);
     cvReleaseImage(&img_color);
     cvReleaseImage(&img_greyscale);
     
@@ -171,8 +171,13 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     CvSeq* contours;
     int numContours = cvFindContours( img_binary , storage, &contours, sizeof(CvContour),
                                      CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, cvPoint(0,0) );
-    
     NSLog(@"Got %d contours!", numContours);
+    
+    while( contours )
+    {
+        // take the next contour
+        contours = contours->h_next;
+    }
     
     // Convert black and whilte to 24bit image then convert to UIImage to show
     IplImage *ipl_result = cvCreateImage(cvGetSize(img_binary), IPL_DEPTH_8U, 3);
