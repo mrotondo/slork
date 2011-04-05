@@ -7,9 +7,26 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <AVFoundation/AVFoundation.h>
+#import <CoreGraphics/CoreGraphics.h>
+#import <CoreVideo/CoreVideo.h>
+#import <CoreMedia/CoreMedia.h>
+#import "opencv/cv.h"
 
-@interface feedborkViewController : UIViewController {
+@interface feedborkViewController : UIViewController <AVCaptureVideoDataOutputSampleBufferDelegate> {
     
+    AVCaptureSession *captureSession;
+    AVCaptureVideoPreviewLayer *previewLayer;
+    UIImageView *imageView;
 }
+
+@property (nonatomic, retain) AVCaptureSession *captureSession;
+@property (nonatomic, retain) AVCaptureVideoPreviewLayer *previewLayer;
+@property (nonatomic, retain) UIImageView *imageView;
+
+- (void)initCapture;
+- (AVCaptureDevice *)frontFacingCameraIfAvailable;
+- (IplImage *)CreateIplImageFromUIImage:(UIImage *)image;
+- (UIImage *)UIImageFromIplImage:(IplImage *)image;
 
 @end
