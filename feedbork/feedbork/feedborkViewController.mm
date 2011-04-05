@@ -63,22 +63,12 @@
 													iplimage->depth, iplimage->widthStep,
 													colorSpace, kCGImageAlphaPremultipliedLast|kCGBitmapByteOrderDefault);
     
-    
-//    // Try to account for the fact that the UIImage apparently is rotated?
-//    CGContextTranslateCTM(contextRef, image.size.width / 2, image.size.height / 2);
-//    CGContextRotateCTM(contextRef, -M_PI / 2);
-//    CGContextTranslateCTM(contextRef, -image.size.width / 2, -image.size.height / 2);
-    
     CGContextDrawImage(contextRef, CGRectMake(0, 0, image.size.width, image.size.height), imageRef);
 
 	CGContextRelease(contextRef);
 	CGColorSpaceRelease(colorSpace);
     
-	IplImage *ret = cvCreateImage(cvGetSize(iplimage), IPL_DEPTH_8U, 3);
-	cvCvtColor(iplimage, ret, CV_RGBA2BGR);
-	cvReleaseImage(&iplimage);
-    
-	return ret;
+	return iplimage;
 }
 
 - (UIImage *)UIImageFromIplImage:(IplImage *)image {
@@ -135,6 +125,115 @@
 	[self.captureSession startRunning];
 }
 
+// rotation helper function
+static CGRect swapWidthAndHeight(CGRect rect)
+{
+    CGFloat  swap = rect.size.width;
+    
+    rect.size.width  = rect.size.height;
+    rect.size.height = swap;
+    
+    return rect;
+}
+
+// rotate image to new orientation programmatically
+-(UIImage*)rotate:(UIImage*)imageIn to:(UIImageOrientation)orient
+{
+    CGRect             bnds = CGRectZero;
+    UIImage*           copy = nil;
+    CGContextRef       ctxt = nil;
+    CGImageRef         imag = imageIn.CGImage;
+    CGRect             rect = CGRectZero;
+    CGAffineTransform  tran = CGAffineTransformIdentity;
+    
+    rect.size.width  = CGImageGetWidth(imag);
+    rect.size.height = CGImageGetHeight(imag);
+    
+    bnds = rect;
+    
+    switch (orient)
+    {
+        case UIImageOrientationUp:
+            // would get you an exact copy of the original
+            assert(false);
+            return nil;
+            
+        case UIImageOrientationUpMirrored:
+            tran = CGAffineTransformMakeTranslation(rect.size.width, 0.0);
+            tran = CGAffineTransformScale(tran, -1.0, 1.0);
+            break;
+            
+        case UIImageOrientationDown:
+            tran = CGAffineTransformMakeTranslation(rect.size.width,
+                                                    rect.size.height);
+            tran = CGAffineTransformRotate(tran, M_PI);
+            break;
+            
+        case UIImageOrientationDownMirrored:
+            tran = CGAffineTransformMakeTranslation(0.0, rect.size.height);
+            tran = CGAffineTransformScale(tran, 1.0, -1.0);
+            break;
+            
+        case UIImageOrientationLeft:
+            bnds = swapWidthAndHeight(bnds);
+            tran = CGAffineTransformMakeTranslation(0.0, rect.size.width);
+            tran = CGAffineTransformRotate(tran, 3.0 * M_PI / 2.0);
+            break;
+            
+        case UIImageOrientationLeftMirrored:
+            bnds = swapWidthAndHeight(bnds);
+            tran = CGAffineTransformMakeTranslation(rect.size.height,
+                                                    rect.size.width);
+            tran = CGAffineTransformScale(tran, -1.0, 1.0);
+            tran = CGAffineTransformRotate(tran, 3.0 * M_PI / 2.0);
+            break;
+            
+        case UIImageOrientationRight:
+            bnds = swapWidthAndHeight(bnds);
+            tran = CGAffineTransformMakeTranslation(rect.size.height, 0.0);
+            tran = CGAffineTransformRotate(tran, M_PI / 2.0);
+            break;
+            
+        case UIImageOrientationRightMirrored:
+            bnds = swapWidthAndHeight(bnds);
+            tran = CGAffineTransformMakeScale(-1.0, 1.0);
+            tran = CGAffineTransformRotate(tran, M_PI / 2.0);
+            break;
+            
+        default:
+            // orientation value supplied is invalid
+            assert(false);
+            return nil;
+    }
+    
+    UIGraphicsBeginImageContext(bnds.size);
+    ctxt = UIGraphicsGetCurrentContext();
+    
+    switch (orient)
+    {
+        case UIImageOrientationLeft:
+        case UIImageOrientationLeftMirrored:
+        case UIImageOrientationRight:
+        case UIImageOrientationRightMirrored:
+            CGContextScaleCTM(ctxt, -1.0, 1.0);
+            CGContextTranslateCTM(ctxt, -rect.size.height, 0.0);
+            break;
+            
+        default:
+            CGContextScaleCTM(ctxt, 1.0, -1.0);
+            CGContextTranslateCTM(ctxt, 0.0, -rect.size.height);
+            break;
+    }
+    
+    CGContextConcatCTM(ctxt, tran);
+    CGContextDrawImage(UIGraphicsGetCurrentContext(), rect, imag);
+    
+    copy = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    return copy;
+}
+
 - (void)captureOutput:(AVCaptureOutput *)captureOutput 
 didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer 
 	   fromConnection:(AVCaptureConnection *)connection 
@@ -158,14 +257,13 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     
     
     // TODO: Figure out why the camera feed is coming through rotated & transformed in these images.
-    UIImage *image= [UIImage imageWithCGImage:newImage scale:1.0 orientation:UIImageOrientationLeftMirrored];
+    UIImage *image= [UIImage imageWithCGImage:newImage scale:1.0 orientation:UIImageOrientationUp];
     IplImage *img_color = [self CreateIplImageFromUIImage:image];
     IplImage *img_greyscale = cvCreateImage(cvGetSize(img_color), IPL_DEPTH_8U, 1);
     cvCvtColor(img_color, img_greyscale, CV_BGR2GRAY);
     IplImage *img_binary = cvCreateImage(cvGetSize(img_greyscale), IPL_DEPTH_8U, 1);
     cvThreshold(img_greyscale, img_binary, 20, 255, CV_THRESH_BINARY);
-    cvReleaseImage(&img_color);
-    cvReleaseImage(&img_greyscale);
+
     
     CvMemStorage* storage = cvCreateMemStorage(0);
     CvSeq* contours;
@@ -182,9 +280,16 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
             *p = *(p+1) = *(p+2) = img_binary->imageData[y * img_binary->widthStep + x];
         }
     }
-    cvReleaseImage(&img_binary);
-    [self.imageView performSelectorOnMainThread:@selector(setImage:) withObject:[self UIImageFromIplImage:ipl_result] waitUntilDone:YES];
     
+    //ipl_result
+    UIImage * rotatedImage = [self rotate:[self UIImageFromIplImage:img_color] to:UIImageOrientationRightMirrored];
+    
+
+    [self.imageView performSelectorOnMainThread:@selector(setImage:) withObject:rotatedImage waitUntilDone:YES];
+    
+    cvReleaseImage(&img_binary);
+    cvReleaseImage(&img_color);
+    cvReleaseImage(&img_greyscale);
     cvReleaseImage(&ipl_result);    
     
 //    cvSetErrMode(CV_ErrModeParent);
