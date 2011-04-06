@@ -535,6 +535,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     cvReleaseMemStorage(&contour_storage);
     cvReleaseMemStorage(&line_storage);
     cvReleaseImage(&img_threshold);
+    cvReleaseImage(&img_lines);
     cvReleaseImage(&img_color);
     cvReleaseImage(&img_red);
     cvReleaseImage(&img_green);
