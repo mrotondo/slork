@@ -397,26 +397,30 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     UIImage *image= [UIImage imageWithCGImage:newImage scale:1.0 orientation:UIImageOrientationUp];
     IplImage *img_color = [self CreateIplImageFromUIImage:image];
     
-    IplImage *img_blue = cvCreateImage(cvGetSize(img_color), IPL_DEPTH_8U, 1);
-    IplImage *img_green = cvCreateImage(cvGetSize(img_color), IPL_DEPTH_8U, 1);
-    IplImage *img_red = cvCreateImage(cvGetSize(img_color), IPL_DEPTH_8U, 1);
-    IplImage *img_alpha = cvCreateImage(cvGetSize(img_color), IPL_DEPTH_8U, 1);
-    cvSplit(img_color, img_blue, img_green, img_red, img_alpha);
-    
-    IplImage *img_temp = cvCreateImage(cvGetSize(img_color), IPL_DEPTH_8U, 1);
-    
-    cvThreshold(img_blue, img_blue, 150, 255, CV_THRESH_BINARY);
-    cvThreshold(img_green, img_green, 150, 255, CV_THRESH_BINARY);
-    cvThreshold(img_red, img_red, 150, 255, CV_THRESH_BINARY);
-    
-    cvXor(img_blue, img_green, img_temp);
-    cvXor(img_temp, img_red, img_temp);
-    cvAnd(img_temp, img_blue, img_blue);
-    cvAnd(img_temp, img_green, img_green);
-    cvAnd(img_temp, img_red, img_red);
-    
-    cvMerge(img_blue, img_green, img_red, img_alpha, img_color);
-    
+    // set a threshold!
+    char thresh = 190;
+    // find the current origin for the raw data
+    char *startingPoint = img_color->imageDataOrigin;
+    // iterate through the data in chunks of 4 (BGRA) discarding A
+    for ( int i = 0; i < img_color->imageSize; i+=4 )
+    {
+        // Grab the raw memory addresses
+        char *B = (startingPoint + i);
+        char *G = (startingPoint + i + 1);
+        char *R = (startingPoint + i + 2);        
+       
+        // Now change contents at that point in memory----
+        // binary bin for each color channel (except alpha)
+        *R = ( *R > thresh) ? 255 : 0;
+        *G = ( *G > thresh) ? 255 : 0;
+        *B = ( *B > thresh) ? 255 : 0;
+        
+        // exclusive or some stuff
+        char T = 0;
+        if ( *R && *G ) { *R = *G = 0; T = 255; }
+        if ( T && *B ) *B = 0;
+    }
+        
     IplImage *img_greyscale = cvCreateImage(cvGetSize(img_color), IPL_DEPTH_8U, 1);
     cvCvtColor(img_color, img_greyscale, CV_BGR2GRAY);
     IplImage *img_lines = cvCreateImage(cvGetSize(img_greyscale), IPL_DEPTH_8U, 1);
@@ -542,13 +546,8 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 //    cvReleaseImage(&img_threshold);
     cvReleaseImage(&img_lines);
     cvReleaseImage(&img_color);
-    cvReleaseImage(&img_red);
-    cvReleaseImage(&img_green);
-    cvReleaseImage(&img_blue);
-    cvReleaseImage(&img_alpha);
     cvReleaseImage(&img_greyscale);
 //    cvReleaseImage(&ipl_result);   
-    cvReleaseImage(&img_temp);
     
 //    cvSetErrMode(CV_ErrModeParent);
 //    UIImage *image= [UIImage imageWithCGImage:newImage scale:1.0 orientation:UIImageOrientationDown];
@@ -596,7 +595,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     // Return YES for supported orientations
-    return YES;
+    return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
 @end
