@@ -405,16 +405,16 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     
     IplImage *img_temp = cvCreateImage(cvGetSize(img_color), IPL_DEPTH_8U, 1);
     
+    cvThreshold(img_blue, img_blue, 170, 255, CV_THRESH_BINARY);
+    cvThreshold(img_green, img_green, 170, 255, CV_THRESH_BINARY);
+    cvThreshold(img_red, img_red, 170, 255, CV_THRESH_BINARY);
+    
     cvXor(img_blue, img_green, img_temp);
     cvXor(img_temp, img_red, img_temp);
     cvAnd(img_temp, img_blue, img_blue);
     cvAnd(img_temp, img_green, img_green);
     cvAnd(img_temp, img_red, img_red);
     
-    // TODO: Check for exclusive color here
-    cvThreshold(img_blue, img_blue, 170, 255, CV_THRESH_BINARY);
-    cvThreshold(img_green, img_green, 170, 255, CV_THRESH_BINARY);
-    cvThreshold(img_red, img_red, 170, 255, CV_THRESH_BINARY);
     cvMerge(img_blue, img_green, img_red, img_alpha, img_color);
     
 //    IplImage *img_greyscale = cvCreateImage(cvGetSize(img_color), IPL_DEPTH_8U, 1);
