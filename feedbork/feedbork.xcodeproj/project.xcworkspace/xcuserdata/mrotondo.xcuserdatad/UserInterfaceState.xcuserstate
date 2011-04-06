@@ -4545,9 +4545,9 @@
 				</dict>
 			</array>
 		</dict>
-		<real>323758102.13646299</real>
+		<real>323758153.80465198</real>
 		<string>{13997, 2616}</string>
-		<string>{14841, 0}</string>
+		<string>{15062, 0}</string>
 		<string>-captureOutput:didOutputSampleBuffer:fromConnection:</string>
 		<dict>
 			<key>$class</key>
@@ -7413,9 +7413,9 @@
 				</dict>
 			</array>
 		</dict>
-		<real>323758102.13262302</real>
+		<real>323758153.80075902</real>
 		<string>{13997, 2616}</string>
-		<string>{14841, 0}</string>
+		<string>{15062, 0}</string>
 		<dict>
 			<key>$class</key>
 			<dict>
