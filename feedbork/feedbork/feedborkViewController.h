@@ -23,11 +23,19 @@
     AVCaptureSession *captureSession;
     AVCaptureVideoPreviewLayer *previewLayer;
     UIImageView *imageView;
+    UIView *maskView;
     feedborkOSC *osc;
+    
+    // color picker stuff
+    UIColor * myColor;
+    UIColor * myFriendsColor;
+    IBOutlet UIView * myColorPicker;
+    IBOutlet UIView * myFriendsColorPicker;
     
     // menu stuff
     IBOutlet UIView *menuView;
     IBOutlet UITextField *IPTextField;
+    IBOutlet UISlider *borderSlider;
     IBOutlet UIToggleButton * exposureLockButton;
 }
 
@@ -41,10 +49,16 @@
 - (IplImage *)CreateIplImageFromUIImage:(UIImage *)image;
 - (UIImage *)UIImageFromIplImage:(IplImage *)image;
 
+// color picker functions
+- (IBAction)chooseMyColor:(UIButton*)sender;
+- (IBAction)chooseMyFriendsColor:(UIButton*)sender;
+
 // menu functions
 - (IBAction)closeMenu;
 - (IBAction)changeIP:(UITextField*)sender;
 - (IBAction)lockExposure;
+- (IBAction)changeAlpha:(UISlider*)slider;
+- (IBAction)changeBorder:(UISlider*)slider;
 
 @end
 

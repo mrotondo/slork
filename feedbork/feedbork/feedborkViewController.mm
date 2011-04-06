@@ -116,16 +116,24 @@
 	[self.captureSession addInput:captureInput];
 	[self.captureSession addOutput:captureOutput];
     
-    captureSession.sessionPreset = AVCaptureSessionPresetPhoto;
+    captureSession.sessionPreset = AVCaptureSessionPresetHigh;
 
     self.previewLayer = [AVCaptureVideoPreviewLayer layerWithSession: self.captureSession];
-	self.previewLayer.frame = self.view.bounds;
+    self.previewLayer.frame = CGRectMake(0.0, 0.0, self.view.bounds.size.width - borderSlider.value/2.0, self.view.bounds.size.height - borderSlider.value/2.0);
+    self.previewLayer.position = self.view.center;
 	self.previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
 	[self.view.layer addSublayer: self.previewLayer];
 
-    self.imageView = [[UIImageView alloc] init];
-	self.imageView.frame = CGRectMake(0, 0, 153, 204);
-    [self.view addSubview:self.imageView];
+    //self.imageView = [[UIImageView alloc] init];
+	//self.imageView.frame = CGRectMake(0, 0, 153, 204);
+    //[self.view addSubview:self.imageView];
+    
+    maskView = [[UIView alloc] initWithFrame:self.view.bounds];
+    [maskView setBackgroundColor:[UIColor blackColor]];
+    maskView.alpha = 0.0;
+    [self.view addSubview:maskView];
+    
+    
     // bring menu to front again and then hide it
     [self.view bringSubviewToFront:menuView];
     menuView.transform = CGAffineTransformMakeTranslation(-1000.0, 0.0);
@@ -193,6 +201,21 @@
     }
 }
 
+// color picker functions
+- (IBAction)chooseMyColor:(UIButton*)sender
+{
+    myColor = sender.backgroundColor;
+    [self.view setBackgroundColor:sender.backgroundColor];
+    myColorPicker.center = sender.center;
+}
+
+- (IBAction)chooseMyFriendsColor:(UIButton*)sender
+{
+    myFriendsColor = sender.backgroundColor;
+    myFriendsColorPicker.center = sender.center;
+}
+
+// menu functions
 - (IBAction)closeMenu
 {
     [UIView beginAnimations:nil context:nil];
@@ -232,6 +255,17 @@
         }
     }
 
+}
+
+- (IBAction)changeAlpha:(UISlider*)slider
+{
+    maskView.alpha = 1.0 - slider.value;   
+}
+
+- (IBAction)changeBorder:(UISlider*)slider
+{
+    self.previewLayer.frame = CGRectMake(0.0, 0.0, self.view.bounds.size.width - borderSlider.value/2.0, self.view.bounds.size.height - borderSlider.value/2.0);
+    self.previewLayer.position = self.view.center;
 }
 
 // rotation helper function
@@ -379,7 +413,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
                                      CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, cvPoint(0,0) );
     NSLog(@"Got %d contours!", numContours);
     
-    [osc sendValue:numContours * 10 withKey:@"test"];
+    [osc sendValue:numContours*10 withKey:@"test"];
 
     
     while( contours )
@@ -403,7 +437,6 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
     [self.imageView performSelectorOnMainThread:@selector(setImage:) withObject:rotatedImage waitUntilDone:YES];
     
-    //cvRelease(&contours);
     cvReleaseMemStorage(&storage);
     cvReleaseImage(&img_binary);
     cvReleaseImage(&img_color);
