@@ -97,7 +97,7 @@
 
     AVCaptureVideoDataOutput *captureOutput = [[AVCaptureVideoDataOutput alloc] init];
     captureOutput.alwaysDiscardsLateVideoFrames = YES; 
-    captureOutput.minFrameDuration = CMTimeMake(1, 10);
+    //captureOutput.minFrameDuration = CMTimeMake(1, 10);
 
     dispatch_queue_t queue;
 	queue = dispatch_queue_create("cameraQueue", NULL);
@@ -119,7 +119,7 @@
 	[self.view.layer addSublayer: self.previewLayer];
 
     self.imageView = [[UIImageView alloc] init];
-	self.imageView.frame = CGRectMake(0, 0, 153, 204);
+	self.imageView.frame = CGRectMake(0, 0, 307, 409);
     [self.view addSubview:self.imageView];
     
 	[self.captureSession startRunning];
@@ -263,7 +263,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     cvCvtColor(img_color, img_greyscale, CV_BGR2GRAY);
     IplImage *img_binary = cvCreateImage(cvGetSize(img_greyscale), IPL_DEPTH_8U, 1);
 
-    cvThreshold(img_greyscale, img_binary, 20, 255, CV_THRESH_BINARY);
+    cvThreshold(img_greyscale, img_binary, 190, 255, CV_THRESH_BINARY);
     
     CvMemStorage* storage = cvCreateMemStorage(0);
     CvSeq* contours;
@@ -271,11 +271,58 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
                                      CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, cvPoint(0,0) );
     NSLog(@"Got %d contours!", numContours);
     
+    //CvSeq* result;
+    int contour_index = 0;
+    int num_angles = 0;
+    float angle_sum = 0;
     while( contours )
     {
+        //NSLog(@"Contour %d has a total of %d", contour_index, contours->total);
+        
+        if (contours->total > 20)
+        {
+            
+            CvPoint* p1;
+            CvPoint* p2;
+            for (int seq_index = 1; seq_index < contours->total; seq_index++) {
+                p1 = (CvPoint*)cvGetSeqElem( contours, seq_index );
+                p2 = (CvPoint*)cvGetSeqElem( contours, seq_index - 1 );
+                
+                num_angles++;
+                angle_sum += atan2f(p1->y - p2->y, p1->x - p2->x);
+            }
+        }
+//        result = cvApproxPoly(contours, sizeof(CvContour), storage,
+//                              CV_POLY_APPROX_DP, cvContourPerimeter(contours)*0.02, 0 );
+//
+//        int i = 0;
+//        
+//        NSLog(@"Contour %d has a total of %d", contour_index, result->total);
+//        NSLog(@"Contour %d has an area of %f", contour_index, fabs(cvContourArea(result,CV_WHOLE_SEQ)));
+//        if (cvCheckContourConvexity(result)) {
+//            NSLog(@"Contour %d is convex", contour_index);
+//        } else {
+//            NSLog(@"Contour %d is not convex", contour_index);
+//        }
+//        
+//        if( result->total > 4 &&
+//           fabs(cvContourArea(result,CV_WHOLE_SEQ)) > 300 &&
+//           cvCheckContourConvexity(result) )
+//        {
+//            i++;            
+//        }
+//        
+//        NSLog(@"Got some squares-ish: %d", i);
+        
         // take the next contour
+        contour_index++;
         contours = contours->h_next;
     }
+    
+    if (num_angles > 0)
+        NSLog(@"Average angle is %f", angle_sum / num_angles);
+    else
+        NSLog(@"No sufficiently large contours found!");
     
     // Convert black and whilte to 24bit image then convert to UIImage to show
     IplImage *ipl_result = cvCreateImage(cvGetSize(img_binary), IPL_DEPTH_8U, 3);
@@ -287,7 +334,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     }
     
     //ipl_result
-    UIImage * rotatedImage = [self rotate:[self UIImageFromIplImage:img_color] to:UIImageOrientationRightMirrored];
+    UIImage * rotatedImage = [self rotate:[self UIImageFromIplImage:ipl_result] to:UIImageOrientationRightMirrored];
     
 
     [self.imageView performSelectorOnMainThread:@selector(setImage:) withObject:rotatedImage waitUntilDone:YES];

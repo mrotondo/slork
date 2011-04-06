@@ -998,7 +998,7 @@
 			<array>
 				<dict>
 					<key>CF$UID</key>
-					<integer>53</integer>
+					<integer>24</integer>
 				</dict>
 				<dict>
 					<key>CF$UID</key>
@@ -1729,9 +1729,9 @@
 		<string>PrimaryDocumentVisibleCharacterRange</string>
 		<string>HideAllIssues</string>
 		<string>PrimaryDocumentSelectedCharacterRange</string>
-		<real>323669807.786295</real>
-		<string>{8996, 2631}</string>
-		<string>{9743, 0}</string>
+		<real>323741168.72774798</real>
+		<string>{8328, 1676}</string>
+		<string>{9719, 0}</string>
 		<string>-captureOutput:didOutputSampleBuffer:fromConnection:</string>
 		<string>Xcode.IDEKit.EditorDocument.SourceCode</string>
 		<dict>
@@ -1775,7 +1775,7 @@
 				</dict>
 			</array>
 		</dict>
-		<string>{{0, 0}, {1140, 802}}</string>
+		<string>{{0, 0}, {1140, 455}}</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -4098,9 +4098,9 @@
 				</dict>
 			</array>
 		</dict>
-		<real>323669807.782552</real>
-		<string>{8996, 2631}</string>
-		<string>{9743, 0}</string>
+		<real>323741168.59487402</real>
+		<string>{8328, 1676}</string>
+		<string>{9719, 0}</string>
 		<dict>
 			<key>$class</key>
 			<dict>
@@ -5341,7 +5341,7 @@
 				</dict>
 				<dict>
 					<key>CF$UID</key>
-					<integer>59</integer>
+					<integer>465</integer>
 				</dict>
 			</array>
 		</dict>
@@ -5595,7 +5595,7 @@
 				<integer>481</integer>
 			</dict>
 			<key>NS.time</key>
-			<real>323669802.779109</real>
+			<real>323681521.24190998</real>
 		</dict>
 		<dict>
 			<key>$classes</key>
@@ -5606,7 +5606,7 @@
 			<key>$classname</key>
 			<string>NSDate</string>
 		</dict>
-		<string>Today at 9:16 PM</string>
+		<string>Today at 12:32 AM</string>
 		<integer>106</integer>
 		<dict>
 			<key>$class</key>
