@@ -5,21 +5,35 @@ OscRecv orec;
 // start listening (launch thread)
 orec.listen();
 // sin osc for goofy testing
-SinOsc s => Gain g => dac;
+PulseOsc s => Gain g => dac;
 0.1 => g.gain;
 
-orec.event("/test,f") @=> OscEvent rate_event; 
+orec.event("/freq,f") @=> OscEvent freq_event; 
+orec.event("/cutoff,f") @=> OscEvent cutoff_event; 
 
 while ( true )
 { 
-    rate_event => now; // wait for events to arrive.
+    freq_event => now; // wait for events to arrive.
     
     // grab the next message from the queue. 
-    while( rate_event.nextMsg() != 0 )
+    while( freq_event.nextMsg() != 0 )
     {   
         
-        rate_event.getFloat() => float f;
+        freq_event.getFloat() => float f;
         f => s.freq;
         <<< f >>>;
     }
+
+    cutoff_event => now; // wait for events to arrive.
+    
+    // grab the next message from the queue. 
+    while( cutoff_event.nextMsg() != 0 )
+    {   
+        
+        cutoff_event.getFloat() => float f;
+        f => s.width;
+        <<< f >>>;
+    }
+    
+    <<< "-----" >>>;
 }

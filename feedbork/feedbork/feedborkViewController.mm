@@ -116,7 +116,7 @@
 	[self.captureSession addInput:captureInput];
 	[self.captureSession addOutput:captureOutput];
 
-    captureSession.sessionPreset = AVCaptureSessionPresetPhoto;
+    captureSession.sessionPreset = AVCaptureSessionPresetMedium;
 
     maskView = [[UIView alloc] initWithFrame:self.view.bounds];
     [maskView setBackgroundColor:[UIColor blackColor]];
@@ -405,9 +405,9 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     
     IplImage *img_temp = cvCreateImage(cvGetSize(img_color), IPL_DEPTH_8U, 1);
     
-    cvThreshold(img_blue, img_blue, 220, 255, CV_THRESH_BINARY);
-    cvThreshold(img_green, img_green, 220, 255, CV_THRESH_BINARY);
-    cvThreshold(img_red, img_red, 220, 255, CV_THRESH_BINARY);
+    cvThreshold(img_blue, img_blue, 150, 255, CV_THRESH_BINARY);
+    cvThreshold(img_green, img_green, 150, 255, CV_THRESH_BINARY);
+    cvThreshold(img_red, img_red, 150, 255, CV_THRESH_BINARY);
     
     cvXor(img_blue, img_green, img_temp);
     cvXor(img_temp, img_red, img_temp);
@@ -417,46 +417,55 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     
     cvMerge(img_blue, img_green, img_red, img_alpha, img_color);
     
-//    IplImage *img_greyscale = cvCreateImage(cvGetSize(img_color), IPL_DEPTH_8U, 1);
-//    cvCvtColor(img_color, img_greyscale, CV_BGR2GRAY);
-//    IplImage *img_threshold = cvCreateImage(cvGetSize(img_greyscale), IPL_DEPTH_8U, 1);
-//    IplImage *img_lines = cvCreateImage(cvGetSize(img_greyscale), IPL_DEPTH_8U, 1);
-//    
-//    cvThreshold(img_greyscale, img_threshold, 190, 255, CV_THRESH_BINARY);
-//
-//    cvCanny(img_greyscale, img_lines, 50, 200, 3);
-//    
-//    CvMemStorage* line_storage = cvCreateMemStorage(0);
-//    CvSeq* lines = 0;
-//    lines = cvHoughLines2(img_lines,
-//                          line_storage,
-//                          CV_HOUGH_PROBABILISTIC,
-//                          1,
-//                          CV_PI/180,
-//                          80,
-//                          30,
-//                          10 );
-//    
-//    int num_angles = 0;
-//    float angle_sum = 0;
-//    for( int line_index = 0; line_index < lines->total; line_index++ )
-//    {
-//        CvPoint* line = (CvPoint*)cvGetSeqElem(lines, line_index);
-//        CvPoint p1 = line[0];
-//        CvPoint p2 = line[1];
-//        cvLine( img_color, line[0], line[1], CV_RGB(255,0,0), 3, 8 );
-//
-//        num_angles++;
-//        // jam all angles into a single quadrant
-//        angle_sum += fmod(fabs(atan2f(p1.y - p2.y, p1.x - p2.x)), M_PI / 2.0);
-//    }
-//    
-//    if (num_angles > 0) {
-//        float average_angle = angle_sum / num_angles;
-//        [osc sendValue:average_angle * 400 withKey:@"test"];
-//    } else {
-//        [osc sendValue:0 withKey:@"test"];
-//    }
+    IplImage *img_greyscale = cvCreateImage(cvGetSize(img_color), IPL_DEPTH_8U, 1);
+    cvCvtColor(img_color, img_greyscale, CV_BGR2GRAY);
+    IplImage *img_lines = cvCreateImage(cvGetSize(img_greyscale), IPL_DEPTH_8U, 1);
+    cvCanny(img_greyscale, img_lines, 50, 200, 3);
+    
+    CvMemStorage* line_storage = cvCreateMemStorage(0);
+    CvSeq* lines = 0;
+    lines = cvHoughLines2(img_lines,
+                          line_storage,
+                          CV_HOUGH_PROBABILISTIC,
+                          1,
+                          CV_PI/180,
+                          80,
+                          30,
+                          10 );
+    
+    int max_line_index = 0;
+    int max_line_length = 0;
+    float dist;
+    for( int line_index = 0; line_index < lines->total; line_index++ )
+    {
+        CvPoint* line = (CvPoint*)cvGetSeqElem(lines, line_index);
+        CvPoint p1 = line[0];
+        CvPoint p2 = line[1];
+        
+        dist = powf(p1.x - p2.x, 2) + powf(p1.y - p2.y, 2);
+        if (dist > max_line_length) {
+            max_line_length = dist;
+            max_line_index = line_index;
+        }
+    }
+    
+    float angle;
+    if (lines->total > 0) {
+        CvPoint* line = (CvPoint*)cvGetSeqElem(lines, max_line_index);
+        CvPoint p1 = line[0];
+        CvPoint p2 = line[1];
+        cvLine( img_color, line[0], line[1], CV_RGB(255,0,0), 3, 8 );
+        
+        angle = fmod(fabs(atan2f(p1.y - p2.y, p1.x - p2.x)), M_PI / 2.0);
+        [osc sendValue:angle * 400 withKey:@"freq"];
+        [osc sendValue:sqrt(max_line_length) / 2000 withKey:@"cutoff"];
+    } else {
+        [osc sendValue:0 withKey:@"freq"];
+        [osc sendValue:0 withKey:@"cutoff"];
+    }
+
+    //IplImage *img_threshold = cvCreateImage(cvGetSize(img_greyscale), IPL_DEPTH_8U, 1);
+    //cvThreshold(img_greyscale, img_threshold, 190, 255, CV_THRESH_BINARY);
 //    
 //    CvMemStorage* contour_storage = cvCreateMemStorage(0);
 //    CvSeq* contours;
@@ -529,15 +538,15 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     [self.imageView performSelectorOnMainThread:@selector(setImage:) withObject:rotatedImage waitUntilDone:YES];
 
 //    cvReleaseMemStorage(&contour_storage);
-//    cvReleaseMemStorage(&line_storage);
+    cvReleaseMemStorage(&line_storage);
 //    cvReleaseImage(&img_threshold);
-//    cvReleaseImage(&img_lines);
+    cvReleaseImage(&img_lines);
     cvReleaseImage(&img_color);
     cvReleaseImage(&img_red);
     cvReleaseImage(&img_green);
     cvReleaseImage(&img_blue);
     cvReleaseImage(&img_alpha);
-//    cvReleaseImage(&img_greyscale);
+    cvReleaseImage(&img_greyscale);
 //    cvReleaseImage(&ipl_result);   
     cvReleaseImage(&img_temp);
     
