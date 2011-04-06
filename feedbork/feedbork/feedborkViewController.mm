@@ -7,6 +7,7 @@
 //
 
 #import "feedborkViewController.h"
+#import "feedborkOSC.h"
 
 @implementation feedborkViewController
 @synthesize captureSession, previewLayer, imageView;
@@ -27,6 +28,8 @@
 {
     [super viewDidLoad];
     [self initCapture];
+    [self initMenu];
+    osc = [[feedborkOSC alloc] initWithIP:IPTextField.text port:PORT];
 }
 
 - (AVCaptureDevice *)frontFacingCameraIfAvailable
@@ -94,7 +97,7 @@
     AVCaptureDeviceInput *captureInput = [AVCaptureDeviceInput 
 										  deviceInputWithDevice:[self frontFacingCameraIfAvailable] 
 										  error:nil];
-
+    
     AVCaptureVideoDataOutput *captureOutput = [[AVCaptureVideoDataOutput alloc] init];
     captureOutput.alwaysDiscardsLateVideoFrames = YES; 
     //captureOutput.minFrameDuration = CMTimeMake(1, 10);
@@ -112,6 +115,8 @@
     self.captureSession = [[AVCaptureSession alloc] init];
 	[self.captureSession addInput:captureInput];
 	[self.captureSession addOutput:captureOutput];
+    
+    captureSession.sessionPreset = AVCaptureSessionPresetPhoto;
 
     self.previewLayer = [AVCaptureVideoPreviewLayer layerWithSession: self.captureSession];
 	self.previewLayer.frame = self.view.bounds;
@@ -121,8 +126,112 @@
     self.imageView = [[UIImageView alloc] init];
 	self.imageView.frame = CGRectMake(0, 0, 307, 409);
     [self.view addSubview:self.imageView];
+    // bring menu to front again and then hide it
+    [self.view bringSubviewToFront:menuView];
+    menuView.transform = CGAffineTransformMakeTranslation(-1000.0, 0.0);
     
 	[self.captureSession startRunning];
+}
+
+- (void)initMenu
+{
+    // set up the IP Text Field stuff
+    if ( [[NSUserDefaults standardUserDefaults] stringForKey:@"IP"] )
+        [IPTextField setText:[[NSUserDefaults standardUserDefaults] stringForKey:@"IP"]];
+    else
+    {
+        [IPTextField setText:IP_ADD];
+        [[NSUserDefaults standardUserDefaults] setObject:IPTextField.text forKey:@"IP"];
+    }
+    
+    // Create a swipe gesture recognizer to recognize right swipes, three finger
+    UISwipeGestureRecognizer *recognizer;
+    recognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeFrom:)];
+    [recognizer setNumberOfTouchesRequired:3];
+    recognizer.direction = UISwipeGestureRecognizerDirectionRight;
+    [self.view addGestureRecognizer:recognizer];
+    // once we add its properties we don't need it
+    [recognizer release];
+    // now create one for the left swipe, also three finger
+    recognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeFrom:)];
+    [recognizer setNumberOfTouchesRequired:3];
+    recognizer.direction = UISwipeGestureRecognizerDirectionLeft;
+    [self.view addGestureRecognizer:recognizer];
+    [recognizer release];
+}
+
+// handle received swipe gestures 
+- (void)handleSwipeFrom:(UISwipeGestureRecognizer *)recognizer 
+{    
+    // move it away if we're centered already
+    if ( CGAffineTransformIsIdentity(menuView.transform) ) 
+    {
+        [UIView beginAnimations:nil context:nil];
+        [UIView setAnimationDuration:0.5];
+        if ( recognizer.direction == UISwipeGestureRecognizerDirectionRight )
+            menuView.transform = CGAffineTransformMakeTranslation(1000.0, 0.0);
+        else
+            menuView.transform = CGAffineTransformMakeTranslation(-1000.0, 0.0);
+        [UIView commitAnimations];
+        
+        [IPTextField resignFirstResponder];
+        
+    }
+    
+    // center it if we're moved away already
+    else
+    {
+        if ( recognizer.direction == UISwipeGestureRecognizerDirectionRight )
+            menuView.transform = CGAffineTransformMakeTranslation(-1000.0, 0.0);
+        else
+            menuView.transform = CGAffineTransformMakeTranslation(1000.0, 0.0);
+        
+        [UIView beginAnimations:nil context:nil];
+        [UIView setAnimationDuration:0.5];
+        menuView.transform = CGAffineTransformIdentity;
+        [UIView commitAnimations];
+    }
+}
+
+- (IBAction)closeMenu
+{
+    [UIView beginAnimations:nil context:nil];
+    [UIView setAnimationDuration:0.5];
+    menuView.transform = CGAffineTransformMakeTranslation(-1000.0, 0.0);
+    [UIView commitAnimations];
+    
+    [IPTextField resignFirstResponder];
+}
+
+- (IBAction)changeIP:(UITextField*)sender
+{
+    [IPTextField resignFirstResponder];
+    [osc changeIP:IPTextField.text];
+    
+    [[NSUserDefaults standardUserDefaults] setObject:IPTextField.text forKey:@"IP"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+- (IBAction)lockExposure
+{    
+    // grab all inputs
+    NSArray * inputs = captureSession.inputs;
+    // if inputs exist, we'll proceed to try locking
+    if ( [inputs count] ) 
+    {
+        AVCaptureDeviceInput * inputDevice = [inputs objectAtIndex:0];
+
+        NSError * outError;
+        // attempt to lock camera for config
+        if ( [inputDevice.device lockForConfiguration:&outError] )
+        {
+            inputDevice.device.exposureMode = (inputDevice.device.exposureMode == AVCaptureExposureModeLocked) ? 
+            AVCaptureExposureModeContinuousAutoExposure : AVCaptureExposureModeLocked;
+            [exposureLockButton updateState];
+            [inputDevice.device unlockForConfiguration];
+        }
+    }
+
 }
 
 // rotation helper function
@@ -256,7 +365,6 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     CGColorSpaceRelease(colorSpace);
     
     
-    // TODO: Figure out why the camera feed is coming through rotated & transformed in these images.
     UIImage *image= [UIImage imageWithCGImage:newImage scale:1.0 orientation:UIImageOrientationUp];
     IplImage *img_color = [self CreateIplImageFromUIImage:image];
     IplImage *img_greyscale = cvCreateImage(cvGetSize(img_color), IPL_DEPTH_8U, 1);
@@ -264,7 +372,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     IplImage *img_binary = cvCreateImage(cvGetSize(img_greyscale), IPL_DEPTH_8U, 1);
 
     cvThreshold(img_greyscale, img_binary, 190, 255, CV_THRESH_BINARY);
-    
+
     CvMemStorage* storage = cvCreateMemStorage(0);
     CvSeq* contours;
     int numContours = cvFindContours( img_binary , storage, &contours, sizeof(CvContour),
@@ -275,6 +383,8 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     int contour_index = 0;
     int num_angles = 0;
     float angle_sum = 0;
+    [osc sendValue:numContours * 10 withKey:@"test"];
+
     while( contours )
     {
         //NSLog(@"Contour %d has a total of %d", contour_index, contours->total);
@@ -339,6 +449,8 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
     [self.imageView performSelectorOnMainThread:@selector(setImage:) withObject:rotatedImage waitUntilDone:YES];
     
+    //cvRelease(&contours);
+    cvReleaseMemStorage(&storage);
     cvReleaseImage(&img_binary);
     cvReleaseImage(&img_color);
     cvReleaseImage(&img_greyscale);
@@ -382,6 +494,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
 - (void)dealloc {
 	[self.captureSession release];
+    [osc release];
     [super dealloc];
 }
 
@@ -392,4 +505,45 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     return YES;
 }
 
+@end
+
+@implementation UIToggleButton
+@synthesize isOn;
+
+- (id) initWithCoder:(NSCoder *)aDecoder
+{
+    if ( (self = [super initWithCoder:aDecoder]) )
+    {
+        indicator = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"switchUp.png"]];
+        indicator.frame = CGRectMake(0.0, 0.0, self.frame.size.height/2.5, self.frame.size.height/2.5);
+        indicator.center = CGPointMake(indicator.frame.size.width, self.frame.size.height/2.0);
+        [self addSubview:indicator];
+        isOn = NO;
+    }
+    return self;
+}
+
+- (void)turnOn
+{
+    indicator.image = [UIImage imageNamed:@"switchDown.png"];
+    isOn = YES;
+}
+
+- (void)turnOff
+{
+    indicator.image = [UIImage imageNamed:@"switchUp.png"];
+    isOn = NO;
+}
+
+- (void)updateState
+{
+    if (isOn) [self turnOff];
+    else [self turnOn];
+}
+
+- (void)dealloc
+{
+    [indicator release];
+    [super dealloc];
+}
 @end
