@@ -403,10 +403,18 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     IplImage *img_alpha = cvCreateImage(cvGetSize(img_color), IPL_DEPTH_8U, 1);
     cvSplit(img_color, img_blue, img_green, img_red, img_alpha);
     
+    IplImage *img_temp = cvCreateImage(cvGetSize(img_color), IPL_DEPTH_8U, 1);
+    
+    cvXor(img_blue, img_green, img_temp);
+    cvXor(img_temp, img_red, img_temp);
+    cvAnd(img_temp, img_blue, img_blue);
+    cvAnd(img_temp, img_green, img_green);
+    cvAnd(img_temp, img_red, img_red);
+    
     // TODO: Check for exclusive color here
-    cvThreshold(img_blue, img_blue, 200, 255, CV_THRESH_BINARY);
-    cvThreshold(img_green, img_green, 200, 255, CV_THRESH_BINARY);
-    cvThreshold(img_red, img_red, 200, 255, CV_THRESH_BINARY);
+    cvThreshold(img_blue, img_blue, 170, 255, CV_THRESH_BINARY);
+    cvThreshold(img_green, img_green, 170, 255, CV_THRESH_BINARY);
+    cvThreshold(img_red, img_red, 170, 255, CV_THRESH_BINARY);
     cvMerge(img_blue, img_green, img_red, img_alpha, img_color);
     
     IplImage *img_greyscale = cvCreateImage(cvGetSize(img_color), IPL_DEPTH_8U, 1);
@@ -533,7 +541,8 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     cvReleaseImage(&img_blue);
     cvReleaseImage(&img_alpha);
     cvReleaseImage(&img_greyscale);
-    cvReleaseImage(&ipl_result);    
+    cvReleaseImage(&ipl_result);   
+    cvReleaseImage(&img_temp);
     
 //    cvSetErrMode(CV_ErrModeParent);
 //    UIImage *image= [UIImage imageWithCGImage:newImage scale:1.0 orientation:UIImageOrientationDown];
