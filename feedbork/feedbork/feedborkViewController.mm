@@ -228,6 +228,7 @@
             inputDevice.device.exposureMode = (inputDevice.device.exposureMode == AVCaptureExposureModeLocked) ? 
             AVCaptureExposureModeContinuousAutoExposure : AVCaptureExposureModeLocked;
             [exposureLockButton updateState];
+            [inputDevice.device unlockForConfiguration];
         }
     }
 
@@ -364,7 +365,6 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     CGColorSpaceRelease(colorSpace);
     
     
-    // TODO: Figure out why the camera feed is coming through rotated & transformed in these images.
     UIImage *image= [UIImage imageWithCGImage:newImage scale:1.0 orientation:UIImageOrientationUp];
     IplImage *img_color = [self CreateIplImageFromUIImage:image];
     IplImage *img_greyscale = cvCreateImage(cvGetSize(img_color), IPL_DEPTH_8U, 1);
@@ -403,6 +403,8 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
     [self.imageView performSelectorOnMainThread:@selector(setImage:) withObject:rotatedImage waitUntilDone:YES];
     
+    //cvRelease(&contours);
+    cvReleaseMemStorage(&storage);
     cvReleaseImage(&img_binary);
     cvReleaseImage(&img_color);
     cvReleaseImage(&img_greyscale);
