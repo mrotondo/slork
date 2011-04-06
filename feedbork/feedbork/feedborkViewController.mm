@@ -405,9 +405,9 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     
     IplImage *img_temp = cvCreateImage(cvGetSize(img_color), IPL_DEPTH_8U, 1);
     
-    cvThreshold(img_blue, img_blue, 170, 255, CV_THRESH_BINARY);
-    cvThreshold(img_green, img_green, 170, 255, CV_THRESH_BINARY);
-    cvThreshold(img_red, img_red, 170, 255, CV_THRESH_BINARY);
+    cvThreshold(img_blue, img_blue, 220, 255, CV_THRESH_BINARY);
+    cvThreshold(img_green, img_green, 220, 255, CV_THRESH_BINARY);
+    cvThreshold(img_red, img_red, 220, 255, CV_THRESH_BINARY);
     
     cvXor(img_blue, img_green, img_temp);
     cvXor(img_temp, img_red, img_temp);
