@@ -100,7 +100,7 @@
     
     AVCaptureVideoDataOutput *captureOutput = [[AVCaptureVideoDataOutput alloc] init];
     captureOutput.alwaysDiscardsLateVideoFrames = YES; 
-    captureOutput.minFrameDuration = CMTimeMake(1, 10);
+    //captureOutput.minFrameDuration = CMTimeMake(1, 10);
 
     dispatch_queue_t queue;
 	queue = dispatch_queue_create("cameraQueue", NULL);
@@ -115,28 +115,23 @@
     self.captureSession = [[AVCaptureSession alloc] init];
 	[self.captureSession addInput:captureInput];
 	[self.captureSession addOutput:captureOutput];
-    
-    captureSession.sessionPreset = AVCaptureSessionPresetHigh;
 
-    self.previewLayer = [AVCaptureVideoPreviewLayer layerWithSession: self.captureSession];
-    self.previewLayer.frame = CGRectMake(0.0, 0.0, self.view.bounds.size.width - borderSlider.value/2.0, self.view.bounds.size.height - borderSlider.value/2.0);
-    self.previewLayer.position = self.view.center;
-	self.previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
-	[self.view.layer addSublayer: self.previewLayer];
+    captureSession.sessionPreset = AVCaptureSessionPresetMedium;
 
-    //self.imageView = [[UIImageView alloc] init];
-	//self.imageView.frame = CGRectMake(0, 0, 153, 204);
-    //[self.view addSubview:self.imageView];
-    
     maskView = [[UIView alloc] initWithFrame:self.view.bounds];
     [maskView setBackgroundColor:[UIColor blackColor]];
     maskView.alpha = 0.0;
     [self.view addSubview:maskView];
     
+    self.imageView = [[UIImageView alloc] init];
+	self.imageView.frame = CGRectMake(0.0, 0.0, self.view.bounds.size.width - borderSlider.value/2.0, self.view.bounds.size.height - borderSlider.value/2.0);
+    self.imageView.center = self.view.center;
+    [self.view addSubview:self.imageView];
     
     // bring menu to front again and then hide it
     [self.view bringSubviewToFront:menuView];
     menuView.transform = CGAffineTransformMakeTranslation(-1000.0, 0.0);
+    
     
 	[self.captureSession startRunning];
 }
@@ -264,8 +259,8 @@
 
 - (IBAction)changeBorder:(UISlider*)slider
 {
-    self.previewLayer.frame = CGRectMake(0.0, 0.0, self.view.bounds.size.width - borderSlider.value/2.0, self.view.bounds.size.height - borderSlider.value/2.0);
-    self.previewLayer.position = self.view.center;
+    self.imageView.frame = CGRectMake(0.0, 0.0, self.view.bounds.size.width - borderSlider.value/2.0, self.view.bounds.size.height - borderSlider.value/2.0);
+    self.imageView.center = self.view.center;
 }
 
 // rotation helper function
@@ -401,45 +396,142 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     
     UIImage *image= [UIImage imageWithCGImage:newImage scale:1.0 orientation:UIImageOrientationUp];
     IplImage *img_color = [self CreateIplImageFromUIImage:image];
+    
+    IplImage *img_blue = cvCreateImage(cvGetSize(img_color), IPL_DEPTH_8U, 1);
+    IplImage *img_green = cvCreateImage(cvGetSize(img_color), IPL_DEPTH_8U, 1);
+    IplImage *img_red = cvCreateImage(cvGetSize(img_color), IPL_DEPTH_8U, 1);
+    IplImage *img_alpha = cvCreateImage(cvGetSize(img_color), IPL_DEPTH_8U, 1);
+    cvSplit(img_color, img_blue, img_green, img_red, img_alpha);
+    
+    // TODO: Check for exclusive color here
+    cvThreshold(img_blue, img_blue, 200, 255, CV_THRESH_BINARY);
+    cvThreshold(img_green, img_green, 200, 255, CV_THRESH_BINARY);
+    cvThreshold(img_red, img_red, 200, 255, CV_THRESH_BINARY);
+    cvMerge(img_blue, img_green, img_red, img_alpha, img_color);
+    
     IplImage *img_greyscale = cvCreateImage(cvGetSize(img_color), IPL_DEPTH_8U, 1);
     cvCvtColor(img_color, img_greyscale, CV_BGR2GRAY);
-    IplImage *img_binary = cvCreateImage(cvGetSize(img_greyscale), IPL_DEPTH_8U, 1);
-
-    cvThreshold(img_greyscale, img_binary, 20, 255, CV_THRESH_TOZERO);
+    IplImage *img_threshold = cvCreateImage(cvGetSize(img_greyscale), IPL_DEPTH_8U, 1);
+    IplImage *img_lines = cvCreateImage(cvGetSize(img_greyscale), IPL_DEPTH_8U, 1);
     
-    CvMemStorage* storage = cvCreateMemStorage(0);
+    cvThreshold(img_greyscale, img_threshold, 190, 255, CV_THRESH_BINARY);
+
+    cvCanny(img_greyscale, img_lines, 50, 200, 3);
+    
+    CvMemStorage* line_storage = cvCreateMemStorage(0);
+    CvSeq* lines = 0;
+    lines = cvHoughLines2(img_lines,
+                          line_storage,
+                          CV_HOUGH_PROBABILISTIC,
+                          1,
+                          CV_PI/180,
+                          80,
+                          30,
+                          10 );
+    
+    int num_angles = 0;
+    float angle_sum = 0;
+    for( int line_index = 0; line_index < lines->total; line_index++ )
+    {
+        CvPoint* line = (CvPoint*)cvGetSeqElem(lines, line_index);
+        CvPoint p1 = line[0];
+        CvPoint p2 = line[1];
+        cvLine( img_color, line[0], line[1], CV_RGB(255,0,0), 3, 8 );
+
+        num_angles++;
+        // jam all angles into a single quadrant
+        angle_sum += fmod(fabs(atan2f(p1.y - p2.y, p1.x - p2.x)), M_PI / 2.0);
+    }
+    
+    if (num_angles > 0) {
+        float average_angle = angle_sum / num_angles;
+        [osc sendValue:average_angle * 400 withKey:@"test"];
+    } else {
+        [osc sendValue:0 withKey:@"test"];
+    }
+    
+    CvMemStorage* contour_storage = cvCreateMemStorage(0);
     CvSeq* contours;
-    int numContours = cvFindContours( img_binary , storage, &contours, sizeof(CvContour),
+    int numContours = cvFindContours( img_threshold , contour_storage, &contours, sizeof(CvContour),
                                      CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, cvPoint(0,0) );
-    NSLog(@"Got %d contours!", numContours);
+    //NSLog(@"Got %d contours!", numContours);
     
-    [osc sendValue:numContours*10 withKey:@"test"];
+    //CvSeq* result;
+    int contour_index = 0;
+    //[osc sendValue:numContours * 10 withKey:@"test"];
 
-    
     while( contours )
     {
+        //NSLog(@"Contour %d has a total of %d", contour_index, contours->total);
+        
+        if (contours->total > 20)
+        {
+            
+            CvPoint* p1;
+            CvPoint* p2;
+            for (int seq_index = 1; seq_index < contours->total; seq_index++) {
+                p1 = (CvPoint*)cvGetSeqElem( contours, seq_index );
+                p2 = (CvPoint*)cvGetSeqElem( contours, seq_index - 1 );
+            }
+        }
+//        result = cvApproxPoly(contours, sizeof(CvContour), contour_storage,
+//                              CV_POLY_APPROX_DP, cvContourPerimeter(contours)*0.02, 0 );
+//
+//        int i = 0;
+//        
+//        NSLog(@"Contour %d has a total of %d", contour_index, result->total);
+//        NSLog(@"Contour %d has an area of %f", contour_index, fabs(cvContourArea(result,CV_WHOLE_SEQ)));
+//        if (cvCheckContourConvexity(result)) {
+//            NSLog(@"Contour %d is convex", contour_index);
+//        } else {
+//            NSLog(@"Contour %d is not convex", contour_index);
+//        }
+//        
+//        if( result->total > 4 &&
+//           fabs(cvContourArea(result,CV_WHOLE_SEQ)) > 300 &&
+//           cvCheckContourConvexity(result) )
+//        {
+//            i++;            
+//        }
+//        
+//        NSLog(@"Got some squares-ish: %d", i);
+        
         // take the next contour
+        contour_index++;
         contours = contours->h_next;
     }
     
+//    if (num_angles > 0)
+//        NSLog(@"Average angle is %f", angle_sum / num_angles);
+//    else
+//        NSLog(@"No sufficiently large contours found!");
+    
     // Convert black and whilte to 24bit image then convert to UIImage to show
-    IplImage *ipl_result = cvCreateImage(cvGetSize(img_binary), IPL_DEPTH_8U, 3);
-    for(int y=0; y<img_binary->height; y++) {
-        for(int x=0; x<img_binary->width; x++) {
+    IplImage *ipl_result = cvCreateImage(cvGetSize(img_threshold), IPL_DEPTH_8U, 3);
+    for(int y = 0; y < img_threshold->height; y++) {
+        for(int x = 0; x < img_threshold->width; x++) {
             char *p = ipl_result->imageData + y * ipl_result->widthStep + x * 3;
-            *p = *(p+1) = *(p+2) = img_binary->imageData[y * img_binary->widthStep + x];
+            *p = *(p+1) = *(p+2) = img_threshold->imageData[y * img_threshold->widthStep + x];
         }
     }
     
     //ipl_result
-    UIImage * rotatedImage = [self rotate:[self UIImageFromIplImage:ipl_result] to:UIImageOrientationRightMirrored];
+    UIImage * rotatedImage = [self rotate:[self UIImageFromIplImage:img_color] to:UIImageOrientationRightMirrored];
     
 
     [self.imageView performSelectorOnMainThread:@selector(setImage:) withObject:rotatedImage waitUntilDone:YES];
     
-    cvReleaseMemStorage(&storage);
-    cvReleaseImage(&img_binary);
+
+//    cvRelease(&contours);
+//    cvRelease(&lines);
+    cvReleaseMemStorage(&contour_storage);
+    cvReleaseMemStorage(&line_storage);
+    cvReleaseImage(&img_threshold);
     cvReleaseImage(&img_color);
+    cvReleaseImage(&img_red);
+    cvReleaseImage(&img_green);
+    cvReleaseImage(&img_blue);
+    cvReleaseImage(&img_alpha);
     cvReleaseImage(&img_greyscale);
     cvReleaseImage(&ipl_result);    
     
