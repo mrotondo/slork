@@ -22,6 +22,8 @@
 		B24001C3134ADACA001C4090 /* feedborkOSC.mm in Sources */ = {isa = PBXBuildFile; fileRef = B24001C2134ADACA001C4090 /* feedborkOSC.mm */; };
 		B24001CE134BB38D001C4090 /* switchDown.png in Resources */ = {isa = PBXBuildFile; fileRef = B24001CC134BB38D001C4090 /* switchDown.png */; };
 		B24001CF134BB38D001C4090 /* switchUp.png in Resources */ = {isa = PBXBuildFile; fileRef = B24001CD134BB38D001C4090 /* switchUp.png */; };
+		B253B7B9134D22AA0026F3FC /* feedborkViewController-iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = B253B7B5134D22AA0026F3FC /* feedborkViewController-iPhone.xib */; };
+		B253B7BA134D22AA0026F3FC /* MainWindow-iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = B253B7B7134D22AA0026F3FC /* MainWindow-iPhone.xib */; };
 		D52B9B0D13469E8800BF4E99 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D52B9B0C13469E8800BF4E99 /* UIKit.framework */; };
 		D52B9B0F13469E8800BF4E99 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D52B9B0E13469E8800BF4E99 /* Foundation.framework */; };
 		D52B9B1113469E8800BF4E99 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D52B9B1013469E8800BF4E99 /* CoreGraphics.framework */; };
@@ -72,6 +74,8 @@
 		B24001C2134ADACA001C4090 /* feedborkOSC.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = feedborkOSC.mm; sourceTree = "<group>"; };
 		B24001CC134BB38D001C4090 /* switchDown.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = switchDown.png; sourceTree = "<group>"; };
 		B24001CD134BB38D001C4090 /* switchUp.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = switchUp.png; sourceTree = "<group>"; };
+		B253B7B6134D22AA0026F3FC /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = "en.lproj/feedborkViewController-iPhone.xib"; sourceTree = "<group>"; };
+		B253B7B8134D22AA0026F3FC /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = "en.lproj/MainWindow-iPhone.xib"; sourceTree = "<group>"; };
 		D52B9B0813469E8800BF4E99 /* feedbork.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = feedbork.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D52B9B0C13469E8800BF4E99 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		D52B9B0E13469E8800BF4E99 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -237,10 +241,12 @@
 			children = (
 				D52B9B1B13469E8800BF4E99 /* feedborkAppDelegate.h */,
 				D52B9B1C13469E8800BF4E99 /* feedborkAppDelegate.mm */,
-				D52B9B1E13469E8800BF4E99 /* MainWindow.xib */,
 				D52B9B2113469E8800BF4E99 /* feedborkViewController.h */,
 				D52B9B2213469E8800BF4E99 /* feedborkViewController.mm */,
+				D52B9B1E13469E8800BF4E99 /* MainWindow.xib */,
 				D52B9B2413469E8800BF4E99 /* feedborkViewController.xib */,
+				B253B7B5134D22AA0026F3FC /* feedborkViewController-iPhone.xib */,
+				B253B7B7134D22AA0026F3FC /* MainWindow-iPhone.xib */,
 				B24001C1134ADACA001C4090 /* feedborkOSC.h */,
 				B24001C2134ADACA001C4090 /* feedborkOSC.mm */,
 				D52B9B1313469E8800BF4E99 /* Supporting Files */,
@@ -312,6 +318,8 @@
 				B2400177134AD269001C4090 /* icon.png in Resources */,
 				B24001CE134BB38D001C4090 /* switchDown.png in Resources */,
 				B24001CF134BB38D001C4090 /* switchUp.png in Resources */,
+				B253B7B9134D22AA0026F3FC /* feedborkViewController-iPhone.xib in Resources */,
+				B253B7BA134D22AA0026F3FC /* MainWindow-iPhone.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -342,6 +350,22 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
+		B253B7B5134D22AA0026F3FC /* feedborkViewController-iPhone.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				B253B7B6134D22AA0026F3FC /* en */,
+			);
+			name = "feedborkViewController-iPhone.xib";
+			sourceTree = "<group>";
+		};
+		B253B7B7134D22AA0026F3FC /* MainWindow-iPhone.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				B253B7B8134D22AA0026F3FC /* en */,
+			);
+			name = "MainWindow-iPhone.xib";
+			sourceTree = "<group>";
+		};
 		D52B9B1513469E8800BF4E99 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -420,6 +444,7 @@
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -439,6 +464,7 @@
 					"\"$(SRCROOT)/lib\"",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				WRAPPER_EXTENSION = app;
 			};

@@ -30,8 +30,10 @@
 	<string>1.0</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>NSMainNibFile</key>
+	<key>NSMainNibFile~ipad</key>
 	<string>MainWindow</string>
+	<key>NSMainNibFile~iphone</key>
+	<string>MainWindow-iPhone</string>
 	<key>UIApplicationExitsOnSuspend</key>
 	<true/>
 	<key>UIPrerenderedIcon</key>

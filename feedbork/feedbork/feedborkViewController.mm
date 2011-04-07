@@ -132,6 +132,10 @@
     [self.view bringSubviewToFront:menuView];
     menuView.transform = CGAffineTransformMakeTranslation(-1000.0, 0.0);
     
+    self.previewLayer = [AVCaptureVideoPreviewLayer layerWithSession: self.captureSession];
+	self.previewLayer.frame = CGRectMake(0, 0, 76, 102);
+	self.previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
+	[menuView.layer addSublayer: self.previewLayer];
     
 	[self.captureSession startRunning];
 }
@@ -161,6 +165,12 @@
     recognizer.direction = UISwipeGestureRecognizerDirectionLeft;
     [self.view addGestureRecognizer:recognizer];
     [recognizer release];
+    
+    // setup colors
+    colorThresh[0] = colorThresh[1] = colorThresh[2] = 128;
+    myColor = 2;
+    myFriendsColor = 1;
+    
 }
 
 // handle received swipe gestures 
@@ -199,14 +209,14 @@
 // color picker functions
 - (IBAction)chooseMyColor:(UIButton*)sender
 {
-    myColor = sender.backgroundColor;
+    myColor = sender.tag;
     [self.view setBackgroundColor:sender.backgroundColor];
     myColorPicker.center = sender.center;
 }
 
 - (IBAction)chooseMyFriendsColor:(UIButton*)sender
 {
-    myFriendsColor = sender.backgroundColor;
+    myFriendsColor = sender.tag;
     myFriendsColorPicker.center = sender.center;
 }
 
@@ -261,6 +271,12 @@
 {
     self.imageView.frame = CGRectMake(0.0, 0.0, self.view.bounds.size.width - borderSlider.value/2.0, self.view.bounds.size.height - borderSlider.value/2.0);
     self.imageView.center = self.view.center;
+}
+
+- (IBAction)changeColorThreshold:(UISlider*)slider
+{
+    //NSLog(@"moving slider: %d with value %f",slider.tag,slider.value);
+    colorThresh[slider.tag] = slider.value;
 }
 
 // rotation helper function
@@ -386,45 +402,72 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     size_t width = CVPixelBufferGetWidth(imageBuffer); 
     size_t height = CVPixelBufferGetHeight(imageBuffer);  
 
-    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB(); 
-    CGContextRef newContext = CGBitmapContextCreate(baseAddress, width, height, 8, bytesPerRow, colorSpace, kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
-    CGImageRef newImage = CGBitmapContextCreateImage(newContext); 
-
-    CGContextRelease(newContext); 
-    CGColorSpaceRelease(colorSpace);
-    
-    
-    UIImage *image= [UIImage imageWithCGImage:newImage scale:1.0 orientation:UIImageOrientationUp];
-    IplImage *img_color = [self CreateIplImageFromUIImage:image];
-    
-    // set a threshold!
-    char thresh = 190;
     // find the current origin for the raw data
-    char *startingPoint = img_color->imageDataOrigin;
+    //uint8_t *startingPoint = img_color->imageData;
     // iterate through the data in chunks of 4 (BGRA) discarding A
-    for ( int i = 0; i < img_color->imageSize; i+=4 )
+    for ( int i = 0; i < width * height * 4; i+=4 )
     {
         // Grab the raw memory addresses
-        char *B = (startingPoint + i);
-        char *G = (startingPoint + i + 1);
-        char *R = (startingPoint + i + 2);        
+        uint8_t *myPtr = (baseAddress + i + myColor);
+        uint8_t *myFriendsPtr = (baseAddress + i + myFriendsColor);
+        uint8_t *otherPtr = (baseAddress + i + 3 - (myColor + myFriendsColor));
+        
+        //*B = 0;
+        //*G = 0;
+        //*R = 0;
+        //*A = 0;
        
         // Now change contents at that point in memory----
         // binary bin for each color channel (except alpha)
-        *R = ( *R > thresh) ? 255 : 0;
-        *G = ( *G > thresh) ? 255 : 0;
-        *B = ( *B > thresh) ? 255 : 0;
+//        *R = ( *R > colorThresh[0]*255) ? 255 : 0;
+//        *G = ( *G > colorThresh[1]*255) ? 255 : 0;
+//        *B = ( *B > colorThresh[2]*255) ? 255 : 0;
+        
+//        *R = (char)((float)*R * colorThresh[0]);
+//        *G = (char)((float)*G * colorThresh[1]);
+//        *B = (char)((float)*B * colorThresh[2]);
         
         // exclusive or some stuff
-        char T = 0;
-        if ( *R && *G ) { *R = *G = 0; T = 255; }
-        if ( T && *B ) *B = 0;
+//        if ( *R && *G ) { *R = *G = 0;}
+//        if ( *R && *B ) { *R = *B = 0;}
+//        if ( *B && *G ) { *B = *G = 0;}
+        
+        // target red
+        // Now change contents at that point in memory----
+        // binary bin for each color channel (except alpha)
+        *myPtr = ( *myPtr > colorThresh[myColor]) ? 255 : 0;
+        *myFriendsPtr = ( *myFriendsPtr > colorThresh[myFriendsColor]) ? 255 : 0;
+        
+        //        *R = (char)((float)*R * colorThresh[0]);
+        //        *G = (char)((float)*G * colorThresh[1]);
+        //        *B = (char)((float)*B * colorThresh[2]);
+        
+        //if ( i == 200) NSLog(@"%d %d %d", (uint8_t)*R, (uint8_t)*G, (uint8_t)*B);
+        
+        if (*myPtr == 255 && *myFriendsPtr == 255 ||
+            *myPtr == 255 && *otherPtr > colorThresh[3 - (myColor + myFriendsColor)] ||
+            *myFriendsPtr == 255 && *otherPtr > colorThresh[3 - (myColor + myFriendsColor)]
+            ) {
+            *myPtr = 0;
+            *myFriendsPtr = 0;
+        }
+        *otherPtr = 0;
     }
+    
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB(); 
+    CGContextRef newContext = CGBitmapContextCreate(baseAddress, width, height, 8, bytesPerRow, colorSpace, kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
+    CGImageRef newImage = CGBitmapContextCreateImage(newContext); 
+    
+    CGContextRelease(newContext); 
+    CGColorSpaceRelease(colorSpace);
+    
+    UIImage *image= [UIImage imageWithCGImage:newImage scale:1.0 orientation:UIImageOrientationUp];
+    IplImage *img_color = [self CreateIplImageFromUIImage:image];
         
     IplImage *img_greyscale = cvCreateImage(cvGetSize(img_color), IPL_DEPTH_8U, 1);
     cvCvtColor(img_color, img_greyscale, CV_BGR2GRAY);
     IplImage *img_lines = cvCreateImage(cvGetSize(img_greyscale), IPL_DEPTH_8U, 1);
-    cvCanny(img_greyscale, img_lines, 50, 200, 3);
+    cvCanny(img_greyscale, img_lines, 50, 100, 3);
     
     CvMemStorage* line_storage = cvCreateMemStorage(0);
     CvSeq* lines = 0;

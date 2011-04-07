@@ -27,10 +27,11 @@
     feedborkOSC *osc;
     
     // color picker stuff
-    UIColor * myColor;
-    UIColor * myFriendsColor;
+    int myColor;
+    int myFriendsColor;
     IBOutlet UIView * myColorPicker;
     IBOutlet UIView * myFriendsColorPicker;
+    float colorThresh[3];
     
     // menu stuff
     IBOutlet UIView *menuView;
@@ -59,6 +60,7 @@
 - (IBAction)lockExposure;
 - (IBAction)changeAlpha:(UISlider*)slider;
 - (IBAction)changeBorder:(UISlider*)slider;
+- (IBAction)changeColorThreshold:(UISlider*)slider;
 
 @end
 
