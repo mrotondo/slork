@@ -169,7 +169,6 @@
 								<string key="NSFrame">{{691, 257}, {72, 37}}</string>
 								<reference key="NSSuperview" ref="321836072"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView"/>
 								<object class="NSColor" key="IBUIBackgroundColor" id="128836821">
 									<int key="NSColorSpace">3</int>
 									<bytes key="NSWhite">MC4zMzMzMzMzMzMzAA</bytes>
@@ -506,6 +505,7 @@
 				<reference key="NSWindow"/>
 				<reference key="NSNextKeyView" ref="321836072"/>
 				<reference key="IBUIBackgroundColor" ref="216077699"/>
+				<bool key="IBUIMultipleTouchEnabled">YES</bool>
 				<string key="targetRuntimeIdentifier">IBIPadFramework</string>
 			</object>
 		</object>

@@ -38,6 +38,11 @@
     IBOutlet UITextField *IPTextField;
     IBOutlet UISlider *borderSlider;
     IBOutlet UIToggleButton * exposureLockButton;
+    
+    // quadrant stuff
+    CGRect quadrant[4];
+    int quadTouches[4];
+    float sWidth, sHeight;
 }
 
 @property (nonatomic, retain) AVCaptureSession *captureSession;
@@ -46,6 +51,7 @@
 
 - (void)initCapture;
 - (void)initMenu;
+- (void)initQuadrants;
 - (AVCaptureDevice *)frontFacingCameraIfAvailable;
 - (IplImage *)CreateIplImageFromUIImage:(UIImage *)image;
 - (UIImage *)UIImageFromIplImage:(IplImage *)image;
