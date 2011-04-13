@@ -14,8 +14,8 @@
 }
 
 @property (nonatomic,retain) id <feedborkDoodadDelegate> delegate;
-
-- (void) animateMe:(CGPoint)originalcenter;
+- (id)initWithImageNamed:(NSString*)_imageName superview:(UIView*)sview center:(CGPoint)_center size:(CGSize)_size color:(UIColor*)_color delegate:(id)_delegate;
+- (void)animateMe:(CGPoint)originalcenter;
 
 @end
 
