@@ -143,7 +143,7 @@
     self.previewLayer = [AVCaptureVideoPreviewLayer layerWithSession: self.captureSession];
 	self.previewLayer.frame = self.view.bounds;//CGRectMake(0, 0, 76, 102);
 	self.previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
-	[self.view.layer addSublayer: self.previewLayer];
+	//[self.view.layer addSublayer: self.previewLayer];
     [self.view bringSubviewToFront: maskView];
     [self.view bringSubviewToFront:menuView];
 
@@ -434,219 +434,72 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     size_t width = CVPixelBufferGetWidth(imageBuffer); 
     size_t height = CVPixelBufferGetHeight(imageBuffer);  
 
-    // find the current origin for the raw data
-    //uint8_t *startingPoint = img_color->imageData;
-    // iterate through the data in chunks of 4 (BGRA) discarding A
-    for ( int i = 0; i < width * height * 4; i+=4 )
-    {
-        // Grab the raw memory addresses
-        uint8_t *myPtr = (baseAddress + i + myColor);
-        uint8_t *myFriendsPtr = (baseAddress + i + myFriendsColor);
-        uint8_t *otherPtr = (baseAddress + i + 3 - (myColor + myFriendsColor));
-        
-        //*B = 0;
-        //*G = 0;
-        //*R = 0;
-        //*A = 0;
-       
-        // Now change contents at that point in memory----
-        // binary bin for each color channel (except alpha)
-//        *R = ( *R > colorThresh[0]*255) ? 255 : 0;
-//        *G = ( *G > colorThresh[1]*255) ? 255 : 0;
-//        *B = ( *B > colorThresh[2]*255) ? 255 : 0;
-        
-//        *R = (char)((float)*R * colorThresh[0]);
-//        *G = (char)((float)*G * colorThresh[1]);
-//        *B = (char)((float)*B * colorThresh[2]);
-        
-        // exclusive or some stuff
-//        if ( *R && *G ) { *R = *G = 0;}
-//        if ( *R && *B ) { *R = *B = 0;}
-//        if ( *B && *G ) { *B = *G = 0;}
-        
-        // target red
-        // Now change contents at that point in memory----
-        // binary bin for each color channel (except alpha)
-        *myPtr = ( *myPtr > colorThresh[myColor]) ? 255 : 0;
-        *myFriendsPtr = ( *myFriendsPtr > colorThresh[myFriendsColor]) ? 255 : 0;
-        
-        //        *R = (char)((float)*R * colorThresh[0]);
-        //        *G = (char)((float)*G * colorThresh[1]);
-        //        *B = (char)((float)*B * colorThresh[2]);
-        
-        //if ( i == 200) NSLog(@"%d %d %d", (uint8_t)*R, (uint8_t)*G, (uint8_t)*B);
-        
-        if (*myPtr == 255 && *myFriendsPtr == 255 ||
-            *myPtr == 255 && *otherPtr > colorThresh[3 - (myColor + myFriendsColor)] ||
-            *myFriendsPtr == 255 && *otherPtr > colorThresh[3 - (myColor + myFriendsColor)]
-            ) {
-            *myPtr = 0;
-            *myFriendsPtr = 0;
-        }
-        *otherPtr = 0;
-    }
+    // Leaving this here in case we want to do something with raw pixels again later.
+//    for ( int i = 0; i < width * height * 4; i+=4 )
+//    {
+//        // Grab the raw memory addresses
+//        uint8_t *r = (baseAddress + i + 0);
+//        uint8_t *g = (baseAddress + i + 1);
+//        uint8_t *b = (baseAddress + i + 2);
+//    }
     
-    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB(); 
+    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
     CGContextRef newContext = CGBitmapContextCreate(baseAddress, width, height, 8, bytesPerRow, colorSpace, kCGBitmapByteOrder32Little | kCGImageAlphaPremultipliedFirst);
     CGImageRef newImage = CGBitmapContextCreateImage(newContext); 
     
-    CGContextRelease(newContext); 
+    CGContextRelease(newContext);
     CGColorSpaceRelease(colorSpace);
     
     UIImage *image= [UIImage imageWithCGImage:newImage scale:1.0 orientation:UIImageOrientationUp];
-    IplImage *img_color = [self CreateIplImageFromUIImage:image];
-        
+    IplImage *img_color = [self CreateIplImageFromUIImage:image];        
     IplImage *img_greyscale = cvCreateImage(cvGetSize(img_color), IPL_DEPTH_8U, 1);
     cvCvtColor(img_color, img_greyscale, CV_BGR2GRAY);
-    IplImage *img_lines = cvCreateImage(cvGetSize(img_greyscale), IPL_DEPTH_8U, 1);
-    cvCanny(img_greyscale, img_lines, 50, 100, 3);
+
+    CvMoments* moments = (CvMoments*)malloc( sizeof(CvMoments) );
+    cvMoments(img_greyscale, moments);
     
-    CvMemStorage* line_storage = cvCreateMemStorage(0);
-    CvSeq* lines = 0;
-//    lines = cvHoughLines2(img_lines,
-//                          line_storage,
-//                          CV_HOUGH_PROBABILISTIC,
-//                          1,
-//                          CV_PI/180,
-//                          80,
-//                          30,
-//                          10 );
-//    
-//    int max_line_index = 0;
-//    int max_line_length = 0;
-//    float dist;
-//    for( int line_index = 0; line_index < lines->total; line_index++ )
-//    {
-//        CvPoint* line = (CvPoint*)cvGetSeqElem(lines, line_index);
-//        CvPoint p1 = line[0];
-//        CvPoint p2 = line[1];
-//        
-//        dist = powf(p1.x - p2.x, 2) + powf(p1.y - p2.y, 2);
-//        if (dist > max_line_length) {
-//            max_line_length = dist;
-//            max_line_index = line_index;
-//        }
-//    }
-//    
-//    float angle;
-//    if (lines->total > 0) {
-//        CvPoint* line = (CvPoint*)cvGetSeqElem(lines, max_line_index);
-//        CvPoint p1 = line[0];
-//        CvPoint p2 = line[1];
-//        cvLine( img_color, line[0], line[1], CV_RGB(255,0,0), 3, 8 );
-//        
-//        angle = fmod(fabs(atan2f(p1.y - p2.y, p1.x - p2.x)), M_PI / 2.0);
-//        [osc sendValue:angle * 400 withKey:@"freq"];
-//        [osc sendValue:sqrt(max_line_length) / 2000 withKey:@"cutoff"];
-//    } else {
-//        [osc sendValue:0 withKey:@"freq"];
-//        [osc sendValue:0 withKey:@"cutoff"];
-//    }
-
-    //IplImage *img_threshold = cvCreateImage(cvGetSize(img_greyscale), IPL_DEPTH_8U, 1);
-    //cvThreshold(img_greyscale, img_threshold, 190, 255, CV_THRESH_BINARY);
-//    
-//    CvMemStorage* contour_storage = cvCreateMemStorage(0);
-//    CvSeq* contours;
-//    int numContours = cvFindContours( img_threshold , contour_storage, &contours, sizeof(CvContour),
-//                                     CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, cvPoint(0,0) );
-//    //NSLog(@"Got %d contours!", numContours);
-//    
-//    //CvSeq* result;
-//    int contour_index = 0;
-//    //[osc sendValue:numContours * 10 withKey:@"test"];
-//
-//    while( contours )
-//    {
-//        //NSLog(@"Contour %d has a total of %d", contour_index, contours->total);
-//        
-//        if (contours->total > 20)
-//        {
-//            
-//            CvPoint* p1;
-//            CvPoint* p2;
-//            for (int seq_index = 1; seq_index < contours->total; seq_index++) {
-//                p1 = (CvPoint*)cvGetSeqElem( contours, seq_index );
-//                p2 = (CvPoint*)cvGetSeqElem( contours, seq_index - 1 );
-//            }
-//        }
-////        result = cvApproxPoly(contours, sizeof(CvContour), contour_storage,
-////                              CV_POLY_APPROX_DP, cvContourPerimeter(contours)*0.02, 0 );
-////
-////        int i = 0;
-////        
-////        NSLog(@"Contour %d has a total of %d", contour_index, result->total);
-////        NSLog(@"Contour %d has an area of %f", contour_index, fabs(cvContourArea(result,CV_WHOLE_SEQ)));
-////        if (cvCheckContourConvexity(result)) {
-////            NSLog(@"Contour %d is convex", contour_index);
-////        } else {
-////            NSLog(@"Contour %d is not convex", contour_index);
-////        }
-////        
-////        if( result->total > 4 &&
-////           fabs(cvContourArea(result,CV_WHOLE_SEQ)) > 300 &&
-////           cvCheckContourConvexity(result) )
-////        {
-////            i++;            
-////        }
-////        
-////        NSLog(@"Got some squares-ish: %d", i);
-//        
-//        // take the next contour
-//        contour_index++;
-//        contours = contours->h_next;
-//    }
-//    
-////    if (num_angles > 0)
-////        NSLog(@"Average angle is %f", angle_sum / num_angles);
-////    else
-////        NSLog(@"No sufficiently large contours found!");
-//    
-//    // Convert black and whilte to 24bit image then convert to UIImage to show
-//    IplImage *ipl_result = cvCreateImage(cvGetSize(img_threshold), IPL_DEPTH_8U, 3);
-//    for(int y = 0; y < img_threshold->height; y++) {
-//        for(int x = 0; x < img_threshold->width; x++) {
-//            char *p = ipl_result->imageData + y * ipl_result->widthStep + x * 3;
-//            *p = *(p+1) = *(p+2) = img_threshold->imageData[y * img_threshold->widthStep + x];
-//        }
-//    }
-
-    UIImage * rotatedImage = [self rotate:[self UIImageFromIplImage:img_color] to:UIImageOrientationRightMirrored];
+    double area = moments->m00;
+    double m10 = moments->m10;
+    double m01 = moments->m01;
     
+    // Thanks, Wikipedia: http://en.wikipedia.org/wiki/Image_moment
+    double x = m10 / area;
+    double y = m01 / area;
+    
+    // Remap opencv's x and y to ours, and normalize to screen size
+    [osc sendValue:y / height withKey:@"centroid_x"];
+    [osc sendValue:1 - (x / width) withKey:@"centroid_y"];
 
+    
+    IplImage *img_threshold = cvCreateImage(cvGetSize(img_greyscale), IPL_DEPTH_8U, 1);
+    cvThreshold(img_greyscale, img_threshold, 160, 255, CV_THRESH_BINARY);
+    CvMemStorage* contour_storage = cvCreateMemStorage(0);
+    CvSeq* contours;
+    int numContours = cvFindContours( img_threshold , contour_storage, &contours, sizeof(CvContour),
+                                     CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, cvPoint(0,0) );
+    
+    [osc sendValue:numContours withKey:@"num_contours"];
+
+    
+    // Convert black and whilte to 24bit image then convert to UIImage to show
+    IplImage *ipl_result = cvCreateImage(cvGetSize(img_greyscale), IPL_DEPTH_8U, 3);
+    for(int y = 0; y < img_greyscale->height; y++) {
+        for(int x = 0; x < img_greyscale->width; x++) {
+            char *p = ipl_result->imageData + y * ipl_result->widthStep + x * 3;
+            *p = *(p+1) = *(p+2) = img_greyscale->imageData[y * img_greyscale->widthStep + x];
+        }
+    }
+
+    UIImage * rotatedImage = [self rotate:[self UIImageFromIplImage:ipl_result] to:UIImageOrientationRightMirrored];
     [self.imageView performSelectorOnMainThread:@selector(setImage:) withObject:rotatedImage waitUntilDone:YES];
 
-//    cvReleaseMemStorage(&contour_storage);
-    cvReleaseMemStorage(&line_storage);
-//    cvReleaseImage(&img_threshold);
-    cvReleaseImage(&img_lines);
+    cvReleaseMemStorage(&contour_storage);
+    cvReleaseImage(&img_threshold);
     cvReleaseImage(&img_color);
     cvReleaseImage(&img_greyscale);
-//    cvReleaseImage(&ipl_result);   
+    cvReleaseImage(&ipl_result);
     
-//    cvSetErrMode(CV_ErrModeParent);
-//    UIImage *image= [UIImage imageWithCGImage:newImage scale:1.0 orientation:UIImageOrientationDown];
-//    IplImage *img_color = [self CreateIplImageFromUIImage:image];
-//    IplImage *img = cvCreateImage(cvGetSize(img_color), IPL_DEPTH_8U, 1);
-//    cvCvtColor(img_color, img, CV_BGR2GRAY);
-//    cvReleaseImage(&img_color);
-//    
-//    // Detect edge
-//    IplImage *img2 = cvCreateImage(cvGetSize(img), IPL_DEPTH_8U, 1);
-//    cvCanny(img, img2, 64, 128, 3);
-//    cvReleaseImage(&img);
-//    
-//    // Convert black and whilte to 24bit image then convert to UIImage to show
-//    IplImage *result = cvCreateImage(cvGetSize(img2), IPL_DEPTH_8U, 3);
-//    for(int y=0; y<img2->height; y++) {
-//        for(int x=0; x<img2->width; x++) {
-//            char *p = result->imageData + y * result->widthStep + x * 3;
-//            *p = *(p+1) = *(p+2) = img2->imageData[y * img2->widthStep + x];
-//        }
-//    }
-//    cvReleaseImage(&img2);
-//    [self.imageView performSelectorOnMainThread:@selector(setImage:) withObject:[self UIImageFromIplImage:result] waitUntilDone:YES];
-//    cvReleaseImage(&result);
+    free(moments);
     
     CGImageRelease(newImage);
 	CVPixelBufferUnlockBaseAddress(imageBuffer,0);
