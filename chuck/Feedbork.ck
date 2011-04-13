@@ -41,9 +41,10 @@ OscRecv orec;
 9999 => orec.port;
 // start listening (launch thread)
 orec.listen();
-// sin osc for goofy testing
-//PulseOsc s => Gain g => dac;
-//0.1 => g.gain;
+
+// OMG Make sure you add melody.ck before you add this file!
+MelodyVoice voice;
+spork ~ voice.Play() @=> Shred @ voice_shred;
 
 orec.event("/IP,s") @=> OscEvent IP_event;
 OscSend xmit;

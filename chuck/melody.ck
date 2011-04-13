@@ -128,39 +128,54 @@ class Voice
     }
 }
 
-class Tenor extends Voice
+public class MelodyVoice extends Voice
 {
     
     NRev reverb;
     
-    ModalBar ugen => reverb => dac;
-    1 => ugen.preset;
+    ModalBar ugen1 => reverb => BPF bf => dac;
+    1 => ugen1.preset;
+    1200 => bf.freq;
+    7 => bf.Q;
     
-    VoicForm voice_ugen => dac;
-    "ahh" => voice_ugen.phoneme;
+    NRev reverb2;    
+    Wurley ugen2 => reverb2 => dac;
+    0.1 => reverb2.mix;
+
+    NRev reverb3;    
+    Wurley ugen3 => reverb3 => dac;
+    0.2 => reverb3.mix;
+    
+    PulseOsc ugen4 => BPF lf => ADSR env4 => NRev reverb4 => dac;
+    0.1 => reverb4.mix;
+    200::ms => env4.duration;
+    1 => lf.Q;
     
     SetGain(0.0);
     
     fun void SetFrequency(float freq)
     {
-        freq => ugen.freq;
-        0.6 => ugen.strike;
+        freq => ugen1.freq;
+        freq * 0.8 => bf.freq;
         
-        freq / 2 => voice_ugen.freq;
+        freq / 2 => ugen2.freq;
+        freq / 2 + 5 => ugen3.freq;
+        
+        freq / 4 => ugen4.freq;
+        freq / 4 => lf.freq;
         
         SetGain(1.0);
     }
     
     fun void SetGain(float gain)
     {
-        gain => ugen.gain;
-        gain => voice_ugen.gain;
+        gain => ugen1.strike;
+        gain / 2 => ugen2.noteOn;
+        gain / 7 => ugen3.noteOn;
+        gain / 3 => env4.value;
+        env4.keyOff();
     }
 }
-
-Tenor voice;
-
-spork ~ voice.Play() @=> Shred @ voice_shred;
 
 while (true)
 {
