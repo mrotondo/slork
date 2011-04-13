@@ -38,8 +38,8 @@ while ( true )
     //    <<< f >>>;
     //} 
          
-    xmit.startMsg("test, i");
-    xmit.addInt(10);
+    xmit.startMsg("/test, f");
+    xmit.addFloat(100.0);
     
     1::second => now;
 }

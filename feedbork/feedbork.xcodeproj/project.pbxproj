@@ -25,8 +25,14 @@
 		B24BF30B135564BD00F19EDF /* splat.png in Resources */ = {isa = PBXBuildFile; fileRef = B24BF30A135564BD00F19EDF /* splat.png */; };
 		B253B7B9134D22AA0026F3FC /* feedborkViewController-iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = B253B7B5134D22AA0026F3FC /* feedborkViewController-iPhone.xib */; };
 		B253B7BA134D22AA0026F3FC /* MainWindow-iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = B253B7B7134D22AA0026F3FC /* MainWindow-iPhone.xib */; };
+		B25EA5D6135665DD0074C8AB /* flare1.png in Resources */ = {isa = PBXBuildFile; fileRef = B25EA5D1135665DD0074C8AB /* flare1.png */; };
+		B25EA5D7135665DD0074C8AB /* flare2.png in Resources */ = {isa = PBXBuildFile; fileRef = B25EA5D2135665DD0074C8AB /* flare2.png */; };
+		B25EA5D8135665DD0074C8AB /* flare3.png in Resources */ = {isa = PBXBuildFile; fileRef = B25EA5D3135665DD0074C8AB /* flare3.png */; };
+		B25EA5D9135665DD0074C8AB /* shine1.png in Resources */ = {isa = PBXBuildFile; fileRef = B25EA5D4135665DD0074C8AB /* shine1.png */; };
+		B25EA5DA135665DD0074C8AB /* shine2.png in Resources */ = {isa = PBXBuildFile; fileRef = B25EA5D5135665DD0074C8AB /* shine2.png */; };
 		B287BB94135507E4006D0BCD /* TVOutManager.m in Sources */ = {isa = PBXBuildFile; fileRef = B287BB93135507E4006D0BCD /* TVOutManager.m */; };
 		B287BBA613555006006D0BCD /* feedborkDoodad.mm in Sources */ = {isa = PBXBuildFile; fileRef = B287BBA513555005006D0BCD /* feedborkDoodad.mm */; };
+		B2B54DE8135660D30003B20A /* particle.png in Resources */ = {isa = PBXBuildFile; fileRef = B2B54DE7135660D30003B20A /* particle.png */; };
 		D52B9B0D13469E8800BF4E99 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D52B9B0C13469E8800BF4E99 /* UIKit.framework */; };
 		D52B9B0F13469E8800BF4E99 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D52B9B0E13469E8800BF4E99 /* Foundation.framework */; };
 		D52B9B1113469E8800BF4E99 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D52B9B1013469E8800BF4E99 /* CoreGraphics.framework */; };
@@ -80,10 +86,16 @@
 		B24BF30A135564BD00F19EDF /* splat.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = splat.png; sourceTree = "<group>"; };
 		B253B7B6134D22AA0026F3FC /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = "en.lproj/feedborkViewController-iPhone.xib"; sourceTree = "<group>"; };
 		B253B7B8134D22AA0026F3FC /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = "en.lproj/MainWindow-iPhone.xib"; sourceTree = "<group>"; };
+		B25EA5D1135665DD0074C8AB /* flare1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = flare1.png; sourceTree = "<group>"; };
+		B25EA5D2135665DD0074C8AB /* flare2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = flare2.png; sourceTree = "<group>"; };
+		B25EA5D3135665DD0074C8AB /* flare3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = flare3.png; sourceTree = "<group>"; };
+		B25EA5D4135665DD0074C8AB /* shine1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = shine1.png; sourceTree = "<group>"; };
+		B25EA5D5135665DD0074C8AB /* shine2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = shine2.png; sourceTree = "<group>"; };
 		B287BB92135507E4006D0BCD /* TVOutManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TVOutManager.h; sourceTree = "<group>"; };
 		B287BB93135507E4006D0BCD /* TVOutManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TVOutManager.m; sourceTree = "<group>"; };
 		B287BBA413555005006D0BCD /* feedborkDoodad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = feedborkDoodad.h; sourceTree = "<group>"; };
 		B287BBA513555005006D0BCD /* feedborkDoodad.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = feedborkDoodad.mm; sourceTree = "<group>"; };
+		B2B54DE7135660D30003B20A /* particle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = particle.png; sourceTree = "<group>"; };
 		D52B9B0813469E8800BF4E99 /* feedbork.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = feedbork.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D52B9B0C13469E8800BF4E99 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		D52B9B0E13469E8800BF4E99 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -131,7 +143,13 @@
 				B24BF30A135564BD00F19EDF /* splat.png */,
 				B24001CC134BB38D001C4090 /* switchDown.png */,
 				B24001CD134BB38D001C4090 /* switchUp.png */,
+				B2B54DE7135660D30003B20A /* particle.png */,
 				B2400176134AD269001C4090 /* icon.png */,
+				B25EA5D1135665DD0074C8AB /* flare1.png */,
+				B25EA5D2135665DD0074C8AB /* flare2.png */,
+				B25EA5D3135665DD0074C8AB /* flare3.png */,
+				B25EA5D4135665DD0074C8AB /* shine1.png */,
+				B25EA5D5135665DD0074C8AB /* shine2.png */,
 			);
 			path = pics;
 			sourceTree = "<group>";
@@ -334,6 +352,12 @@
 				B253B7B9134D22AA0026F3FC /* feedborkViewController-iPhone.xib in Resources */,
 				B253B7BA134D22AA0026F3FC /* MainWindow-iPhone.xib in Resources */,
 				B24BF30B135564BD00F19EDF /* splat.png in Resources */,
+				B2B54DE8135660D30003B20A /* particle.png in Resources */,
+				B25EA5D6135665DD0074C8AB /* flare1.png in Resources */,
+				B25EA5D7135665DD0074C8AB /* flare2.png in Resources */,
+				B25EA5D8135665DD0074C8AB /* flare3.png in Resources */,
+				B25EA5D9135665DD0074C8AB /* shine1.png in Resources */,
+				B25EA5DA135665DD0074C8AB /* shine2.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

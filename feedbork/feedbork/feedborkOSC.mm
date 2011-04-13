@@ -10,8 +10,9 @@
 #import "mo_net.h"
 
 @implementation feedborkOSC
+@synthesize delegate;
 // entry point for OSC source message callback
-void osc_callback( osc::ReceivedMessageArgumentStream & oscin, void * data );
+void drum_callback( osc::ReceivedMessageArgumentStream & oscin, void * data );
 
 // override init to include setting the IP and port for OSC
 - (id)initWithIP:(NSString*)_IP portOut:(int)_porto portIn:(int)_porti
@@ -21,7 +22,7 @@ void osc_callback( osc::ReceivedMessageArgumentStream & oscin, void * data );
         IP = [_IP copy];
         port = _porto;
         // set mo_net to receive
-        MoNet::addAddressCallback( "/test", osc_callback, self );
+        MoNet::addAddressCallback( "/drum", drum_callback, self );
         // set the incoming port
         MoNet::setListeningPort( _porti );
         // start the listener
@@ -67,15 +68,38 @@ void osc_callback( osc::ReceivedMessageArgumentStream & oscin, void * data );
  
 }
 
-void osc_callback( osc::ReceivedMessageArgumentStream & oscin, void * data )
+void drum_callback( osc::ReceivedMessageArgumentStream & oscin, void * data )
 {
     feedborkOSC * me = (feedborkOSC*)data;
     
-    me = NULL; // just to stop warnings
+    //me = NULL; // just to stop warnings
     
-    float test;
-    oscin >> test;
-    NSLog(@"test: %f",test);
+    const char* drumname;
+    float vel;
+    oscin >> drumname >> vel;
+    //NSLog(@"test: %s %f",drumname, test);
+    
+    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+    NSString * dname = [NSString stringWithCString:drumname encoding:NSStringEncodingConversionAllowLossy];
+    if ( [dname isEqualToString:@"kick"] )
+        [me.delegate makeDoodad:CGPointMake(375.0, 600.0) size:vel image:@"flare1.png" color:[UIColor blueColor]];
+    else if ( [dname isEqualToString:@"snare"] )
+        [me.delegate makeDoodad:CGPointMake(150.0, 400.0) size:vel image:@"flare2.png" color:[UIColor redColor]];
+    else if ( [dname isEqualToString:@"hihat"] )
+        [me.delegate makeDoodad:CGPointMake(300.0, 400.0) size:vel image:@"flare3.png" color:[UIColor yellowColor]];
+    else if ( [dname isEqualToString:@"kickhard"] )
+        [me.delegate makeDoodad:CGPointMake(450.0, 400.0) size:vel image:@"flare1.png" color:[UIColor greenColor]];
+    else if ( [dname isEqualToString:@"snarehard"] )
+        [me.delegate makeDoodad:CGPointMake(600.0, 400.0) size:vel image:@"flare2.png" color:[UIColor purpleColor]];
+    else if ( [dname isEqualToString:@"cym1"] )
+        [me.delegate makeDoodad:CGPointMake(150.0, 800.0) size:vel image:@"shine1.png" color:[UIColor lightGrayColor]];
+    else if ( [dname isEqualToString:@"cym2"] )
+        [me.delegate makeDoodad:CGPointMake(300.0, 800.0) size:vel image:@"shine2.png" color:[UIColor cyanColor]];
+    else if ( [dname isEqualToString:@"cym3"] )
+        [me.delegate makeDoodad:CGPointMake(450.0, 800.0) size:vel image:@"shine1.png" color:[UIColor magentaColor]];
+    else if ( [dname isEqualToString:@"cym4"] )
+        [me.delegate makeDoodad:CGPointMake(600.0, 800.0) size:vel image:@"shine2.png" color:[UIColor brownColor]];
+    [pool drain];
 }
 
 - (void)dealloc

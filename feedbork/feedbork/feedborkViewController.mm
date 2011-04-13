@@ -7,7 +7,6 @@
 //
 
 #import "feedborkViewController.h"
-#import "feedborkOSC.h"
 
 #define IPAD_WIDTH 768.0
 #define IPAD_HEIGHT 1024.0
@@ -38,6 +37,7 @@
     
     // setup OSC
     osc = [[feedborkOSC alloc] initWithIP:IPTextField.text portOut:PORT_OUT portIn:PORT_IN];
+    osc.delegate = self;
 }
 
 - (AVCaptureDevice *)frontFacingCameraIfAvailable
@@ -143,7 +143,7 @@
     self.previewLayer = [AVCaptureVideoPreviewLayer layerWithSession: self.captureSession];
 	self.previewLayer.frame = self.view.bounds;//CGRectMake(0, 0, 76, 102);
 	self.previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
-	//[self.view.layer addSublayer: self.previewLayer];
+	[self.view.layer addSublayer: self.previewLayer];
     [self.view bringSubviewToFront: maskView];
     [self.view bringSubviewToFront:menuView];
 
@@ -536,6 +536,35 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     return (interfaceOrientation == UIInterfaceOrientationPortrait && UIInterfaceOrientationPortraitUpsideDown);
 }
 
+#pragma  mark feedborkDoodads delegate methods
+- (void)killMe:(feedborkDoodad*)doodad
+{
+    [doodad removeFromSuperview];
+    [doodad release];
+}
+
+#pragma mark feedborkOSC delegate methods
+
+- (void)makeDoodadMainThread:(NSArray*)stuff 
+{
+    CGPoint _center = [[stuff objectAtIndex:0] CGPointValue];
+    float vel = 80.0 * [[stuff objectAtIndex:1] floatValue];
+    [[feedborkDoodad alloc] initWithImageNamed:[stuff objectAtIndex:2] superview:self.view center:_center size:CGSizeMake(vel, vel) color:[stuff objectAtIndex:3] delegate:self];
+}
+
+- (void)makeDoodad:(CGPoint)_center size:(float)vel image:(NSString*)_image color:(UIColor*)_color;
+{
+    // jitter center a bit
+    _center.x += rand()%1000/10.0 - 50.0;
+    _center.y += rand()%1000/10.0 - 50.0;
+    
+    NSValue * val = [NSValue valueWithCGPoint:_center];
+    NSArray * stuff = [NSArray arrayWithObjects:val,[NSNumber numberWithFloat:vel],_image,_color,nil];
+    
+    [self performSelectorOnMainThread:@selector(makeDoodadMainThread:) withObject:stuff waitUntilDone:NO];
+    
+}
+
 #pragma mark Touch Methods
 
 - (bool)point:(CGPoint)thisPoint isInside:(CGRect)thisRect
@@ -546,22 +575,8 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
              thisPoint.y < thisRect.origin.y + thisRect.size.height);
 }
 
-- (void)addCrap:(CGPoint)crap
-{
-    NSLog(@"ADDING CRAP: %f, %f", crap.x, crap.y);
-    
-    feedborkDoodad * tempDoodad = [[feedborkDoodad alloc] initWithFrame:CGRectMake(10, 10, 200, 200)];
-    tempDoodad.image = [UIImage imageNamed:@"splat.png"];
-    tempDoodad.delegate = self;
-    [self.view addSubview:tempDoodad];
-    
-    tempDoodad.center = crap;
-    [tempDoodad animateMe:crap];
-}
-
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    NSLog(@"touchbegan");
     quadTouches[0] = quadTouches[1] = quadTouches[2] = quadTouches[3] = 0;
     for ( UITouch * touch in [event allTouches] )
     {
@@ -580,17 +595,9 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     
     for ( UITouch * touch in touches )
     {
-        NSLog(@"making crap");
         CGPoint thisPoint = [touch locationInView:self.view];
-        
-        [self addCrap:thisPoint];
+        [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(40.0,40.0) color:[UIColor blueColor] delegate:self];
     }
-}
-
-- (void)killMe:(feedborkDoodad*)doodad
-{
-    [doodad removeFromSuperview];
-    [doodad release];
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
@@ -614,7 +621,6 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    NSLog(@"touchbegan");
     for ( UITouch * touch in touches )
     {
         CGPoint thisPoint = [touch locationInView:self.view];

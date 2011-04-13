@@ -13,14 +13,15 @@
 #import <CoreMedia/CoreMedia.h>
 #import "opencv/cv.h"
 #import "feedborkDoodad.h"
+#import "feedborkOSC.h"
 
-@class feedborkOSC;
 @class UIToggleButton;
 #define IP_ADD @"192.168.188.26"
 #define PORT_OUT 9999
 #define PORT_IN 9998
 
-@interface feedborkViewController : UIViewController <AVCaptureVideoDataOutputSampleBufferDelegate,feedborkDoodadDelegate> {
+@interface feedborkViewController : UIViewController <AVCaptureVideoDataOutputSampleBufferDelegate,
+feedborkDoodadDelegate, feedborkOSCdelegate> {
     
     AVCaptureSession *captureSession;
     AVCaptureVideoPreviewLayer *previewLayer;
