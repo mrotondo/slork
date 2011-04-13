@@ -99,7 +99,6 @@
 	return ret;
 }
 
-
 - (void)initCapture
 {
     AVCaptureDeviceInput *captureInput = [AVCaptureDeviceInput 
@@ -175,12 +174,6 @@
     recognizer.direction = UISwipeGestureRecognizerDirectionLeft;
     [self.view addGestureRecognizer:recognizer];
     [recognizer release];
-    
-    // setup colors
-    colorThresh[0] = colorThresh[1] = colorThresh[2] = 128;
-    myColor = 2;
-    myFriendsColor = 1;
-    
 }
 
 - (void)initQuadrants
@@ -238,20 +231,6 @@
     }
 }
 
-// color picker functions
-- (IBAction)chooseMyColor:(UIButton*)sender
-{
-    myColor = sender.tag;
-    [self.view setBackgroundColor:sender.backgroundColor];
-    myColorPicker.center = sender.center;
-}
-
-- (IBAction)chooseMyFriendsColor:(UIButton*)sender
-{
-    myFriendsColor = sender.tag;
-    myFriendsColorPicker.center = sender.center;
-}
-
 // menu functions
 - (IBAction)closeMenu
 {
@@ -303,12 +282,6 @@
 {
     self.imageView.frame = CGRectMake(0.0, 0.0, self.view.bounds.size.width - borderSlider.value/2.0, self.view.bounds.size.height - borderSlider.value/2.0);
     self.imageView.center = self.view.center;
-}
-
-- (IBAction)changeColorThreshold:(UISlider*)slider
-{
-    //NSLog(@"moving slider: %d with value %f",slider.tag,slider.value);
-    colorThresh[slider.tag] = slider.value;
 }
 
 // rotation helper function
@@ -420,6 +393,100 @@ static CGRect swapWidthAndHeight(CGRect rect)
     return copy;
 }
 
+- (void) findLinesInImage:(IplImage*)img_greyscale
+{
+    IplImage *img_lines = cvCreateImage(cvGetSize(img_greyscale), IPL_DEPTH_8U, 1);
+    cvCanny(img_greyscale, img_lines, 50, 200, 3);
+    
+    CvMemStorage* line_storage = cvCreateMemStorage(0);
+    CvSeq* lines = 0;
+    lines = cvHoughLines2(img_lines,
+                          line_storage,
+                          CV_HOUGH_PROBABILISTIC,
+                          1,
+                          CV_PI/180,
+                          80,
+                          30,
+                          10 );
+    
+    int max_line_index = 0;
+    int max_line_length = 0;
+    float dist;
+    for( int line_index = 0; line_index < lines->total; line_index++ )
+    {
+        CvPoint* line = (CvPoint*)cvGetSeqElem(lines, line_index);
+        CvPoint p1 = line[0];
+        CvPoint p2 = line[1];
+        
+        dist = powf(p1.x - p2.x, 2) + powf(p1.y - p2.y, 2);
+        if (dist > max_line_length) {
+            max_line_length = dist;
+            max_line_index = line_index;
+        }
+    }
+    
+    float angle;
+    if (lines->total > 0) {
+        CvPoint* line = (CvPoint*)cvGetSeqElem(lines, max_line_index);
+        CvPoint p1 = line[0];
+        CvPoint p2 = line[1];
+        
+        // To draw diagnostic output
+        //cvLine( img_color, line[0], line[1], CV_RGB(255,0,0), 3, 8 );
+        cvLine( img_greyscale, p1, p2, CV_RGB(255,0,0), 3, 8 );
+        
+        angle = fmod(fabs(atan2f(p1.y - p2.y, p1.x - p2.x)), M_PI / 2.0);
+        [osc sendValue:angle withKey:@"line_angle"];
+        [osc sendValue:sqrt(max_line_length) withKey:@"line_length"];
+    } else {
+        [osc sendValue:0 withKey:@"line_angle"];
+        [osc sendValue:0 withKey:@"line_length"];
+    }
+    
+    // Cleanup
+    cvReleaseMemStorage(&line_storage);
+    cvReleaseImage(&img_lines);
+}
+
+- (void) findCentroidAndAreaOfImage:(IplImage*)img_greyscale
+{
+    CvMoments* moments = (CvMoments*)malloc( sizeof(CvMoments) );
+    cvMoments(img_greyscale, moments);
+    
+    double area = moments->m00;
+    double m10 = moments->m10;
+    double m01 = moments->m01;
+    
+    // Thanks, Wikipedia: http://en.wikipedia.org/wiki/Image_moment
+    double x = m10 / area;
+    double y = m01 / area;
+    
+    CvPoint centroid = cvPoint(x, y);
+    cvCircle(img_greyscale, centroid, 20, CV_RGB(255, 255, 255));
+    
+    CvSize size = cvGetSize(img_greyscale);
+    // Remap opencv's x and y to ours, and normalize to screen size
+    [osc sendValue:y / size.height withKey:@"centroid_x"];
+    [osc sendValue:1 - (x / size.width) withKey:@"centroid_y"];
+    
+    free(moments);
+}
+
+- (void) findContoursInImage:(IplImage*)img_greyscale
+{
+    IplImage *img_threshold = cvCreateImage(cvGetSize(img_greyscale), IPL_DEPTH_8U, 1);
+    cvThreshold(img_greyscale, img_threshold, 160, 255, CV_THRESH_BINARY);
+    CvMemStorage* contour_storage = cvCreateMemStorage(0);
+    CvSeq* contours;
+    int numContours = cvFindContours( img_threshold , contour_storage, &contours, sizeof(CvContour),
+                                     CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, cvPoint(0,0) );
+    
+    [osc sendValue:numContours withKey:@"num_contours"];
+    
+    cvReleaseMemStorage(&contour_storage);
+    cvReleaseImage(&img_threshold);
+}
+
 - (void)captureOutput:(AVCaptureOutput *)captureOutput 
 didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer 
 	   fromConnection:(AVCaptureConnection *)connection 
@@ -454,32 +521,11 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     IplImage *img_color = [self CreateIplImageFromUIImage:image];        
     IplImage *img_greyscale = cvCreateImage(cvGetSize(img_color), IPL_DEPTH_8U, 1);
     cvCvtColor(img_color, img_greyscale, CV_BGR2GRAY);
-
-    CvMoments* moments = (CvMoments*)malloc( sizeof(CvMoments) );
-    cvMoments(img_greyscale, moments);
     
-    double area = moments->m00;
-    double m10 = moments->m10;
-    double m01 = moments->m01;
-    
-    // Thanks, Wikipedia: http://en.wikipedia.org/wiki/Image_moment
-    double x = m10 / area;
-    double y = m01 / area;
-    
-    // Remap opencv's x and y to ours, and normalize to screen size
-    [osc sendValue:y / height withKey:@"centroid_x"];
-    [osc sendValue:1 - (x / width) withKey:@"centroid_y"];
-
-    
-    IplImage *img_threshold = cvCreateImage(cvGetSize(img_greyscale), IPL_DEPTH_8U, 1);
-    cvThreshold(img_greyscale, img_threshold, 160, 255, CV_THRESH_BINARY);
-    CvMemStorage* contour_storage = cvCreateMemStorage(0);
-    CvSeq* contours;
-    int numContours = cvFindContours( img_threshold , contour_storage, &contours, sizeof(CvContour),
-                                     CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, cvPoint(0,0) );
-    
-    [osc sendValue:numContours withKey:@"num_contours"];
-
+    // Extract features
+    [self findCentroidAndAreaOfImage:img_greyscale];
+    [self findContoursInImage:img_greyscale];
+    [self findLinesInImage:img_greyscale];
     
     // Convert black and whilte to 24bit image then convert to UIImage to show
     IplImage *ipl_result = cvCreateImage(cvGetSize(img_greyscale), IPL_DEPTH_8U, 3);
@@ -493,13 +539,9 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     UIImage * rotatedImage = [self rotate:[self UIImageFromIplImage:ipl_result] to:UIImageOrientationRightMirrored];
     [self.imageView performSelectorOnMainThread:@selector(setImage:) withObject:rotatedImage waitUntilDone:YES];
 
-    cvReleaseMemStorage(&contour_storage);
-    cvReleaseImage(&img_threshold);
     cvReleaseImage(&img_color);
     cvReleaseImage(&img_greyscale);
     cvReleaseImage(&ipl_result);
-    
-    free(moments);
     
     CGImageRelease(newImage);
 	CVPixelBufferUnlockBaseAddress(imageBuffer,0);

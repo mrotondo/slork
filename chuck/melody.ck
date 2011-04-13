@@ -71,7 +71,8 @@ class Voice
                 break;
             }
         }
-        duration_subdivisions[duration_subdivisions_index] * 500::ms => note_duration;
+        (60.0 / 145)::second => dur max_duration;
+        duration_subdivisions[duration_subdivisions_index] * max_duration => note_duration;
     }
     
     fun void ComputeNextPitch()
