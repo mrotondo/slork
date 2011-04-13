@@ -14,7 +14,9 @@
 
 - (void) animateMe:(CGPoint) originalCenter
 {
-    [UIView animateWithDuration:2.0
+    [UIView animateWithDuration:1.0
+                          delay:0.0
+                        options:UIViewAnimationOptionAllowUserInteraction
                      animations:^{ 
                          CGPoint center = self.center;
                          center.y += 60;
@@ -22,7 +24,9 @@
                      } 
                      completion:^(BOOL finished){
                          
-                         [UIView animateWithDuration:2.0
+                         [UIView animateWithDuration:1.0
+                                               delay:0.0
+                                             options:UIViewAnimationOptionAllowUserInteraction
                                           animations:^{ 
                                               self.center = originalCenter;
                                           } 
