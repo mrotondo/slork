@@ -22,8 +22,11 @@
 		B24001C3134ADACA001C4090 /* feedborkOSC.mm in Sources */ = {isa = PBXBuildFile; fileRef = B24001C2134ADACA001C4090 /* feedborkOSC.mm */; };
 		B24001CE134BB38D001C4090 /* switchDown.png in Resources */ = {isa = PBXBuildFile; fileRef = B24001CC134BB38D001C4090 /* switchDown.png */; };
 		B24001CF134BB38D001C4090 /* switchUp.png in Resources */ = {isa = PBXBuildFile; fileRef = B24001CD134BB38D001C4090 /* switchUp.png */; };
+		B24BF30B135564BD00F19EDF /* splat.png in Resources */ = {isa = PBXBuildFile; fileRef = B24BF30A135564BD00F19EDF /* splat.png */; };
 		B253B7B9134D22AA0026F3FC /* feedborkViewController-iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = B253B7B5134D22AA0026F3FC /* feedborkViewController-iPhone.xib */; };
 		B253B7BA134D22AA0026F3FC /* MainWindow-iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = B253B7B7134D22AA0026F3FC /* MainWindow-iPhone.xib */; };
+		B287BB94135507E4006D0BCD /* TVOutManager.m in Sources */ = {isa = PBXBuildFile; fileRef = B287BB93135507E4006D0BCD /* TVOutManager.m */; };
+		B287BBA613555006006D0BCD /* feedborkDoodad.mm in Sources */ = {isa = PBXBuildFile; fileRef = B287BBA513555005006D0BCD /* feedborkDoodad.mm */; };
 		D52B9B0D13469E8800BF4E99 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D52B9B0C13469E8800BF4E99 /* UIKit.framework */; };
 		D52B9B0F13469E8800BF4E99 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D52B9B0E13469E8800BF4E99 /* Foundation.framework */; };
 		D52B9B1113469E8800BF4E99 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D52B9B1013469E8800BF4E99 /* CoreGraphics.framework */; };
@@ -74,8 +77,13 @@
 		B24001C2134ADACA001C4090 /* feedborkOSC.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = feedborkOSC.mm; sourceTree = "<group>"; };
 		B24001CC134BB38D001C4090 /* switchDown.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = switchDown.png; sourceTree = "<group>"; };
 		B24001CD134BB38D001C4090 /* switchUp.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = switchUp.png; sourceTree = "<group>"; };
+		B24BF30A135564BD00F19EDF /* splat.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = splat.png; sourceTree = "<group>"; };
 		B253B7B6134D22AA0026F3FC /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = "en.lproj/feedborkViewController-iPhone.xib"; sourceTree = "<group>"; };
 		B253B7B8134D22AA0026F3FC /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = "en.lproj/MainWindow-iPhone.xib"; sourceTree = "<group>"; };
+		B287BB92135507E4006D0BCD /* TVOutManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TVOutManager.h; sourceTree = "<group>"; };
+		B287BB93135507E4006D0BCD /* TVOutManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TVOutManager.m; sourceTree = "<group>"; };
+		B287BBA413555005006D0BCD /* feedborkDoodad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = feedborkDoodad.h; sourceTree = "<group>"; };
+		B287BBA513555005006D0BCD /* feedborkDoodad.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = feedborkDoodad.mm; sourceTree = "<group>"; };
 		D52B9B0813469E8800BF4E99 /* feedbork.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = feedbork.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D52B9B0C13469E8800BF4E99 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		D52B9B0E13469E8800BF4E99 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -120,6 +128,7 @@
 		B2400175134AD269001C4090 /* pics */ = {
 			isa = PBXGroup;
 			children = (
+				B24BF30A135564BD00F19EDF /* splat.png */,
 				B24001CC134BB38D001C4090 /* switchDown.png */,
 				B24001CD134BB38D001C4090 /* switchUp.png */,
 				B2400176134AD269001C4090 /* icon.png */,
@@ -249,6 +258,10 @@
 				B253B7B7134D22AA0026F3FC /* MainWindow-iPhone.xib */,
 				B24001C1134ADACA001C4090 /* feedborkOSC.h */,
 				B24001C2134ADACA001C4090 /* feedborkOSC.mm */,
+				B287BBA413555005006D0BCD /* feedborkDoodad.h */,
+				B287BBA513555005006D0BCD /* feedborkDoodad.mm */,
+				B287BB92135507E4006D0BCD /* TVOutManager.h */,
+				B287BB93135507E4006D0BCD /* TVOutManager.m */,
 				D52B9B1313469E8800BF4E99 /* Supporting Files */,
 			);
 			path = feedbork;
@@ -320,6 +333,7 @@
 				B24001CF134BB38D001C4090 /* switchUp.png in Resources */,
 				B253B7B9134D22AA0026F3FC /* feedborkViewController-iPhone.xib in Resources */,
 				B253B7BA134D22AA0026F3FC /* MainWindow-iPhone.xib in Resources */,
+				B24BF30B135564BD00F19EDF /* splat.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -344,6 +358,8 @@
 				B24001AA134AD938001C4090 /* OscReceivedElements.cpp in Sources */,
 				B24001AB134AD938001C4090 /* OscTypes.cpp in Sources */,
 				B24001C3134ADACA001C4090 /* feedborkOSC.mm in Sources */,
+				B287BB94135507E4006D0BCD /* TVOutManager.m in Sources */,
+				B287BBA613555006006D0BCD /* feedborkDoodad.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

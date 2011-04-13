@@ -37,7 +37,7 @@
     [self initQuadrants];
     
     // setup OSC
-    osc = [[feedborkOSC alloc] initWithIP:IPTextField.text port:PORT];
+    osc = [[feedborkOSC alloc] initWithIP:IPTextField.text portOut:PORT_OUT portIn:PORT_IN];
 }
 
 - (AVCaptureDevice *)frontFacingCameraIfAvailable
@@ -492,7 +492,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 	   fromConnection:(AVCaptureConnection *)connection 
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-    
+
     CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer); 
     CVPixelBufferLockBaseAddress(imageBuffer,0); 
 
@@ -588,6 +588,19 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
              thisPoint.y < thisRect.origin.y + thisRect.size.height);
 }
 
+- (void)addCrap:(CGPoint)crap
+{
+    NSLog(@"ADDING CRAP: %f, %f", crap.x, crap.y);
+    
+    feedborkDoodad * tempDoodad = [[feedborkDoodad alloc] initWithFrame:CGRectMake(10, 10, 200, 200)];
+    tempDoodad.image = [UIImage imageNamed:@"splat.png"];
+    tempDoodad.delegate = self;
+    [self.view addSubview:tempDoodad];
+    
+    tempDoodad.center = crap;
+    [tempDoodad animateMe:crap];
+}
+
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
     quadTouches[0] = quadTouches[1] = quadTouches[2] = quadTouches[3] = 0;
@@ -603,8 +616,21 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         else if ( [self point:thisPoint isInside: quadrant[3]] ) 
             quadTouches[3]++;
     }
-    NSLog(@"q1: %d ---\n q2: %d ---\n q3: %d ---\n q4: %d ---", quadTouches[0], quadTouches[1], 
-                                                      quadTouches[2], quadTouches[3] );
+//    NSLog(@"q1: %d ---\n q2: %d ---\n q3: %d ---\n q4: %d ---", quadTouches[0], quadTouches[1], 
+//                                                      quadTouches[2], quadTouches[3] );
+    
+    for ( UITouch * touch in touches )
+    {
+        NSLog(@"making crap");
+        CGPoint thisPoint = [touch locationInView:self.view];
+        [self addCrap:thisPoint];
+    }
+}
+
+- (void)killMe:(feedborkDoodad*)doodad
+{
+    [doodad removeFromSuperview];
+    [doodad release];
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
@@ -622,8 +648,8 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         else if ( [self point:thisPoint isInside: quadrant[3]] ) 
             quadTouches[3]++;
     }
-    NSLog(@"q1: %d ---\n q2: %d ---\n q3: %d ---\n q4: %d ---", quadTouches[0], quadTouches[1], 
-          quadTouches[2], quadTouches[3] );
+//    NSLog(@"q1: %d ---\n q2: %d ---\n q3: %d ---\n q4: %d ---", quadTouches[0], quadTouches[1], 
+//          quadTouches[2], quadTouches[3] );
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
@@ -640,8 +666,8 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         else if ( [self point:thisPoint isInside: quadrant[3]] ) 
             quadTouches[3]--;
     }
-    NSLog(@"q1: %d ---\n q2: %d ---\n q3: %d ---\n q4: %d ---", quadTouches[0], quadTouches[1], 
-          quadTouches[2], quadTouches[3] );
+//    NSLog(@"q1: %d ---\n q2: %d ---\n q3: %d ---\n q4: %d ---", quadTouches[0], quadTouches[1], 
+//          quadTouches[2], quadTouches[3] );
 }
 
 @end
