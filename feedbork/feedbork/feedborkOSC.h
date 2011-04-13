@@ -7,15 +7,18 @@
 //
 
 #import <Foundation/Foundation.h>
-
+class MoNet;
 
 @interface feedborkOSC : NSObject {
     NSString *IP;
     int port;
+    
+    MoNet * recv;
 }
 
-- (id)initWithIP:(NSString*)_IP port:(int)_port;
+- (id)initWithIP:(NSString*)_IP portOut:(int)_porto portIn:(int)_porti;
 - (void)changeIP:(NSString*)_IP;
 - (void)sendValue:(float)value withKey:(NSString*)key;
+- (void)broadcastIP;
 
 @end

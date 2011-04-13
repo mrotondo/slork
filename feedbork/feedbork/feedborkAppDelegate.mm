@@ -7,7 +7,7 @@
 //
 
 #import "feedborkAppDelegate.h"
-
+#import "TVOutManager.h"
 #import "feedborkViewController.h"
 
 @implementation feedborkAppDelegate
@@ -23,6 +23,7 @@
      
     self.window.rootViewController = self.viewController;
     [self.window makeKeyAndVisible];
+    [[TVOutManager sharedInstance] startTVOut];
     return YES;
 }
 
