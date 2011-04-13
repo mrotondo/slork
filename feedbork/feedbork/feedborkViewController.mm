@@ -603,6 +603,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
+    NSLog(@"touchbegan");
     quadTouches[0] = quadTouches[1] = quadTouches[2] = quadTouches[3] = 0;
     for ( UITouch * touch in [event allTouches] )
     {
@@ -623,6 +624,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     {
         NSLog(@"making crap");
         CGPoint thisPoint = [touch locationInView:self.view];
+        
         [self addCrap:thisPoint];
     }
 }
@@ -654,6 +656,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
+    NSLog(@"touchbegan");
     for ( UITouch * touch in touches )
     {
         CGPoint thisPoint = [touch locationInView:self.view];
