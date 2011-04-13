@@ -35,7 +35,6 @@ class FloatListener extends FeedborkListener
 
 // Create mapping listeners here!!
 
-
 // create our OSC receiver
 OscRecv orec;
 // port 9999
@@ -43,8 +42,24 @@ OscRecv orec;
 // start listening (launch thread)
 orec.listen();
 // sin osc for goofy testing
-PulseOsc s => Gain g => dac;
-0.1 => g.gain;
+//PulseOsc s => Gain g => dac;
+//0.1 => g.gain;
+
+orec.event("/IP,s") @=> OscEvent IP_event;
+OscSend xmit;
+fun void getIP()
+{
+    IP_event => now; 
+    string s;
+    // grab the next message from the queue. 
+    while( IP_event.nextMsg() != 0 )
+    {   
+        IP_event.getString() => s;
+    }
+    <<< s >>>;
+    xmit.setHost(s, 9998);
+}
+spork ~ getIP();
 
 FloatListener centroid_x_listener;
 centroid_x_listener.init(orec, "centroid_x");
