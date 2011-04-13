@@ -26,13 +26,6 @@
     UIView *maskView;
     feedborkOSC *osc;
     
-    // color picker stuff
-    int myColor;
-    int myFriendsColor;
-    IBOutlet UIView * myColorPicker;
-    IBOutlet UIView * myFriendsColorPicker;
-    float colorThresh[3];
-    
     // menu stuff
     IBOutlet UIView *menuView;
     IBOutlet UITextField *IPTextField;
@@ -55,10 +48,9 @@
 - (AVCaptureDevice *)frontFacingCameraIfAvailable;
 - (IplImage *)CreateIplImageFromUIImage:(UIImage *)image;
 - (UIImage *)UIImageFromIplImage:(IplImage *)image;
-
-// color picker functions
-- (IBAction)chooseMyColor:(UIButton*)sender;
-- (IBAction)chooseMyFriendsColor:(UIButton*)sender;
+- (void) findLinesInImage:(IplImage*)img_greyscale;
+- (void) findCentroidAndAreaOfImage:(IplImage*)img_greyscale;
+- (void) findContoursInImage:(IplImage*)img_greyscale;
 
 // menu functions
 - (IBAction)closeMenu;
@@ -66,7 +58,6 @@
 - (IBAction)lockExposure;
 - (IBAction)changeAlpha:(UISlider*)slider;
 - (IBAction)changeBorder:(UISlider*)slider;
-- (IBAction)changeColorThreshold:(UISlider*)slider;
 
 @end
 
