@@ -16,10 +16,10 @@ class Voice
     
     0::ms => dur note_duration;
     
-    [0, 2, 4, 5, 7, 10, 12] @=> int intervals[];
+    [0, 2, 4, 5, 7, 10, 12, 14, 16, 17, 19, 22, 24] @=> int intervals[];
     
     // start on the root
-    [1.0, 0.0, 0.0, 0.0, 0.0, 0.0] @=> float weights[];
+    [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0] @=> float weights[];
     
     // HACK: the subdivisions also act as probability weights for how they are selected.
     [0.5, 1.0] @=> float duration_subdivisions[];
@@ -130,23 +130,24 @@ class Voice
 
 public class MelodyVoice extends Voice
 {
+    HPF hf => dac;
+    10 => hf.freq;
     
-    NRev reverb;
-    
-    ModalBar ugen1 => reverb => BPF bf => dac;
+    NRev reverb;   
+    ModalBar ugen1 => reverb => BPF bf => hf;
     1 => ugen1.preset;
     1200 => bf.freq;
     7 => bf.Q;
     
     NRev reverb2;    
-    Wurley ugen2 => reverb2 => dac;
+    Wurley ugen2 => reverb2 => hf;
     0.1 => reverb2.mix;
 
     NRev reverb3;    
-    Wurley ugen3 => reverb3 => dac;
+    Wurley ugen3 => reverb3 => hf;
     0.2 => reverb3.mix;
     
-    PulseOsc ugen4 => BPF lf => ADSR env4 => NRev reverb4 => dac;
+    PulseOsc ugen4 => BPF lf => ADSR env4 => NRev reverb4 => hf;
     0.1 => reverb4.mix;
     200::ms => env4.duration;
     1 => lf.Q;
@@ -175,9 +176,16 @@ public class MelodyVoice extends Voice
         gain / 3 => env4.value;
         env4.keyOff();
     }
-}
+    
+    fun void SetHPFFreq(float freq)
+    {
+        freq => hf.freq;
+    }
 
-while (true)
-{
-    1::second => now;
+	fun void SetReverbMix(float mix)
+	{
+		//<<< mix >>>;
+		mix => reverb2.mix;
+		mix => reverb3.mix;
+	}
 }

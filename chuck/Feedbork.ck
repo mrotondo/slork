@@ -33,8 +33,6 @@ class FloatListener extends FeedborkListener
     }
 }
 
-// Create mapping listeners here!!
-
 // create our OSC receiver
 OscRecv orec;
 // port 9999
@@ -62,11 +60,33 @@ fun void getIP()
 }
 spork ~ getIP();
 
-FloatListener centroid_x_listener;
+class HPFFreqListener extends FloatListener
+{
+    fun void handleEvent()
+    {
+		
+        event.getFloat() => float f;
+
+		voice.SetHPFFreq(Math.max(10, -1000 + 3300 * f));
+    }
+}
+
+class ReverbListener extends FloatListener
+{
+    fun void handleEvent()
+    {
+		
+        event.getFloat() => float f;
+
+		voice.SetReverbMix(f);
+    }
+}
+
+ReverbListener centroid_x_listener;
 centroid_x_listener.init(orec, "centroid_x");
 spork ~ centroid_x_listener.go() @=> Shred @ centroid_x_shred;
 
-FloatListener centroid_y_listener;
+HPFFreqListener centroid_y_listener;
 centroid_y_listener.init(orec, "centroid_y");
 spork ~ centroid_y_listener.go() @=> Shred @ centroid_y_shred;
 

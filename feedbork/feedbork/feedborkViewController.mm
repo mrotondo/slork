@@ -7,6 +7,7 @@
 //
 
 #import "feedborkViewController.h"
+#import "QuartzCore/QuartzCore.h"
 
 #define IPAD_WIDTH 768.0
 #define IPAD_HEIGHT 1024.0
@@ -133,7 +134,7 @@
     self.imageView = [[UIImageView alloc] init];
 	self.imageView.frame = CGRectMake(0.0, 0.0, self.view.bounds.size.width - borderSlider.value/2.0, self.view.bounds.size.height - borderSlider.value/2.0);
     self.imageView.center = self.view.center;
-    [self.view addSubview:self.imageView];
+    //[self.view addSubview:self.imageView];
     
     // bring menu to front again and then hide it
     [self.view bringSubviewToFront:menuView];
@@ -141,7 +142,8 @@
     
     self.previewLayer = [AVCaptureVideoPreviewLayer layerWithSession: self.captureSession];
 	self.previewLayer.frame = self.view.bounds;//CGRectMake(0, 0, 76, 102);
-	self.previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
+    self.previewLayer.transform = CATransform3DMakeScale(0.9, 0.9, 1.0);
+    self.previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
 	[self.view.layer addSublayer: self.previewLayer];
     [self.view bringSubviewToFront: maskView];
     [self.view bringSubviewToFront:menuView];
