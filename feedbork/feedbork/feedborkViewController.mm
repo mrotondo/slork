@@ -619,7 +619,16 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
+    // see if we've lifted fingers off
+    if ( [[event allTouches] count] != 4 )
+    {
+        [osc sendDrumControl:-10.0 withKey:@"glitch"];
+    }
+    
+    // reset touches
     quadTouches[0] = quadTouches[1] = quadTouches[2] = quadTouches[3] = 0;
+    
+    // this will count all touches on screen (as opposed to touch in touches which only counts new ones)
     for ( UITouch * touch in [event allTouches] )
     {
         CGPoint thisPoint = [touch locationInView:self.view];
@@ -635,15 +644,38 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 //    NSLog(@"q1: %d ---\n q2: %d ---\n q3: %d ---\n q4: %d ---", quadTouches[0], quadTouches[1], 
 //                                                      quadTouches[2], quadTouches[3] );
     
+    // this will just count new touches to the screen
     for ( UITouch * touch in touches )
     {
         CGPoint thisPoint = [touch locationInView:self.view];
         [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(40.0,40.0) color:[UIColor blueColor] delegate:self];
-    }
+        if ( [self point:thisPoint isInside: quadrant[0]] ) 
+        {
+            [osc sendDrumControl:thisPoint.y/11.0 withKey:@"random"];
+        }
+        else if ( [self point:thisPoint isInside: quadrant[1]] ) 
+        {
+            [osc sendDrumControl:thisPoint.y/11.0 withKey:@"density"];
+        }
+        else if ( [self point:thisPoint isInside: quadrant[2]] ) 
+        {
+            [osc sendDrumControl:thisPoint.y/11.0 withKey:@"density"];
+        }
+        else if ( [self point:thisPoint isInside: quadrant[3]] ) 
+        {
+            [osc sendDrumControl:thisPoint.y/11.0 withKey:@"random"];
+        }
+    }    
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
 {
+    // see if we've lifted fingers off
+    if ( [[event allTouches] count] != 4 )
+    {
+        [osc sendDrumControl:-10.0 withKey:@"glitch"];
+    }
+    
     quadTouches[0] = quadTouches[1] = quadTouches[2] = quadTouches[3] = 0;
     for ( UITouch * touch in [event allTouches] )
     {
@@ -659,10 +691,47 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     }
 //    NSLog(@"q1: %d ---\n q2: %d ---\n q3: %d ---\n q4: %d ---", quadTouches[0], quadTouches[1], 
 //          quadTouches[2], quadTouches[3] );
+    
+    if ( [touches count] < 4 )
+    {
+        for ( UITouch * touch in touches )
+        {
+            CGPoint thisPoint = [touch locationInView:self.view];
+            [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(40.0,40.0) color:[UIColor blueColor] delegate:self];
+            if ( [self point:thisPoint isInside: quadrant[0]] ) 
+            {
+                [osc sendDrumControl:thisPoint.y/11.0 withKey:@"random"];
+            }
+            else if ( [self point:thisPoint isInside: quadrant[1]] ) 
+            {
+                [osc sendDrumControl:thisPoint.y/11.0 withKey:@"density"];
+            }
+            else if ( [self point:thisPoint isInside: quadrant[2]] ) 
+            {
+                [osc sendDrumControl:thisPoint.y/11.0 withKey:@"density"];
+            }
+            else if ( [self point:thisPoint isInside: quadrant[3]] ) 
+            {
+                [osc sendDrumControl:thisPoint.y/11.0 withKey:@"random"];
+            }
+        } 
+    }
+    if ( [touches count] == 4 )
+    {
+        UITouch * touch = [touches anyObject];
+        CGPoint thisPoint = [touch locationInView:self.view];
+        [osc sendDrumControl:thisPoint.y/11.0 withKey:@"glitch"];
+    }
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
+    // see if we've lifted fingers off
+    if ( [[event allTouches] count] != 4 || [touches count] == 4 )
+    {
+        [osc sendDrumControl:-10.0 withKey:@"glitch"];
+    }
+    
     for ( UITouch * touch in touches )
     {
         CGPoint thisPoint = [touch locationInView:self.view];

@@ -51,6 +51,17 @@ void drum_callback( osc::ReceivedMessageArgumentStream & oscin, void * data );
     MoNet::sendMessage([IP UTF8String],
                        port, [keyWithSlash UTF8String], types, 1, value);
 }
+
+// send a single float to the waiting, friendly computer
+- (void)sendDrumControl:(float)value withKey:(NSString*)key
+{
+    static char types[2] = {'s','f'};
+    
+    NSString *keyWithSlash = [NSString stringWithFormat:@"/drumcontrol",key];
+    
+    MoNet::sendMessage([IP UTF8String],
+                       port, [keyWithSlash UTF8String], types, 2, [key UTF8String], value);
+}
      
 - (void)broadcastIP
 {
