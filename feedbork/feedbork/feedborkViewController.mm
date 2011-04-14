@@ -720,6 +720,11 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     }
     if ( [touches count] == 4 )
     {
+        for ( UITouch * touch in touches )
+        {
+            CGPoint thisPoint = [touch locationInView:self.view];
+            [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(40.0,40.0) color:[UIColor blueColor] delegate:self];
+        }
         UITouch * touch = [touches anyObject];
         CGPoint thisPoint = [touch locationInView:self.view];
         [osc sendDrumControl:thisPoint.y/11.0 withKey:@"glitch"];

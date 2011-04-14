@@ -79,7 +79,7 @@ class Randrum
         if ( f < 0.0 ) 0 => glitchOn;
         else 1 => glitchOn;
         
-        Math.floor(f) => glitchLevel;
+        Math.ceil(f) => glitchLevel;
     }
     
     // shred for playback
@@ -143,7 +143,7 @@ class Randrum
                 
                 else
                 {
-                    <<< glitchLevel >>>;
+                    //<<< glitchLevel >>>;
                     for ( 0 => int j; j < glitchLevel; j++ )
                     {
                         0 => drum.pos;
@@ -157,7 +157,7 @@ class Randrum
 };
 
 // Randrum setups
-Randrum kick,snare,hihat,kickhard,snarehard,cym[4],glitch;
+Randrum kick,snare,hihat,kickhard,snarehard,glitch,cym[4];
 kick.setup("Documents/CCRMA/Slork/slork/chuck/kick.aiff", "kick");
 snare.setup("Documents/CCRMA/Slork/slork/chuck/snare.aiff", "snare");
 hihat.setup("Documents/CCRMA/Slork/slork/chuck/hihat.aiff", "hihat");
