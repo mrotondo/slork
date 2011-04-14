@@ -16,10 +16,10 @@ class Voice
     
     0::ms => dur note_duration;
     
-    [0, 2, 4, 5, 7, 10, 12] @=> int intervals[];
+    [0, 2, 4, 5, 7, 10, 12, 14, 16, 17, 19, 22, 24] @=> int intervals[];
     
     // start on the root
-    [1.0, 0.0, 0.0, 0.0, 0.0, 0.0] @=> float weights[];
+    [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0] @=> float weights[];
     
     // HACK: the subdivisions also act as probability weights for how they are selected.
     [0.5, 1.0] @=> float duration_subdivisions[];
@@ -128,41 +128,64 @@ class Voice
     }
 }
 
-class Tenor extends Voice
+public class MelodyVoice extends Voice
 {
+    HPF hf => dac;
+    10 => hf.freq;
     
-    NRev reverb;
+    NRev reverb;   
+    ModalBar ugen1 => reverb => BPF bf => hf;
+    1 => ugen1.preset;
+    1200 => bf.freq;
+    7 => bf.Q;
     
-    ModalBar ugen => reverb => dac;
-    1 => ugen.preset;
+    NRev reverb2;    
+    Wurley ugen2 => reverb2 => hf;
+    0.1 => reverb2.mix;
+
+    NRev reverb3;    
+    Wurley ugen3 => reverb3 => hf;
+    0.2 => reverb3.mix;
     
-    VoicForm voice_ugen => dac;
-    "ahh" => voice_ugen.phoneme;
+    PulseOsc ugen4 => BPF lf => ADSR env4 => NRev reverb4 => hf;
+    0.1 => reverb4.mix;
+    200::ms => env4.duration;
+    1 => lf.Q;
     
     SetGain(0.0);
     
     fun void SetFrequency(float freq)
     {
-        freq => ugen.freq;
-        0.6 => ugen.strike;
+        freq => ugen1.freq;
+        freq * 0.8 => bf.freq;
         
-        freq / 2 => voice_ugen.freq;
+        freq / 2 => ugen2.freq;
+        freq / 2 + 5 => ugen3.freq;
+        
+        freq / 4 => ugen4.freq;
+        freq / 4 => lf.freq;
         
         SetGain(1.0);
     }
     
     fun void SetGain(float gain)
     {
-        gain => ugen.gain;
-        gain => voice_ugen.gain;
+        gain => ugen1.strike;
+        gain / 2 => ugen2.noteOn;
+        gain / 7 => ugen3.noteOn;
+        gain / 3 => env4.value;
+        env4.keyOff();
     }
-}
+    
+    fun void SetHPFFreq(float freq)
+    {
+        freq => hf.freq;
+    }
 
-Tenor voice;
-
-spork ~ voice.Play() @=> Shred @ voice_shred;
-
-while (true)
-{
-    1::second => now;
+	fun void SetReverbMix(float mix)
+	{
+		//<<< mix >>>;
+		mix => reverb2.mix;
+		mix => reverb3.mix;
+	}
 }
