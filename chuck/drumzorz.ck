@@ -8,8 +8,8 @@
 // total number of hits per beat availale (e.g. 4 for 16th notes, 3 for eighth triplets, 2 for eighth notes)
 4 => int quantizationSize;
 //initial tempo
-145.0 => float tempo;
-(60.0/tempo)::second => dur sampsPerBeat;
+144.0 => float tempo;
+(44100*60.0/tempo)::samp => dur sampsPerBeat;
 // compute gridsize
 quantizationSize * totalBeatsPerMeasure * totalMeasures => int gridSize;
 // OSC sender
@@ -55,14 +55,14 @@ class Randrum
     1.8 => float density;
     string myname;
     0 => int glitchOn;
-    0.0 => float glitchLevel;
+    1.0 => float glitchLevel;
     
     // setup the filepath for the sample as well as a unique name
     fun void setup( string _filename, string _name )
     {
         _filename => drum.read;
         _name => myname;
-       drum.samples() => drum.pos;
+        drum.samples() => drum.pos;
     }
     
     // clear out everything in that player
@@ -88,72 +88,76 @@ class Randrum
         // main loop
         while( true ) {
             // go through all of the spots in the gridsize
-            for (0 => int i; i < gridSize; i++) {
-                0.0 => float sendGain;
-                0 => int send;
-                // if we have said this should be hit in our main pattern
-                
-                if ( glitchOn == 0 )
-                {
-                    if (hitsOn[i] == 1) {
-                        1 => send;
-                        hitsGain[i] => sendGain;
-                        hitsGain[i] => drum.gain;
-                        1.0 => drum.rate;
-                        if ( density < 2.0 ) 
-                        {
-                            if ( Math.rand2(0,100) / 50.0 < density )
-                                { 
-                                    0 => drum.pos;
-                                }
-                            else 0 => send;
-                        }
-                        else 0 => drum.pos;
-                        // possibly allow random sample to be added on
-                        if (Math.rand2(0,100) < randThreshold) {
-                            i + Math.rand2f(-1*density, density) $ int => int tempLocation;
-                            if ( tempLocation < gridSize && tempLocation >= 0 && hitsOn[tempLocation] == 0) {
-                                Math.floor(density) $ int => randHitsOn[tempLocation];
-                                Math.rand2f(.1,.4)*hitsGain[i] => randHitsGain[tempLocation];
-                            }
-                        }
-                    }
-                    // handle the case that a random sample got triggered in the previous run
-                    if (randHitsOn[i] > 0) {
-                        1 => send;
-                        randHitsGain[i] => sendGain;
-                        randHitsGain[i] => drum.gain;
-                        Math.rand2f(1 - randThreshold/1000, 1 + randThreshold/1000) => drum.rate;
-                        0 => drum.pos;
-                        1 -=> randHitsOn[i];
-                        Math.floor(randThreshold * .01 * randHitsOn[i]) $ int => randHitsOn[i];
-                    }
-                
-                    // send OSC if there's been a hit
-                    if ( send == 1 )
+            //for (0 => int i; i < gridSize; i++) {
+            ((now/(sampsPerBeat/quantizationSize)) % 16) $ int  => int i;
+            0.0 => float sendGain;
+            0 => int send;
+            // if we have said this should be hit in our main pattern
+            
+            if ( glitchOn == 0 )
+            {
+                if (hitsOn[i] == 1) {
+                    1 => send;
+                    hitsGain[i] => sendGain;
+                    hitsGain[i] => drum.gain;
+                    1.0 => drum.rate;
+                    if ( density < 2.0 ) 
                     {
-                        xmit.startMsg("/drum, s, f");
-                        xmit.addString( myname );
-                        xmit.addFloat(sendGain); 
+                        if ( Math.rand2(0,100) / 50.0 < density )
+                        { 
+                            0 => drum.pos;
+                        }
+                        else 0 => send;
                     }
-                
-                    // advance time by the quantization size in samps
-                    sampsPerBeat/quantizationSize => now;
+                    else 0 => drum.pos;
+                    // possibly allow random sample to be added on
+                    if (Math.rand2(0,100) < randThreshold) {
+                        i + Math.rand2f(-1*density, density) $ int => int tempLocation;
+                        if ( tempLocation < gridSize && tempLocation >= 0 && hitsOn[tempLocation] == 0) {
+                            Math.floor(density) $ int => randHitsOn[tempLocation];
+                            Math.rand2f(.1,.4)*hitsGain[i] => randHitsGain[tempLocation];
+                        }
+                    }
+                }
+                // handle the case that a random sample got triggered in the previous run
+                if (randHitsOn[i] > 0) {
+                    1 => send;
+                    randHitsGain[i] => sendGain;
+                    randHitsGain[i] => drum.gain;
+                    Math.rand2f(1 - randThreshold/1000, 1 + randThreshold/1000) => drum.rate;
+                    0 => drum.pos;
+                    1 -=> randHitsOn[i];
+                    Math.floor(randThreshold * .01 * randHitsOn[i]) $ int => randHitsOn[i];
                 }
                 
-                else
+                // send OSC if there's been a hit
+                if ( send == 1 )
                 {
-                    //<<< glitchLevel >>>;
-                    for ( 0 => int j; j < glitchLevel; j++ )
-                    {
-                        0 => drum.pos;
-                        (sampsPerBeat/quantizationSize)/glitchLevel => now;
-                    }
+                    xmit.startMsg("/drum, s, f");
+                    xmit.addString( myname );
+                    xmit.addFloat(sendGain); 
+                }
+                
+                now % (sampsPerBeat/quantizationSize) => dur mod;
+                // advance time by the quantization size in samps
+                (sampsPerBeat/quantizationSize) - mod => dur wait;
+                wait => now;
+            }
+            
+            else
+            {
+                //<<< glitchLevel >>>;
+                Math.floor((sampsPerBeat/1::samp)/(quantizationSize))/glitchLevel => float sampsPerGlitch;
+                for ( 0 => int j; j < glitchLevel; j++ )
+                {
+                    0 => drum.pos;
+                    sampsPerGlitch::samp => now;
                 }
             }
+            //}
         }
     }
-
+    
 };
 
 // Randrum setups
@@ -254,6 +258,41 @@ fun void getDrumControl()
             }
             else if (x[s] == x["glitch"])
             { 
+                if ( f > 0 )
+                {
+                    //1 => kick.glitchOn;
+                    1 => snare.glitchOn;
+                    1 => hihat.glitchOn;
+                    1 => kickhard.glitchOn;
+                    1 => snarehard.glitchOn;
+                    for ( 0 => int i; i < 4; i++ )
+                    {
+                        1 => cym[i].glitchOn;
+                    }
+                    
+                    f => kick.glitchLevel;
+                    f => snare.glitchLevel;
+                    f => hihat.glitchLevel;
+                    f => kickhard.glitchLevel;
+                    f => snarehard.glitchLevel;
+                    for ( 0 => int i; i < 4; i++ )
+                    {
+                        f => cym[i].glitchLevel;
+                    }
+                    
+                }
+                else
+                {
+                    0 => kick.glitchOn;
+                    0 => snare.glitchOn;
+                    0 => hihat.glitchOn;
+                    0 => kickhard.glitchOn;
+                    0 => snarehard.glitchOn;
+                    for ( 0 => int i; i < 4; i++ )
+                    {
+                        0 => cym[i].glitchOn;
+                    }
+                }
                 //<<< "glitch!", f >>>;
                 glitch.glitch(f);
             }

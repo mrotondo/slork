@@ -23,7 +23,7 @@
      
     self.window.rootViewController = self.viewController;
     [self.window makeKeyAndVisible];
-    [[TVOutManager sharedInstance] startTVOut];
+    //[[TVOutManager sharedInstance] startTVOut];
     return YES;
 }
 

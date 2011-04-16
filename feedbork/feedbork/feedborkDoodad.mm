@@ -64,7 +64,7 @@
                           delay:0.0
                         options:UIViewAnimationOptionAllowUserInteraction
                      animations:^{ 
-                         self.transform = CGAffineTransformConcat(CGAffineTransformMakeScale(2.5, 2.5),CGAffineTransformMakeRotation((rand()%10 - 5)*360.0));
+                         self.transform = CGAffineTransformConcat(CGAffineTransformMakeScale(5.5, 5.5),CGAffineTransformMakeRotation((rand()%10 - 5)*360.0));
                          self.alpha = 1.0;
                          
                      } 

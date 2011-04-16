@@ -108,7 +108,7 @@
     
     AVCaptureVideoDataOutput *captureOutput = [[AVCaptureVideoDataOutput alloc] init];
     captureOutput.alwaysDiscardsLateVideoFrames = YES; 
-    //captureOutput.minFrameDuration = CMTimeMake(1, 10);
+    captureOutput.minFrameDuration = CMTimeMake(1, 30);
 
     dispatch_queue_t queue;
 	queue = dispatch_queue_create("cameraQueue", NULL);
@@ -124,7 +124,7 @@
 	[self.captureSession addInput:captureInput];
 	[self.captureSession addOutput:captureOutput];
 
-    captureSession.sessionPreset = AVCaptureSessionPresetMedium;
+    captureSession.sessionPreset = AVCaptureSessionPresetPhoto;
 
     maskView = [[UIView alloc] initWithFrame:self.view.bounds];
     [maskView setBackgroundColor:[UIColor blackColor]];
@@ -529,21 +529,21 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     [self findContoursInImage:img_greyscale];
     [self findLinesInImage:img_greyscale];
     
-    // Convert black and whilte to 24bit image then convert to UIImage to show
-    IplImage *ipl_result = cvCreateImage(cvGetSize(img_greyscale), IPL_DEPTH_8U, 3);
-    for(int y = 0; y < img_greyscale->height; y++) {
-        for(int x = 0; x < img_greyscale->width; x++) {
-            char *p = ipl_result->imageData + y * ipl_result->widthStep + x * 3;
-            *p = *(p+1) = *(p+2) = img_greyscale->imageData[y * img_greyscale->widthStep + x];
-        }
-    }
+//    // Convert black and whilte to 24bit image then convert to UIImage to show
+//    IplImage *ipl_result = cvCreateImage(cvGetSize(img_greyscale), IPL_DEPTH_8U, 3);
+//    for(int y = 0; y < img_greyscale->height; y++) {
+//        for(int x = 0; x < img_greyscale->width; x++) {
+//            char *p = ipl_result->imageData + y * ipl_result->widthStep + x * 3;
+//            *p = *(p+1) = *(p+2) = img_greyscale->imageData[y * img_greyscale->widthStep + x];
+//        }
+//    }
 
-    UIImage * rotatedImage = [self rotate:[self UIImageFromIplImage:ipl_result] to:UIImageOrientationRightMirrored];
+    UIImage * rotatedImage = [self rotate:[self UIImageFromIplImage:img_color] to:UIImageOrientationRightMirrored];
     [self.imageView performSelectorOnMainThread:@selector(setImage:) withObject:rotatedImage waitUntilDone:YES];
 
     cvReleaseImage(&img_color);
     cvReleaseImage(&img_greyscale);
-    cvReleaseImage(&ipl_result);
+//    cvReleaseImage(&ipl_result);
     
     CGImageRelease(newImage);
 	CVPixelBufferUnlockBaseAddress(imageBuffer,0);
@@ -650,7 +650,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     for ( UITouch * touch in touches )
     {
         CGPoint thisPoint = [touch locationInView:self.view];
-        [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(40.0,40.0) color:[UIColor blueColor] delegate:self];
+        [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(40.0,40.0) color:[UIColor yellowColor] delegate:self];
         if ( [self point:thisPoint isInside: quadrant[0]] ) 
         {
             [osc sendDrumControl:thisPoint.y/11.0 withKey:@"random"];
@@ -699,7 +699,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         for ( UITouch * touch in touches )
         {
             CGPoint thisPoint = [touch locationInView:self.view];
-            [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(40.0,40.0) color:[UIColor blueColor] delegate:self];
+            [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(40.0,40.0) color:[UIColor yellowColor] delegate:self];
             if ( [self point:thisPoint isInside: quadrant[0]] ) 
             {
                 [osc sendDrumControl:thisPoint.y/11.0 withKey:@"random"];
@@ -723,7 +723,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         for ( UITouch * touch in touches )
         {
             CGPoint thisPoint = [touch locationInView:self.view];
-            [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(40.0,40.0) color:[UIColor blueColor] delegate:self];
+            [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(40.0,40.0) color:[UIColor yellowColor] delegate:self];
         }
         UITouch * touch = [touches anyObject];
         CGPoint thisPoint = [touch locationInView:self.view];
