@@ -165,14 +165,14 @@
     // Create a swipe gesture recognizer to recognize right swipes, three finger
     UISwipeGestureRecognizer *recognizer;
     recognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeFrom:)];
-    [recognizer setNumberOfTouchesRequired:3];
+    [recognizer setNumberOfTouchesRequired:5];
     recognizer.direction = UISwipeGestureRecognizerDirectionRight;
     [self.view addGestureRecognizer:recognizer];
     // once we add its properties we don't need it
     [recognizer release];
     // now create one for the left swipe, also three finger
     recognizer = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(handleSwipeFrom:)];
-    [recognizer setNumberOfTouchesRequired:3];
+    [recognizer setNumberOfTouchesRequired:5];
     recognizer.direction = UISwipeGestureRecognizerDirectionLeft;
     [self.view addGestureRecognizer:recognizer];
     [recognizer release];
@@ -624,7 +624,12 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     // see if we've lifted fingers off
     if ( [[event allTouches] count] != 4 )
     {
-        [osc sendDrumControl:-10.0 withKey:@"glitch"];
+        [osc sendDrumControlX:-10.0 Y:0.0 withKey:@"glitch"];
+    }
+    if ( [[event allTouches] count] != 3 )
+    {
+        [osc sendDrumControlX:-10.0 Y:0.0 withKey:@"stutter"];
+        
     }
     
     // reset touches
@@ -653,19 +658,19 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(40.0,40.0) color:[UIColor yellowColor] delegate:self];
         if ( [self point:thisPoint isInside: quadrant[0]] ) 
         {
-            [osc sendDrumControl:thisPoint.y/11.0 withKey:@"random"];
+            [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"random"];
         }
         else if ( [self point:thisPoint isInside: quadrant[1]] ) 
         {
-            [osc sendDrumControl:thisPoint.y/11.0 withKey:@"density"];
+            [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"density"];
         }
         else if ( [self point:thisPoint isInside: quadrant[2]] ) 
         {
-            [osc sendDrumControl:thisPoint.y/11.0 withKey:@"density"];
+            [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"density"];
         }
         else if ( [self point:thisPoint isInside: quadrant[3]] ) 
         {
-            [osc sendDrumControl:thisPoint.y/11.0 withKey:@"random"];
+            [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"random"];
         }
     }    
 }
@@ -675,7 +680,13 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     // see if we've lifted fingers off
     if ( [[event allTouches] count] != 4 )
     {
-        [osc sendDrumControl:-10.0 withKey:@"glitch"];
+        [osc sendDrumControlX:-10.0 Y:0.0 withKey:@"glitch"];
+
+    }
+    if ( [[event allTouches] count] != 3 )
+    {
+        [osc sendDrumControlX:-10.0 Y:0.0 withKey:@"stutter"];
+        
     }
     
     quadTouches[0] = quadTouches[1] = quadTouches[2] = quadTouches[3] = 0;
@@ -694,7 +705,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 //    NSLog(@"q1: %d ---\n q2: %d ---\n q3: %d ---\n q4: %d ---", quadTouches[0], quadTouches[1], 
 //          quadTouches[2], quadTouches[3] );
     
-    if ( [touches count] < 4 )
+    if ( [touches count] < 3 )
     {
         for ( UITouch * touch in touches )
         {
@@ -702,32 +713,45 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
             [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(40.0,40.0) color:[UIColor yellowColor] delegate:self];
             if ( [self point:thisPoint isInside: quadrant[0]] ) 
             {
-                [osc sendDrumControl:thisPoint.y/11.0 withKey:@"random"];
+                [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"random"];
             }
             else if ( [self point:thisPoint isInside: quadrant[1]] ) 
             {
-                [osc sendDrumControl:thisPoint.y/11.0 withKey:@"density"];
+                [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"density"];
             }
             else if ( [self point:thisPoint isInside: quadrant[2]] ) 
             {
-                [osc sendDrumControl:thisPoint.y/11.0 withKey:@"density"];
+                [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"density"];
             }
             else if ( [self point:thisPoint isInside: quadrant[3]] ) 
             {
-                [osc sendDrumControl:thisPoint.y/11.0 withKey:@"random"];
+                [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"random"];
             }
         } 
     }
-    if ( [touches count] == 4 )
+    if ( [[event allTouches] count] == 4 )
     {
-        for ( UITouch * touch in touches )
+        float xtouch = 0; float ytouch = 0;
+        for ( UITouch * touch in [event allTouches] )
         {
             CGPoint thisPoint = [touch locationInView:self.view];
-            [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(40.0,40.0) color:[UIColor yellowColor] delegate:self];
+            xtouch += thisPoint.x; ytouch += thisPoint.y;
+            [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(40.0,40.0) color:[UIColor magentaColor] delegate:self];
         }
-        UITouch * touch = [touches anyObject];
-        CGPoint thisPoint = [touch locationInView:self.view];
-        [osc sendDrumControl:thisPoint.y/11.0 withKey:@"glitch"];
+        xtouch /= 4.0; ytouch /= 4.0;
+        [osc sendDrumControlX:ytouch/11.0 Y:xtouch/8.0 withKey:@"glitch"];
+    }
+    if ( [[event allTouches] count] == 3 )
+    {
+        float xtouch = 0; float ytouch = 0;
+        for ( UITouch * touch in [event allTouches] )
+        {
+            CGPoint thisPoint = [touch locationInView:self.view];
+            xtouch += thisPoint.x; ytouch += thisPoint.y;
+            [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(40.0,40.0) color:[UIColor greenColor] delegate:self];
+        }
+        xtouch /= 3.0; ytouch /= 3.0;
+        [osc sendDrumControlX:ytouch/11.0 Y:xtouch/8.0 withKey:@"stutter"];
     }
 }
 
@@ -736,7 +760,11 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     // see if we've lifted fingers off
     if ( [[event allTouches] count] != 4 || [touches count] == 4 )
     {
-        [osc sendDrumControl:-10.0 withKey:@"glitch"];
+        [osc sendDrumControlX:-10.0 Y:0.0 withKey:@"glitch"];
+    }
+    if ( [[event allTouches] count] != 3 || [touches count] == 3 )
+    {
+        [osc sendDrumControlX:-10.0 Y:0.0 withKey:@"stutter"];
     }
     
     for ( UITouch * touch in touches )
