@@ -49,11 +49,13 @@ feedborkDoodadDelegate, feedborkOSCdelegate> {
 - (void)initMenu;
 - (void)initQuadrants;
 - (AVCaptureDevice *)frontFacingCameraIfAvailable;
+# if !TARGET_IPHONE_SIMULATOR
 - (IplImage *)CreateIplImageFromUIImage:(UIImage *)image;
 - (UIImage *)UIImageFromIplImage:(IplImage *)image;
 - (void) findLinesInImage:(IplImage*)img_greyscale;
 - (void) findCentroidAndAreaOfImage:(IplImage*)img_greyscale;
 - (void) findContoursInImage:(IplImage*)img_greyscale;
+#endif
 
 // menu functions
 - (IBAction)closeMenu;

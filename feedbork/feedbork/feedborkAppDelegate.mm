@@ -23,6 +23,7 @@
      
     self.window.rootViewController = self.viewController;
     [self.window makeKeyAndVisible];
+    [UIApplication sharedApplication].idleTimerDisabled = YES;
     //[[TVOutManager sharedInstance] startTVOut];
     return YES;
 }

@@ -14,7 +14,7 @@
 quantizationSize * totalBeatsPerMeasure * totalMeasures => int gridSize;
 // OSC sender
 OscSend xmit;
-xmit.setHost("192.168.176.226", 9998);
+xmit.setHost("hysteriport.local", 9998);
 // create our OSC receiver
 OscRecv orec;
 // port 9999
