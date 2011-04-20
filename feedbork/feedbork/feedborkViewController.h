@@ -48,6 +48,7 @@ feedborkDoodadDelegate, feedborkOSCdelegate> {
 - (void)initCapture;
 - (void)initMenu;
 - (void)initQuadrants;
+- (void)initTapRecognizer;
 - (AVCaptureDevice *)frontFacingCameraIfAvailable;
 # if !TARGET_IPHONE_SIMULATOR
 - (IplImage *)CreateIplImageFromUIImage:(UIImage *)image;

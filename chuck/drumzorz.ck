@@ -229,18 +229,19 @@ class Randrum
 };
 
 // Randrum setups
-Randrum kick,snare,hihat,openhat,kickhard,snarehard,glitch,cym[4];
-kick.setup("Documents/CCRMA/Slork/slork/chuck/jason/kickmed.wav", "kick");
-snare.setup("Documents/CCRMA/Slork/slork/chuck/jason/snarerealdry.wav", "snare");
-hihat.setup("Documents/CCRMA/Slork/slork/chuck/jason/hihatthin.wav", "hihat");
-openhat.setup("Documents/CCRMA/Slork/slork/chuck/jason/hihatopen.wav", "hihat");
-kickhard.setup("Documents/CCRMA/Slork/slork/chuck/jason/kickbig.wav", "kickhard");
-snarehard.setup("Documents/CCRMA/Slork/slork/chuck/jason/snarehigh.wav", "snarehard");
-cym[0].setup("Documents/CCRMA/Slork/slork/chuck/cym1.aiff", "cym1");
-cym[1].setup("Documents/CCRMA/Slork/slork/chuck/cym2.aiff", "cym2");
-cym[2].setup("Documents/CCRMA/Slork/slork/chuck/cym3.aiff", "cym3");
-cym[3].setup("Documents/CCRMA/Slork/slork/chuck/cym4.aiff", "cym4");
-glitch.setup("Documents/CCRMA/Slork/slork/chuck/snare.aiff", "glitch");
+Randrum kick,snare,hihat,kickhard,openhat,snarehard,glitch,cym[4];
+"jason/" => string path;
+kick.setup(path+"kickmed.wav", "kick");
+snare.setup(path+"snarerealdry.wav", "snare");
+hihat.setup(path+"hihatthin.wav", "hihat");
+kickhard.setup(path+"kickbig.wav", "kickhard");
+snarehard.setup(path+"snarehigh.wav", "snarehard");
+openhat.setup(path+"hihatopen.wav","openhat");
+cym[0].setup("cym1.aiff", "cym1");
+cym[1].setup("cym2.aiff", "cym2");
+cym[2].setup("cym3.aiff", "cym3");
+cym[3].setup("cym4.aiff", "cym4");
+glitch.setup("snare.aiff", "glitch");
 [ 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0 ] @=> int kickPattern[];
 [ 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 ] @=> float kickGain[];
 [ 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 ] @=> int snarePattern[];
