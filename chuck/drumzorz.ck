@@ -162,16 +162,16 @@ class Randrum
 
 // Randrum setups
 Randrum kick,snare,hihat,kickhard,snarehard,glitch,cym[4];
-kick.setup("Documents/CCRMA/Slork/slork/chuck/kick.aiff", "kick");
-snare.setup("Documents/CCRMA/Slork/slork/chuck/snare.aiff", "snare");
-hihat.setup("Documents/CCRMA/Slork/slork/chuck/hihat.aiff", "hihat");
-kickhard.setup("Documents/CCRMA/Slork/slork/chuck/kickbig.aiff", "kickhard");
-snarehard.setup("Documents/CCRMA/Slork/slork/chuck/snarebig.aiff", "snarehard");
-cym[0].setup("Documents/CCRMA/Slork/slork/chuck/cym1.aiff", "cym1");
-cym[1].setup("Documents/CCRMA/Slork/slork/chuck/cym2.aiff", "cym2");
-cym[2].setup("Documents/CCRMA/Slork/slork/chuck/cym3.aiff", "cym3");
-cym[3].setup("Documents/CCRMA/Slork/slork/chuck/cym4.aiff", "cym4");
-glitch.setup("Documents/CCRMA/Slork/slork/chuck/snare.aiff", "glitch");
+kick.setup("kick.aiff", "kick");
+snare.setup("snare.aiff", "snare");
+hihat.setup("hihat.aiff", "hihat");
+kickhard.setup("kickbig.aiff", "kickhard");
+snarehard.setup("snarebig.aiff", "snarehard");
+cym[0].setup("cym1.aiff", "cym1");
+cym[1].setup("cym2.aiff", "cym2");
+cym[2].setup("cym3.aiff", "cym3");
+cym[3].setup("cym4.aiff", "cym4");
+glitch.setup("snare.aiff", "glitch");
 [ 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0 ] @=> int kickPattern[];
 [ 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 ] @=> float kickGain[];
 [ 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 ] @=> int snarePattern[];

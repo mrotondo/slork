@@ -48,6 +48,7 @@ feedborkDoodadDelegate, feedborkOSCdelegate> {
 - (void)initCapture;
 - (void)initMenu;
 - (void)initQuadrants;
+- (void)initTapRecognizer;
 - (AVCaptureDevice *)frontFacingCameraIfAvailable;
 - (IplImage *)CreateIplImageFromUIImage:(UIImage *)image;
 - (UIImage *)UIImageFromIplImage:(IplImage *)image;

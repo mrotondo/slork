@@ -35,6 +35,7 @@
     [self initCapture];
     [self initMenu];
     [self initQuadrants];
+    [self initTapRecognizer];
     
     // setup OSC
     osc = [[feedborkOSC alloc] initWithIP:IPTextField.text portOut:PORT_OUT portIn:PORT_IN];
@@ -198,6 +199,23 @@
     quadrant[2] = CGRectMake(0.0,        sHeight/2.0, sWidth/2.0, sHeight/2.0);
     quadrant[3] = CGRectMake(sWidth/2.0, sHeight/2.0, sWidth/2.0, sHeight/2.0);
     quadTouches[0] = quadTouches[1] = quadTouches[2] = quadTouches[3] = 0;
+}
+
+- (void)initTapRecognizer
+{
+    // Create a tap gesture recognizer to recognize single-finger taps
+    UISwipeGestureRecognizer *recognizer;
+    recognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTapFrom:)];
+    [self.view addGestureRecognizer:recognizer];
+    // once we add its properties we don't need it
+    [recognizer release];
+}
+
+- (void)handleTapFrom:(UITapGestureRecognizer *)recognizer
+{
+    CGPoint loc = [recognizer locationInView:self.view];
+    [osc sendValue:loc.x / self.view.bounds.size.width withKey:@"tap_x"];
+    [osc sendValue:1 - (loc.y / self.view.bounds.size.height) withKey:@"tap_y"];
 }
 
 // handle received swipe gestures 
