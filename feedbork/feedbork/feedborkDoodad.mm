@@ -60,7 +60,7 @@
 - (void) animateMe:(CGPoint) originalCenter
 {
     self.transform = CGAffineTransformMakeScale(0.1, 0.1);
-    [UIView animateWithDuration:0.1
+    [UIView animateWithDuration:0.03
                           delay:0.0
                         options:UIViewAnimationOptionAllowUserInteraction
                      animations:^{ 
@@ -69,7 +69,7 @@
                          
                      } 
                      completion:^(BOOL finished){
-                         [UIView animateWithDuration:1.5
+                         [UIView animateWithDuration:1.0
                                                delay:0.0
                                              options:UIViewAnimationOptionAllowUserInteraction
                                           animations:^{ 

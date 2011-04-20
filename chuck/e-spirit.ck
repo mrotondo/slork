@@ -6,20 +6,23 @@ recv.listen();
 // create an address in the receiver, store in new variable
 recv.event( "/chord, f" ) @=> OscEvent oe;
 
-1::second => dur TimeUnit;
+144.0 => float tempo;
+(44100*60.0/tempo)::samp => dur TimeUnit;
 TimeUnit * 0.5 => dur Half;
 Half * 0.5 => dur Quarter;
 Quarter * 0.5 => dur Eighth;
 Eighth * 0.5 => dur Sixteenth;
+16.0 => float quantizationSize;
 
 Blit chord[4];
-ADSR e => Envelope ramp => NRev rev => dac;
-e => Delay dly => ramp => rev;
+ADSR e => NRev rev => dac;
+e => Delay dly => rev;
 dly => Gain fb => dly;
+for ( 0 => int i; i<4; i++ ) chord[i] => e;
 
 rev.mix(0.1);
-rev.gain(0.05);
-dly.gain(0.5);
+rev.gain(0.35);
+dly.gain(0.6);
 TimeUnit => dly.max;
 Half => dly.delay;
 0.99 => fb.gain;
@@ -27,12 +30,12 @@ Half => dly.delay;
 0 => int thechord;
 int whichchord[];
 
-3::second => ramp.duration;
-ramp.value( 0.0 );
+//3::second => ramp.duration;
+//ramp.value( 0.0 );
 
-e.set( 60::ms, 20::ms, .3, 150::ms );
+e.set( 5::ms, 20::ms, .3, 150::ms );
 
-for ( 0 => int i; i<4; i++ ) chord[i] => e;
+
 [ [0, 5, 11, 16], [0, 4, 11, 12], [5, 7, 12, 16] ] @=> int c[][];
 [0,4,7,11] @=> int maj7[];
 [0,3,7,10] @=> int min7[];
@@ -41,19 +44,9 @@ for ( 0 => int i; i<4; i++ ) chord[i] => e;
 
 maj7 @=> whichchord;
 
-spork ~ playChord();
-
 // infinite time loop
 fun void playChord()
-{
-    while( true )
-    {
-        for( 0 => int i; i<4; i++ )
-        {
-            Std.mtof( whichchord[i] + 33 + Std.rand2(0,3) * 12 ) => chord[i].freq;
-            Std.rand2( 1, 5 ) => chord[i].harmonics;
-        }
-        
+{        
         // key on
         e.keyOn();
         
@@ -62,13 +55,6 @@ fun void playChord()
         
         // key off
         e.keyOff();
-        
-        // advance time
-        5::ms => now;
-        
-        // advance time
-        Quarter => now;
-    }
 }
 
 // infinite event loop
@@ -92,15 +78,15 @@ while ( true )
             min7 @=> whichchord;
         for( 0 => int i; i<4; i++ )
         {
-            Std.mtof( whichchord[i] + 33 + Std.rand2(0,3) * 12 ) => chord[i].freq;
+            Std.mtof( whichchord[i] + 45 + Std.rand2(0,3) * 12 ) => chord[i].freq;
             Std.rand2( 1, 5 ) => chord[i].harmonics;
         }
+        now % (TimeUnit/quantizationSize) => dur mod;
+        // advance time by the quantization size in samps
+        (TimeUnit/quantizationSize) - mod => dur wait;
+        wait => now;
         
-        <<< "received","" >>>;
-        40::ms => ramp.duration;
-        ramp.target( 1.0 );
-        40::ms => now;
-        2.0::second => ramp.duration;
-        ramp.target( 0.0 );
+        spork ~ playChord();
+
     }
 }

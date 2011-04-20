@@ -29,6 +29,8 @@ void drum_callback( osc::ReceivedMessageArgumentStream & oscin, void * data );
         MoNet::startListening();
         
         [self broadcastIP];
+        
+        [NSTimer scheduledTimerWithTimeInterval:0.2 target:self selector:@selector(updateColor:) userInfo:nil repeats:YES];
     }
     
     return self;
@@ -79,6 +81,10 @@ void drum_callback( osc::ReceivedMessageArgumentStream & oscin, void * data );
  
 }
 
+float r = 0.0;
+float g = 0.0;
+float b = 1.0;
+
 void drum_callback( osc::ReceivedMessageArgumentStream & oscin, void * data )
 {
     feedborkOSC * me = (feedborkOSC*)data;
@@ -93,15 +99,15 @@ void drum_callback( osc::ReceivedMessageArgumentStream & oscin, void * data )
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     NSString * dname = [NSString stringWithCString:drumname encoding:NSStringEncodingConversionAllowLossy];
     if ( [dname isEqualToString:@"kick"] )
-        [me.delegate makeDoodad:CGPointMake(518.0, 300.0) size:vel image:@"flare3.png" color:[UIColor blueColor]];
+        [me.delegate makeDoodad:CGPointMake(518.0, 300.0) size:vel image:@"flare3.png" color:[UIColor colorWithRed:r green:g blue:b/5.0 alpha:1.0]];
     else if ( [dname isEqualToString:@"snare"] )
-        [me.delegate makeDoodad:CGPointMake(250.0, 300.0) size:vel image:@"flare3.png" color:[UIColor redColor]];
+        [me.delegate makeDoodad:CGPointMake(250.0, 300.0) size:vel image:@"flare3.png" color:[UIColor colorWithRed:r green:g blue:2*b/5.0 alpha:1.0]];
     else if ( [dname isEqualToString:@"hihat"] )
-        [me.delegate makeDoodad:CGPointMake(518.0, 824.0) size:vel image:@"flare3.png" color:[UIColor yellowColor]];
+        [me.delegate makeDoodad:CGPointMake(518.0, 824.0) size:vel image:@"flare3.png" color:[UIColor colorWithRed:r green:g blue:3*b/5.0 alpha:1.0]];
     else if ( [dname isEqualToString:@"kickhard"] )
-        [me.delegate makeDoodad:CGPointMake(250.0, 824.0) size:vel image:@"flare3.png" color:[UIColor greenColor]];
+        [me.delegate makeDoodad:CGPointMake(250.0, 824.0) size:vel image:@"flare3.png" color:[UIColor colorWithRed:r green:g blue:4*b/5.0 alpha:1.0]];
     else if ( [dname isEqualToString:@"snarehard"] )
-        [me.delegate makeDoodad:CGPointMake(384.0, 562.0) size:vel image:@"flare3.png" color:[UIColor purpleColor]];
+        [me.delegate makeDoodad:CGPointMake(384.0, 562.0) size:vel image:@"flare3.png" color:[UIColor colorWithRed:r green:g blue:1.0 alpha:1.0]];
     else if ( [dname isEqualToString:@"cym1"] )
         [me.delegate makeDoodad:CGPointMake(150.0, 800.0) size:vel image:@"shine1.png" color:[UIColor lightGrayColor]];
     else if ( [dname isEqualToString:@"cym2"] )
@@ -111,6 +117,15 @@ void drum_callback( osc::ReceivedMessageArgumentStream & oscin, void * data )
     else if ( [dname isEqualToString:@"cym4"] )
         [me.delegate makeDoodad:CGPointMake(600.0, 800.0) size:vel image:@"shine2.png" color:[UIColor brownColor]];
     [pool drain];
+}
+
+- (void)updateColor:(NSTimer*)timer
+{
+    r += 0.01;
+    g += 0.0052;
+    
+    if ( r > 1.0 ) r = 0.0;
+    if ( g > 1.0 ) g = 0.0;
 }
 
 - (void)dealloc

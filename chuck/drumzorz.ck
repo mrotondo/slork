@@ -14,7 +14,7 @@
 quantizationSize * totalBeatsPerMeasure * totalMeasures => int gridSize;
 // OSC sender
 OscSend xmit;
-xmit.setHost("hysteriport.local", 9998);
+xmit.setHost("192.168.176.226", 9998);
 // create our OSC receiver
 OscRecv orec;
 // port 9999
@@ -52,7 +52,7 @@ class Randrum
     float hitsGain[gridSize];
     float randHitsGain[gridSize];
     10.0 => float randThreshold;
-    1.8 => float density;
+    2.8 => float density;
     string myname;
     0 => int glitchOn;
     1.0 => float glitchLevel;
@@ -105,9 +105,9 @@ class Randrum
                     hitsGain[i] => sendGain;
                     hitsGain[i] => drum.gain;
                     1.0 * baseRate => drum.rate;
-                    if ( density < 2.0 ) 
+                    if ( density < 3.0 ) 
                     {
-                        if ( Math.rand2(0,100) / 50.0 < density )
+                        if ( Math.rand2(0,100) / 33.0 < density )
                         { 
                             0 => drum.pos;
                         }
@@ -181,9 +181,9 @@ class Randrum
                     hitsGain[i] => sendGain;
                     hitsGain[i] => drum.gain;
                     1.0 * baseRate => drum.rate;
-                    if ( density < 2.0 ) 
+                    if ( density < 4.0 ) 
                     {
-                        if ( Math.rand2(0,100) / 50.0 < density )
+                        if ( Math.rand2(0,1000) / 250.0 < density )
                         { 
                             0 => drum.pos;
                         }
@@ -277,15 +277,18 @@ cym3Pattern @=> cym[2].hitsOn;
 kickHardGain @=> cym[2].hitsGain;
 cym4Pattern @=> cym[3].hitsOn;
 kickHardGain @=> cym[3].hitsGain;
-1.3 => snare.g.gain;
+1.1 => snare.g.gain;
 1.3 => snare.baseRate;
 0.7 => hihat.baseRate;
-0.7 => kickhard.g.gain;
+0.9 => kickhard.g.gain;
 0.7 => hihat.g.gain => openhat.g.gain;
 0.9 => kickhard.baseRate;
-0.3 => snarehard.g.gain;
+0.4 => snarehard.g.gain;
 0.6 => glitch.g.gain;
 0.5 => snarehard.randThreshold;
+0.5 => openhat.g.gain;
+
+0 => int isGlitching;
 
 // drum control listener
 fun void getDrumControl()
@@ -312,12 +315,13 @@ fun void getDrumControl()
             if (x[s] == x["random"])
             { 
                 fx*10.0 => fx;
-                //<<< "random!", f >>>;
+                //<<< "random!", fx >>>;
                 fx => kick.randThreshold;
                 fx => snare.randThreshold;
                 fx => hihat.randThreshold;
                 fx => kickhard.randThreshold;
                 fx => snarehard.randThreshold;
+                fx => openhat.randThreshold;
                 for ( 0 => int i; i < 4; i++ )
                 {
                     fx => cym[i].randThreshold;
@@ -331,6 +335,7 @@ fun void getDrumControl()
                 fx => hihat.density;
                 fx => kickhard.density;
                 fx => snarehard.density;
+                fx => openhat.density;
                 for ( 0 => int i; i < 4; i++ )
                 {
                     fx => cym[i].density;
@@ -338,14 +343,49 @@ fun void getDrumControl()
             }
             else if (x[s] == x["glitch"])
             { 
+                
                 if ( fx > 0 )
                 {
-                    1 => kick.glitchOn;
-                    1 => snare.glitchOn;
-                    1 => hihat.glitchOn;
-                    1 => openhat.glitchOn;
-                    1 => kickhard.glitchOn;
-                    1 => snarehard.glitchOn;
+                    
+                    
+                    if ( !isGlitching )
+                    {
+                        1 => isGlitching;
+                        Math.rand() % 10 => int whichGlitch;
+                        if ( whichGlitch == 0 ) 
+                        {
+                            1 => kick.glitchOn;
+                        }
+                        else if ( whichGlitch == 1 ) 1 => snare.glitchOn;
+                        else if ( whichGlitch == 2 ) 1 => hihat.glitchOn;
+                        else if ( whichGlitch == 3 ) 1 => openhat.glitchOn;
+                        else if ( whichGlitch == 4 ) 1 => kickhard.glitchOn;
+                        else if ( whichGlitch == 5 ) 1 => snarehard.glitchOn;
+                        else if ( whichGlitch == 6 ) 
+                        {
+                            1 => snarehard.glitchOn;
+                            1 => hihat.glitchOn;
+                            1 => snare.glitchOn;
+                        }
+                        else if ( whichGlitch == 7 )
+                        {
+                            1 => snarehard.glitchOn;
+                            1 => kick.glitchOn;
+                            1 => snare.glitchOn;
+                        }
+                        else if ( whichGlitch == 8 ) 
+                        {
+                            1 => kickhard.glitchOn;
+                            1 => openhat.glitchOn;
+                            1 => kick.glitchOn;
+                        }
+                        else if ( whichGlitch == 9 ) 
+                        {
+                            1 => hihat.glitchOn;
+                            1 => kick.glitchOn;
+                            1 => snarehard.glitchOn;
+                        }
+                    }
                     for ( 0 => int i; i < 4; i++ )
                     {
                         1 => cym[i].glitchOn;
@@ -362,12 +402,12 @@ fun void getDrumControl()
                         fx => cym[i].glitchLevel;
                     }
                     
-                    fy => kick.drum.gain;
-                    fy => snare.drum.gain;
-                    fy => hihat.drum.gain;
-                    fy => openhat.drum.gain;
-                    fy => kickhard.drum.gain;
-                    fy => snarehard.drum.gain;
+                    if ( kick.glitchOn ) fy => kick.drum.gain;
+                    else if ( snare.glitchOn ) fy => snare.drum.gain;
+                    else if ( hihat.glitchOn ) fy => hihat.drum.gain;
+                    else if ( openhat.glitchOn ) fy => openhat.drum.gain;
+                    else if ( kickhard.glitchOn ) fy => kickhard.drum.gain;
+                    else if ( snarehard.glitchOn ) fy => snarehard.drum.gain;
                     for ( 0 => int i; i < 4; i++ )
                     {
                         fy => cym[i].drum.gain;
@@ -376,6 +416,7 @@ fun void getDrumControl()
                 }
                 else
                 {
+                    0 => isGlitching;
                     0 => kick.glitchOn => kick.isIn;
                     0 => snare.glitchOn => snare.isIn;
                     0 => hihat.glitchOn => hihat.isIn;

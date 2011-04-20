@@ -658,6 +658,8 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
              thisPoint.y < thisRect.origin.y + thisRect.size.height);
 }
 
+const float thresh = 50.0;
+
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {    
     // reset touches
@@ -692,26 +694,35 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     for ( UITouch * touch in touches )
     {
         CGPoint thisPoint = [touch locationInView:self.view];
-        [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(20.0,20.0) color:[UIColor yellowColor] delegate:self];
+        if ( [touches count] > 1 ) [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(25.0,25.0) color:[UIColor yellowColor] delegate:self];
         if ( [self point:thisPoint isInside: quadrant[0]] ) 
         {
-            if ( thisPoint.x > IPAD_WIDTH - 20.0 ) [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"random"];
-            [osc sendValue:0.0 withKey:@"chord"];
+            if ( thisPoint.x > IPAD_WIDTH - thresh ) [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"random"];
+            //else if ( [touches count] == 1 ) [osc sendValue:0.0 withKey:@"chord"];
         }
         else if ( [self point:thisPoint isInside: quadrant[1]] ) 
         {
-            if ( thisPoint.x < 20.0 ) [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"density"];
-            [osc sendValue:1.0 withKey:@"chord"];
+            if ( thisPoint.x < thresh ) [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"density"];
+            //else if ( [touches count] == 1 ) [osc sendValue:1.0 withKey:@"chord"];
         }
         else if ( [self point:thisPoint isInside: quadrant[2]] ) 
         {
-            if ( thisPoint.x < 20.0 ) [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"density"];
-            [osc sendValue:2.0 withKey:@"chord"];
+            if ( thisPoint.x < thresh ) [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"density"];
+            else if ( [touches count] == 1 ) 
+            {
+                [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(100.0,100.0) color:[UIColor yellowColor] delegate:self];
+                [osc sendValue:2.0 withKey:@"chord"];
+            }
+            
         }
         else if ( [self point:thisPoint isInside: quadrant[3]] ) 
         {
-            if ( thisPoint.x > IPAD_WIDTH - 20.0 ) [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"random"];
-            [osc sendValue:3.0 withKey:@"chord"];
+            if ( thisPoint.x > IPAD_WIDTH - thresh ) [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"random"];
+            else if ( [touches count] == 1 ) 
+            {
+                [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(100.0,100.0) color:[UIColor yellowColor] delegate:self];
+                [osc sendValue:3.0 withKey:@"chord"];
+            }
         }
     }    
 }
@@ -739,22 +750,22 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         for ( UITouch * touch in touches )
         {
             CGPoint thisPoint = [touch locationInView:self.view];
-            [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(20.0,20.0) color:[UIColor yellowColor] delegate:self];
+            [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(10.0,10.0) color:[UIColor yellowColor] delegate:self];
             if ( [self point:thisPoint isInside: quadrant[0]] ) 
             {
-                if ( thisPoint.x > IPAD_WIDTH - 20.0 ) [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"random"];
+                if ( thisPoint.x > IPAD_WIDTH - thresh ) [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"random"];
             }
             else if ( [self point:thisPoint isInside: quadrant[1]] ) 
             {
-                if ( thisPoint.x < 20.0 ) [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"density"];
+                if ( thisPoint.x < thresh ) [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"density"];
             }
             else if ( [self point:thisPoint isInside: quadrant[2]] ) 
             {
-                if ( thisPoint.x < 20.0 ) [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"density"];
+                if ( thisPoint.x < thresh ) [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"density"];
             }
             else if ( [self point:thisPoint isInside: quadrant[3]] ) 
             {
-                if ( thisPoint.x > IPAD_WIDTH - 20.0 ) [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"random"];
+                if ( thisPoint.x > IPAD_WIDTH - thresh ) [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"random"];
             }
         } 
     }
@@ -765,7 +776,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         {
             CGPoint thisPoint = [touch locationInView:self.view];
             xtouch += thisPoint.x; ytouch += thisPoint.y;
-            [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(20.0,20.0) color:[UIColor magentaColor] delegate:self];
+            [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(10.0,10.0) color:[UIColor yellowColor] delegate:self];
         }
         xtouch *= 0.25; ytouch *= 0.25;
         [osc sendDrumControlX:ytouch/11.0 Y:xtouch/8.0 withKey:@"glitch"];
@@ -777,7 +788,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
         {
             CGPoint thisPoint = [touch locationInView:self.view];
             xtouch += thisPoint.x; ytouch += thisPoint.y;
-            [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(20.0,20.0) color:[UIColor greenColor] delegate:self];
+            [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(10.0,10.0) color:[UIColor yellowColor] delegate:self];
         }
         xtouch *= 0.3333; ytouch *= 0.3333;
         [osc sendDrumControlX:ytouch/11.0 Y:xtouch/8.0 withKey:@"stutter"];
