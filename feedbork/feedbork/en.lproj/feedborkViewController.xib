@@ -2,13 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.CocoaTouch.iPad.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">800</int>
-		<string key="IBDocument.SystemVersion">10J567</string>
-		<string key="IBDocument.InterfaceBuilderVersion">1306</string>
+		<string key="IBDocument.SystemVersion">10J869</string>
+		<string key="IBDocument.InterfaceBuilderVersion">1305</string>
 		<string key="IBDocument.AppKitVersion">1038.35</string>
-		<string key="IBDocument.HIToolboxVersion">462.00</string>
+		<string key="IBDocument.HIToolboxVersion">461.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
-			<string key="NS.object.0">301</string>
+			<string key="NS.object.0">300</string>
 		</object>
 		<object class="NSArray" key="IBDocument.IntegratedClassDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -53,7 +53,7 @@
 							<object class="IBUILabel" id="853558349">
 								<reference key="NSNextResponder" ref="321836072"/>
 								<int key="NSvFlags">292</int>
-								<string key="NSFrame">{{162, 20}, {70, 21}}</string>
+								<string key="NSFrame">{{17, 20}, {70, 21}}</string>
 								<reference key="NSSuperview" ref="321836072"/>
 								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="146455649"/>
@@ -98,7 +98,7 @@
 							<object class="IBUITextField" id="146455649">
 								<reference key="NSNextResponder" ref="321836072"/>
 								<int key="NSvFlags">292</int>
-								<string key="NSFrame">{{228, 15}, {138, 31}}</string>
+								<string key="NSFrame">{{83, 15}, {264, 31}}</string>
 								<reference key="NSSuperview" ref="321836072"/>
 								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="185050001"/>
@@ -115,6 +115,11 @@
 									<object class="NSColorSpace" key="NSCustomColorSpace">
 										<int key="NSID">2</int>
 									</object>
+								</object>
+								<object class="NSFont" key="IBUIFont">
+									<string key="NSName">Helvetica</string>
+									<double key="NSSize">24</double>
+									<int key="NSfFlags">16</int>
 								</object>
 								<int key="IBUITextAlignment">2</int>
 								<bool key="IBUIAdjustsFontSizeToFit">YES</bool>
@@ -159,7 +164,7 @@
 							<object class="IBUIButton" id="185050001">
 								<reference key="NSNextResponder" ref="321836072"/>
 								<int key="NSvFlags">292</int>
-								<string key="NSFrame">{{228, 60}, {138, 37}}</string>
+								<string key="NSFrame">{{17, 69}, {138, 37}}</string>
 								<reference key="NSSuperview" ref="321836072"/>
 								<reference key="NSWindow"/>
 								<reference key="NSNextKeyView" ref="888107117"/>
@@ -230,7 +235,6 @@
 								<string key="NSFrame">{{14, 206}, {134, 21}}</string>
 								<reference key="NSSuperview" ref="321836072"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView"/>
 								<bool key="IBUIOpaque">NO</bool>
 								<bool key="IBUIClipsSubviews">YES</bool>
 								<int key="IBUIContentMode">7</int>
@@ -400,7 +404,6 @@
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<reference ref="146455649"/>
-							<reference ref="185050001"/>
 							<reference ref="888107117"/>
 							<reference ref="835486041"/>
 							<reference ref="973635136"/>
@@ -408,6 +411,7 @@
 							<reference ref="371050746"/>
 							<reference ref="853558349"/>
 							<reference ref="369935818"/>
+							<reference ref="185050001"/>
 						</object>
 						<reference key="parent" ref="766721923"/>
 					</object>
@@ -531,10 +535,7 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>changeAlpha:</string>
 							<string>changeBorder:</string>
-							<string>changeColorThreshold:</string>
 							<string>changeIP:</string>
-							<string>chooseMyColor:</string>
-							<string>chooseMyFriendsColor:</string>
 							<string>closeMenu</string>
 							<string>lockExposure</string>
 						</object>
@@ -542,10 +543,7 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>UISlider</string>
 							<string>UISlider</string>
-							<string>UISlider</string>
 							<string>UITextField</string>
-							<string>UIButton</string>
-							<string>UIButton</string>
 							<string>id</string>
 							<string>id</string>
 						</object>
@@ -556,10 +554,7 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>changeAlpha:</string>
 							<string>changeBorder:</string>
-							<string>changeColorThreshold:</string>
 							<string>changeIP:</string>
-							<string>chooseMyColor:</string>
-							<string>chooseMyFriendsColor:</string>
 							<string>closeMenu</string>
 							<string>lockExposure</string>
 						</object>
@@ -574,20 +569,8 @@
 								<string key="candidateClassName">UISlider</string>
 							</object>
 							<object class="IBActionInfo">
-								<string key="name">changeColorThreshold:</string>
-								<string key="candidateClassName">UISlider</string>
-							</object>
-							<object class="IBActionInfo">
 								<string key="name">changeIP:</string>
 								<string key="candidateClassName">UITextField</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">chooseMyColor:</string>
-								<string key="candidateClassName">UIButton</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">chooseMyFriendsColor:</string>
-								<string key="candidateClassName">UIButton</string>
 							</object>
 							<object class="IBActionInfo">
 								<string key="name">closeMenu</string>
@@ -607,16 +590,12 @@
 							<string>borderSlider</string>
 							<string>exposureLockButton</string>
 							<string>menuView</string>
-							<string>myColorPicker</string>
-							<string>myFriendsColorPicker</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>UITextField</string>
 							<string>UISlider</string>
 							<string>UIToggleButton</string>
-							<string>UIView</string>
-							<string>UIView</string>
 							<string>UIView</string>
 						</object>
 					</object>
@@ -628,8 +607,6 @@
 							<string>borderSlider</string>
 							<string>exposureLockButton</string>
 							<string>menuView</string>
-							<string>myColorPicker</string>
-							<string>myFriendsColorPicker</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
@@ -647,14 +624,6 @@
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">menuView</string>
-								<string key="candidateClassName">UIView</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">myColorPicker</string>
-								<string key="candidateClassName">UIView</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">myFriendsColorPicker</string>
 								<string key="candidateClassName">UIView</string>
 							</object>
 						</object>
@@ -678,6 +647,6 @@
 		</object>
 		<bool key="IBDocument.PluginDeclaredDependenciesTrackSystemTargetVersion">YES</bool>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
-		<string key="IBCocoaTouchPluginVersion">301</string>
+		<string key="IBCocoaTouchPluginVersion">300</string>
 	</data>
 </archive>

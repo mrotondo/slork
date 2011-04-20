@@ -14,7 +14,8 @@
 quantizationSize * totalBeatsPerMeasure * totalMeasures => int gridSize;
 // OSC sender
 OscSend xmit;
-xmit.setHost("192.168.176.226", 9998);
+xmit.setHost("
+hysteriport.local", 9998);
 // create our OSC receiver
 OscRecv orec;
 // port 9999
@@ -22,7 +23,7 @@ OscRecv orec;
 // start listening (launch thread)
 orec.listen();
 orec.event("/IP,s") @=> OscEvent IP_event;
-orec.event("/drumcontrol,s,f") @=> OscEvent Drum_event;
+orec.event("/drumcontrol,s,f,f") @=> OscEvent Drum_event;
 
 // IP listener
 fun void getIP()
@@ -46,7 +47,7 @@ fun void getIP()
 // class for randrumly generated drums
 class Randrum
 {
-    SndBuf drum => Gain gain => dac;
+    SndBuf drum => Gain g => dac;
     int hitsOn[gridSize];
     int randHitsOn[gridSize];
     float hitsGain[gridSize];
@@ -56,6 +57,8 @@ class Randrum
     string myname;
     0 => int glitchOn;
     1.0 => float glitchLevel;
+    1.0 => float baseRate;
+    0 => int isIn;
     
     // setup the filepath for the sample as well as a unique name
     fun void setup( string _filename, string _name )
@@ -89,18 +92,20 @@ class Randrum
         while( true ) {
             // go through all of the spots in the gridsize
             //for (0 => int i; i < gridSize; i++) {
-            ((now/(sampsPerBeat/quantizationSize)) % 16) $ int  => int i;
-            0.0 => float sendGain;
-            0 => int send;
+            
             // if we have said this should be hit in our main pattern
             
             if ( glitchOn == 0 )
             {
+                ((now/(sampsPerBeat/quantizationSize)) % gridSize) $ int  => int i;
+                0.0 => float sendGain;
+                0 => int send;
+                
                 if (hitsOn[i] == 1) {
                     1 => send;
                     hitsGain[i] => sendGain;
                     hitsGain[i] => drum.gain;
-                    1.0 => drum.rate;
+                    1.0 * baseRate => drum.rate;
                     if ( density < 2.0 ) 
                     {
                         if ( Math.rand2(0,100) / 50.0 < density )
@@ -124,7 +129,7 @@ class Randrum
                     1 => send;
                     randHitsGain[i] => sendGain;
                     randHitsGain[i] => drum.gain;
-                    Math.rand2f(1 - randThreshold/1000, 1 + randThreshold/1000) => drum.rate;
+                    baseRate * Math.rand2f(1 - randThreshold/1000, 1 + randThreshold/1000) => drum.rate;
                     0 => drum.pos;
                     1 -=> randHitsOn[i];
                     Math.floor(randThreshold * .01 * randHitsOn[i]) $ int => randHitsOn[i];
@@ -144,20 +149,84 @@ class Randrum
                 wait => now;
             }
             
-            else
+            else if ( glitchOn == 1 )
             {
                 //<<< glitchLevel >>>;
                 Math.floor((sampsPerBeat/1::samp)/(quantizationSize))/glitchLevel => float sampsPerGlitch;
                 for ( 0 => int j; j < glitchLevel; j++ )
                 {
+                    //0.4 => drum.gain;
                     0 => drum.pos;
                     sampsPerGlitch::samp => now;
                 }
             }
-            //}
+            
+            if ( glitchOn == 2 )
+            {
+                int i;
+                if ( i % gridSize != 0 || isIn == 0 )
+                {
+                    ((now/(sampsPerBeat/quantizationSize)) % gridSize) $ int  => i;
+                }
+                
+                else 
+                {
+                    1 => isIn;
+                    ((now/(4.0*(sampsPerBeat/quantizationSize)/3.0)) % gridSize) $ int  => i;
+                }
+                0.0 => float sendGain;
+                0 => int send;
+                
+                if (hitsOn[i] == 1) {
+                    1 => send;
+                    hitsGain[i] => sendGain;
+                    hitsGain[i] => drum.gain;
+                    1.0 * baseRate => drum.rate;
+                    if ( density < 2.0 ) 
+                    {
+                        if ( Math.rand2(0,100) / 50.0 < density )
+                        { 
+                            0 => drum.pos;
+                        }
+                        else 0 => send;
+                    }
+                    else 0 => drum.pos;
+                    // possibly allow random sample to be added on
+                    if (Math.rand2(0,100) < randThreshold) {
+                        i + Math.rand2f(-1*density, density) $ int => int tempLocation;
+                        if ( tempLocation < gridSize && tempLocation >= 0 && hitsOn[tempLocation] == 0) {
+                            Math.floor(density) $ int => randHitsOn[tempLocation];
+                            Math.rand2f(.1,.4)*hitsGain[i] => randHitsGain[tempLocation];
+                        }
+                    }
+                }
+                // handle the case that a random sample got triggered in the previous run
+                if (randHitsOn[i] > 0) {
+                    1 => send;
+                    randHitsGain[i] => sendGain;
+                    randHitsGain[i] => drum.gain;
+                    baseRate * Math.rand2f(1 - randThreshold/1000, 1 + randThreshold/1000) => drum.rate;
+                    0 => drum.pos;
+                    1 -=> randHitsOn[i];
+                    Math.floor(randThreshold * .01 * randHitsOn[i]) $ int => randHitsOn[i];
+                }
+                
+                // send OSC if there's been a hit
+                if ( send == 1 )
+                {
+                    xmit.startMsg("/drum, s, f");
+                    xmit.addString( myname );
+                    xmit.addFloat(sendGain); 
+                }
+                
+                //now % (2.0*(sampsPerBeat/quantizationSize)/3.0) => dur mod;
+                // advance time by the quantization size in samps
+                //(2.0*(sampsPerBeat/quantizationSize)/3.0) - mod => dur wait;
+                //wait => now;
+                (4.0*(sampsPerBeat/quantizationSize)/3.0) => now;
+            }
         }
     }
-    
 };
 
 // Randrum setups
@@ -174,12 +243,14 @@ cym[3].setup("cym4.aiff", "cym4");
 glitch.setup("snare.aiff", "glitch");
 [ 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0 ] @=> int kickPattern[];
 [ 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 ] @=> float kickGain[];
-[ 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 ] @=> int snarePattern[];
-[ 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 ] @=> float snareGain[];
-[ 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 ] @=> int snareHardPattern[];
+[ 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 ] @=> int snarePattern[];
+[ 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.6, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 ] @=> float snareGain[];
+[ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 ] @=> int snareHardPattern[];
 [ 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 ] @=> float snareHardGain[];
 [ 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0 ] @=> int hihatPattern[];
 [ 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 ] @=> float hihatGain[];
+[ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 ] @=> int openhatPattern[];
+[ 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 ] @=> float openhatGain[];
 [ 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0 ] @=> int kickHardPattern[];
 [ 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 ] @=> float kickHardGain[];
 [ 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0 ] @=> int cym1Pattern[];
@@ -194,6 +265,8 @@ snareHardPattern @=> snarehard.hitsOn;
 snareHardGain @=> snarehard.hitsGain;
 hihatPattern @=> hihat.hitsOn;
 hihatGain @=> hihat.hitsGain;
+openhatPattern @=> openhat.hitsOn;
+openhatGain @=> openhat.hitsGain;
 kickHardPattern @=> kickhard.hitsOn;
 kickHardGain @=> kickhard.hitsGain;
 cym1Pattern @=> cym[0].hitsOn;
@@ -204,16 +277,21 @@ cym3Pattern @=> cym[2].hitsOn;
 kickHardGain @=> cym[2].hitsGain;
 cym4Pattern @=> cym[3].hitsOn;
 kickHardGain @=> cym[3].hitsGain;
-0.2 => kickhard.gain.gain;
-0.1 => snarehard.gain.gain;
-0.6 => glitch.gain.gain;
+1.3 => snare.g.gain;
+1.3 => snare.baseRate;
+0.7 => hihat.baseRate;
+0.7 => kickhard.g.gain;
+0.7 => hihat.g.gain => openhat.g.gain;
+0.9 => kickhard.baseRate;
+0.3 => snarehard.g.gain;
+0.6 => glitch.g.gain;
 0.5 => snarehard.randThreshold;
 
 // drum control listener
 fun void getDrumControl()
 {
     string s;
-    float f;
+    float fx, fy;
     
     while (true)
     {
@@ -223,46 +301,49 @@ fun void getDrumControl()
         while( Drum_event.nextMsg() != 0 )
         {   
             Drum_event.getString() => s;
-            Drum_event.getFloat()/10.0 => f;
+            Drum_event.getFloat()/10.0 => fx;
+            Drum_event.getFloat()/200.0 => fy;
             //<<< s, f >>>;
             int x[0];
             1 => x["random"];
             2 => x["density"];
             3 => x["glitch"];
+            4 => x["stutter"];
             if (x[s] == x["random"])
             { 
-                f*10.0 => f;
+                fx*10.0 => fx;
                 //<<< "random!", f >>>;
-                f => kick.randThreshold;
-                f => snare.randThreshold;
-                f => hihat.randThreshold;
-                f => kickhard.randThreshold;
-                f => snarehard.randThreshold;
+                fx => kick.randThreshold;
+                fx => snare.randThreshold;
+                fx => hihat.randThreshold;
+                fx => kickhard.randThreshold;
+                fx => snarehard.randThreshold;
                 for ( 0 => int i; i < 4; i++ )
                 {
-                    f => cym[i].randThreshold;
+                    fx => cym[i].randThreshold;
                 }
             }
             else if (x[s] == x["density"])
             { 
                 //<<< "density!", f >>>;
-                f => kick.density;
-                f => snare.density;
-                f => hihat.density;
-                f => kickhard.density;
-                f => snarehard.density;
+                fx => kick.density;
+                fx => snare.density;
+                fx => hihat.density;
+                fx => kickhard.density;
+                fx => snarehard.density;
                 for ( 0 => int i; i < 4; i++ )
                 {
-                    f => cym[i].density;
+                    fx => cym[i].density;
                 }
             }
             else if (x[s] == x["glitch"])
             { 
-                if ( f > 0 )
+                if ( fx > 0 )
                 {
-                    //1 => kick.glitchOn;
+                    1 => kick.glitchOn;
                     1 => snare.glitchOn;
                     1 => hihat.glitchOn;
+                    1 => openhat.glitchOn;
                     1 => kickhard.glitchOn;
                     1 => snarehard.glitchOn;
                     for ( 0 => int i; i < 4; i++ )
@@ -270,31 +351,84 @@ fun void getDrumControl()
                         1 => cym[i].glitchOn;
                     }
                     
-                    f => kick.glitchLevel;
-                    f => snare.glitchLevel;
-                    f => hihat.glitchLevel;
-                    f => kickhard.glitchLevel;
-                    f => snarehard.glitchLevel;
+                    fx => kick.glitchLevel;
+                    fx => snare.glitchLevel;
+                    fx => hihat.glitchLevel;
+                    fx => openhat.glitchLevel;
+                    fx => kickhard.glitchLevel;
+                    fx => snarehard.glitchLevel;
                     for ( 0 => int i; i < 4; i++ )
                     {
-                        f => cym[i].glitchLevel;
+                        fx => cym[i].glitchLevel;
+                    }
+                    
+                    fy => kick.drum.gain;
+                    fy => snare.drum.gain;
+                    fy => hihat.drum.gain;
+                    fy => openhat.drum.gain;
+                    fy => kickhard.drum.gain;
+                    fy => snarehard.drum.gain;
+                    for ( 0 => int i; i < 4; i++ )
+                    {
+                        fy => cym[i].drum.gain;
                     }
                     
                 }
                 else
                 {
-                    0 => kick.glitchOn;
-                    0 => snare.glitchOn;
-                    0 => hihat.glitchOn;
-                    0 => kickhard.glitchOn;
-                    0 => snarehard.glitchOn;
+                    0 => kick.glitchOn => kick.isIn;
+                    0 => snare.glitchOn => snare.isIn;
+                    0 => hihat.glitchOn => hihat.isIn;
+                    0 => openhat.glitchOn => openhat.isIn;
+                    0 => kickhard.glitchOn => kickhard.isIn;
+                    0 => snarehard.glitchOn => snarehard.isIn;
                     for ( 0 => int i; i < 4; i++ )
                     {
-                        0 => cym[i].glitchOn;
+                        0 => cym[i].glitchOn => cym[i].isIn;
                     }
                 }
                 //<<< "glitch!", f >>>;
-                glitch.glitch(f);
+                //glitch.glitch(f);
+            }
+            else if (x[s] == x["stutter"])
+            { 
+                if ( fx > 0 )
+                {
+                    2 => kick.glitchOn;
+                    2 => snare.glitchOn;
+                    2 => hihat.glitchOn;
+                    2 => openhat.glitchOn;
+                    2 => kickhard.glitchOn;
+                    2 => snarehard.glitchOn;
+                    for ( 0 => int i; i < 4; i++ )
+                    {
+                        2 => cym[i].glitchOn;
+                    }
+                    
+                    fx => kick.glitchLevel;
+                    fx => snare.glitchLevel;
+                    fx => hihat.glitchLevel;
+                    fx => openhat.glitchLevel;
+                    fx => kickhard.glitchLevel;
+                    fx => snarehard.glitchLevel;
+                    for ( 0 => int i; i < 4; i++ )
+                    {
+                        fx => cym[i].glitchLevel;
+                    }                    
+                }
+                else
+                {
+                    0 => kick.glitchOn => kick.isIn;
+                    0 => snare.glitchOn => snare.isIn;
+                    0 => hihat.glitchOn => hihat.isIn;
+                    0 => openhat.glitchOn => openhat.isIn;
+                    0 => kickhard.glitchOn => kickhard.isIn;
+                    0 => snarehard.glitchOn => snarehard.isIn;
+                    for ( 0 => int i; i < 4; i++ )
+                    {
+                        0 => cym[i].glitchOn => cym[i].isIn;
+                    }
+                }
             }
         }
     }
@@ -306,6 +440,7 @@ spork ~ kickhard.playback();
 spork ~ snare.playback();
 spork ~ snarehard.playback();
 spork ~ hihat.playback();
+spork ~ openhat.playback();
 spork ~ glitch.playback();
 
 // these are some listeners
@@ -314,7 +449,7 @@ spork ~ getDrumControl();
 
 for ( 0 => int i; i < 4; i++ )
 {
-    0.2 => cym[i].gain.gain;
+    0.2 => cym[i].g.gain;
     1.0 => cym[i].randThreshold;
     //spork ~ cym[i].playback();
 }

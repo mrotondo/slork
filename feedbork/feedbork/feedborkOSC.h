@@ -25,7 +25,7 @@ class MoNet;
 - (id)initWithIP:(NSString*)_IP portOut:(int)_porto portIn:(int)_porti;
 - (void)changeIP:(NSString*)_IP;
 - (void)sendValue:(float)value withKey:(NSString*)key;
-- (void)sendDrumControl:(float)value withKey:(NSString*)key;
+- (void)sendDrumControlX:(float)xval Y:(float)yval withKey:(NSString*)key;
 - (void)broadcastIP;
 
 @end
