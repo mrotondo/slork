@@ -223,7 +223,7 @@ public class MelodyVoice extends Voice
 			reverb3.mix() + ((reverb3_mix_target + Scenes.current_scene.reverb_base) - reverb3.mix()) * 0.01 => reverb3.mix;
 			reverb4.mix() + ((reverb4_mix_target + Scenes.current_scene.reverb_base) - reverb4.mix()) * 0.01 => reverb4.mix;
 			
-			ms => now;
+			second => now;
 		}
 	}
 }

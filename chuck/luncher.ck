@@ -1,4 +1,10 @@
 Machine.add("scenes.ck");
+me.yield();
 Machine.add("melody.ck");
+me.yield();
 Machine.add("Feedbork.ck");
-//Machine.add("drumzorz.ck");
+me.yield();
+Machine.add("drumzorz.ck");
+me.yield();
+Machine.add("e-spirit.ck");
+me.yield();
