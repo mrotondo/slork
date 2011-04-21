@@ -10,7 +10,7 @@ fun float SumFloats(float floats[])
 
 class Voice
 {
-    69 => int root;
+    45 => int root;
     root => int pitch;
     0 => int prev_pitch;
 
@@ -28,6 +28,18 @@ class Voice
     
     SinOsc osc => dac;
     0.0 => osc.gain;
+
+	fun void SetKey(int major_minor)
+	{
+		if (major_minor == 0)
+		{
+			[0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23, 24] @=> intervals;
+		}
+		else
+		{
+			[0, 2, 3, 5, 7, 9, 10, 12, 14, 15, 17, 19, 21, 22, 24] @=> intervals;
+		}
+	}
     
     fun void updateParams()
     {
@@ -139,8 +151,6 @@ class Voice
         }
 
         next_pitch => pitch;
-        
-        <<< "Voice pitch", pitch >>>;
     }
 }
 

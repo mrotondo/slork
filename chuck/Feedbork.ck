@@ -33,6 +33,14 @@ class FloatListener extends FeedborkListener
     }
 }
 
+class IntListener extends FeedborkListener
+{    
+    fun void init(OscRecv orec, string event_name)
+    {
+        orec.event("/" + event_name + ",i") @=> event;
+    }
+}
+
 // create our OSC receiver for messages from the iPad
 OscRecv orec;
 // port 9999
@@ -99,46 +107,55 @@ class ReverbListener extends FloatListener
 
 // Collapse these down into one listener for two floats
 0 => int manual_note_choice;
-class NotePitchListener extends FloatListener
-{
+class NoteListener extends FeedborkListener
+{    
+    fun void init(OscRecv orec, string event_name)
+    {
+        orec.event("/" + event_name + ",f f") @=> event;
+    }
+	
     fun void handleEvent()
     {
-        event.getFloat() => float f;
-		f < 0.5 => manual_note_choice;
+		<<< "TAPPED" >>>;
+		
+        event.getFloat() => float x;
+        event.getFloat() => float y;
+		x < 0.5 => manual_note_choice;
+		voice.ChooseNextNote(manual_note_choice, y);
+		voice.PlayNextNote();
     }
 }
 
-class NoteTriggerListener extends FloatListener
+class KeyListener extends IntListener
 {
     fun void handleEvent()
     {
-        event.getFloat() => float f;
-		voice.ChooseNextNote(manual_note_choice, f);
+        event.getInt() => int i;
+		voice.SetKey(i);
     }
 }
 
 ReverbListener reverb_listener;
 reverb_listener.init(orec, "centroid_x");
-spork ~ reverb_listener.go() @=> Shred @ reverb_shred;
+//spork ~ reverb_listener.go() @=> Shred @ reverb_shred;
 
 HPFFreqListener hpf_freq_listener;
 hpf_freq_listener.init(orec, "centroid_y");
-spork ~ hpf_freq_listener.go() @=> Shred @ hpf_freq_shred;
+//spork ~ hpf_freq_listener.go() @=> Shred @ hpf_freq_shred;
 
-NotePitchListener note_pitch_listener;
-note_pitch_listener.init(orec, "tap_x");
-spork ~ note_pitch_listener.go() @=> Shred @ note_pitch_shred;
+NoteListener note_listener;
+note_listener.init(orec, "tap");
+spork ~ note_listener.go() @=> Shred @ note_shred;
 
-NoteTriggerListener note_trigger_listener;
-note_trigger_listener.init(orec, "tap_y");
-spork ~ note_trigger_listener.go() @=> Shred @ note_trigger_shred;
+KeyListener key_listener;
+key_listener.init(orec, "chord");
+spork ~ key_listener.go();
 
 1::minute / (Scenes.bpm * 8) => dur eighth_note_duration;
 now => time start_offset;
 
 while(true) {
 	for (0 => int i; i < 8; i++) {
-		voice.PlayNextNote();
 		eighth_note_duration => now;
 	}
 }

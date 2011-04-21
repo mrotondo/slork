@@ -252,8 +252,8 @@
 - (void)handleTapFrom:(UITapGestureRecognizer *)recognizer
 {
     CGPoint loc = [recognizer locationInView:self.view];
-    [osc sendValue:loc.x / self.view.bounds.size.width withKey:@"tap_x"];
-    [osc sendValue:1 - (loc.y / self.view.bounds.size.height) withKey:@"tap_y"];
+    CGPoint tapPoint = CGPointMake(loc.x / self.view.bounds.size.width, 1 - (loc.y / self.view.bounds.size.height));
+    [osc sendPoint:tapPoint withKey:@"tap"];
 }
 
 // handle received swipe gestures 
