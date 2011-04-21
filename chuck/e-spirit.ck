@@ -30,11 +30,15 @@ Half => dly.delay;
 0 => int thechord;
 int whichchord[];
 
+// OSC sender
+OscSend xmit;
+xmit.setHost("192.168.177.31", 9999);
+
 //3::second => ramp.duration;
 //ramp.value( 0.0 );
 
 e.set( 5::ms, 20::ms, .3, 150::ms );
-
+e.keyOff();
 
 [ [0, 5, 11, 16], [0, 4, 11, 12], [5, 7, 12, 16] ] @=> int c[][];
 [0,4,7,11] @=> int maj7[];
@@ -73,9 +77,17 @@ while ( true )
         if ( thechord == 1 )
             min @=> whichchord;
         if ( thechord == 2 )
+        {
+            xmit.startMsg("/chord, i");
+            xmit.addInt(0);
             maj7 @=> whichchord;
+        }
         if ( thechord == 3 )
+        {
+            xmit.startMsg("/chord, i");
+            xmit.addInt(1); 
             min7 @=> whichchord;
+        }
         for( 0 => int i; i<4; i++ )
         {
             Std.mtof( whichchord[i] + 45 + Std.rand2(0,3) * 12 ) => chord[i].freq;

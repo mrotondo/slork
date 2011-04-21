@@ -449,6 +449,15 @@ fun void updateParams()
     Scenes.current_scene.hihatPattern @=> hihat.hitsOn;
     Scenes.current_scene.openhatPattern @=> openhat.hitsOn;
     Scenes.current_scene.kickHardPattern @=> kickhard.hitsOn;
+    
+    Scenes.current_scene.drumRandomness => float fx;
+    
+    fx => kick.randThreshold;
+    fx => snare.randThreshold;
+    fx => hihat.randThreshold;
+    fx => kickhard.randThreshold;
+    fx => snarehard.randThreshold;
+    fx => openhat.randThreshold;
 }
 
 // "main" loop
