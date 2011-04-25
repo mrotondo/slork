@@ -62,7 +62,7 @@ spork ~ Scenes.startPiece() @=> Shred @ scenes_shred;
 me.yield();
 <<< "BPM in feedbork is: " + Scenes.bpm >>>;
 
-MelodyVoice voice;
+Bass voice;
 spork ~ voice.updateParams() @=> Shred @ voice_shred;
 
 orec.event("/IP,s") @=> OscEvent IP_event;
@@ -88,7 +88,7 @@ class HPFFreqListener extends FloatListener
     fun void handleEvent()
     {
         event.getFloat() => float f;
-		voice.SetHPFFreq(Math.max(10, f / 10000 - 1000));
+		//voice.SetHPFFreq(Math.max(10, f / 10000 - 1000));
     }
 }
 
@@ -97,7 +97,7 @@ class ReverbListener extends FloatListener
     fun void handleEvent()
     {
         event.getFloat() => float f;
-		voice.SetReverbMix(f);
+		//voice.SetReverbMix(f);
     }
 }
 
@@ -135,7 +135,7 @@ reverb_listener.init(orec, "centroid_x");
 
 HPFFreqListener hpf_freq_listener;
 hpf_freq_listener.init(orec, "brightness");
-spork ~ hpf_freq_listener.go() @=> Shred @ hpf_freq_shred;
+//spork ~ hpf_freq_listener.go() @=> Shred @ hpf_freq_shred;
 
 NoteListener note_listener;
 note_listener.init(orec, "tap");

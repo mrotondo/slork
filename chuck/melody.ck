@@ -154,7 +154,79 @@ class Voice
     }
 }
 
-public class MelodyVoice extends Voice
+public class Bass extends Voice
+{
+	Gain g => dac;
+	
+	Blit ugen1 => LPF f1 => ADSR env1 => g;
+	5 => ugen1.harmonics;	
+	10::ms => env1.attackTime;
+	1500::ms => env1.decayTime;
+	0.1 => env1.sustainLevel;
+
+	Blit ugen2 => ADSR env2 => g;
+	10 => ugen2.harmonics;
+	500::ms => env2.attackTime;
+	200::ms => env2.decayTime;
+	0.1 => env2.sustainLevel;
+	
+	BlitSquare ugen3 => BPF f3 => ADSR env3 => g;
+	300::ms => env3.attackTime;
+	600::ms => env3.decayTime;
+	0.1 => env3.sustainLevel;
+	
+	BlitSaw ugen4 => BPF f4 => ADSR env4 => g;
+	2 => ugen4.harmonics;
+	600::ms => env4.attackTime;
+	600::ms => env4.decayTime;
+	0.1 => env4.sustainLevel;
+
+	SinOsc mod => blackhole;
+	3 => mod.freq;
+	
+	fun void SetFrequency(float freq)
+    {
+        freq / 2 => ugen1.freq;
+		freq => f1.freq;
+		5 => f1.Q;
+
+		freq / 2 => ugen2.freq;
+		
+        freq / 4 => ugen3.freq;
+		freq / 2 => f3.freq;
+		3 => f3.Q;
+
+		freq / 4 => ugen4.freq;
+		freq / 4 => f4.freq;
+		10 => f4.Q;
+    }
+    
+    fun void SetGain(float gain)
+    {
+        gain => ugen1.gain;
+		1 => env1.keyOn;
+		
+        gain => ugen2.gain;
+		1 => env2.keyOn;
+
+        gain => ugen3.gain;
+		1 => env3.keyOn;
+
+        gain => ugen4.gain;
+		1 => env4.keyOn;
+    }
+    
+	fun void updateParams()
+	{
+		while(true)
+		{
+			//(mod.last() + 1) / 2 => g.gain;
+			ms => now;
+		}
+	}
+}
+
+class MelodyVoice extends Voice
 {
     HPF hpf => dac;
     10 => hpf.freq;

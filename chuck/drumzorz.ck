@@ -1,3 +1,9 @@
+// TODO: Figure out ranges of sounds that we like from TweakyDrum and NoiseDrum, and set them up in the right places
+// TODO: Slew the parameters of the drums from section to section
+// TODO: Figure out some nice effects to lay on top of the drums, or modulations of their parameters
+// TODO: Add a real kick in with the synth drums in sections where we want to get SERIOUS BUSINESS
+// TODO: Make the gain of the tweaky- and noise-drums settable so that the randomizer can emphasize/de-emphasize different beats
+
 .7 => float startGain;
 0 => int currentBeat;
 
@@ -46,7 +52,9 @@ now % (totalBeatsPerMeasure * totalMeasures * sampsPerBeat) => dur offset;
 // class for randrumly generated drums
 class Randrum
 {
-    SndBuf drum => Gain g => dac;
+    //SndBuf drum => Gain g => dac;
+	TweakyDrum drum;
+	
     int hitsOn[gridSize];
     int randHitsOn[gridSize];
     float hitsGain[gridSize];
@@ -65,9 +73,10 @@ class Randrum
     // setup the filepath for the sample as well as a unique name
     fun void setup( string _filename, string _name )
     {
-        _filename => drum.read;
-        _name => myname;
-        drum.samples() => drum.pos;
+		drum.randomize();
+        //_filename => drum.read;
+        //_name => myname;
+        //drum.samples() => drum.pos;
     }
     
     // clear out everything in that player
@@ -106,17 +115,22 @@ class Randrum
                 if (hitsOn[i] == 1) {
                     1 => send;
                     hitsGain[i] => sendGain;
-                    hitsGain[i] => drum.gain;
-                    1.0 * baseRate => drum.rate;
+                    //hitsGain[i] => drum.gain;
+                    //1.0 * baseRate => drum.rate;
                     if ( density < 3.0 ) 
                     {
                         if ( Math.rand2(0,100) / 33.0 < density )
                         { 
-                            0 => drum.pos;
+                            //0 => drum.pos;
+							spork ~ drum.play();
                         }
                         else 0 => send;
                     }
-                    else 0 => drum.pos;
+                    else
+					{
+						//0 => drum.pos;
+						spork ~ drum.play();
+					}
                     // possibly allow random sample to be added on
                     if (Math.rand2(0,100) < randThreshold) {
                         i + Math.rand2f(-1*density, density) $ int => int tempLocation;
@@ -130,9 +144,10 @@ class Randrum
                 if (randHitsOn[i] > 0) {
                     1 => send;
                     randHitsGain[i] => sendGain;
-                    randHitsGain[i] => drum.gain;
-                    baseRate * Math.rand2f(1 - randThreshold/1000, 1 + randThreshold/1000) => drum.rate;
-                    0 => drum.pos;
+                    //randHitsGain[i] => drum.gain;
+                    //baseRate * Math.rand2f(1 - randThreshold/1000, 1 + randThreshold/1000) => drum.rate;
+                    //0 => drum.pos;
+					spork ~ drum.play();
                     1 -=> randHitsOn[i];
                     Math.floor(randThreshold * .01 * randHitsOn[i]) $ int => randHitsOn[i];
                 }
@@ -158,7 +173,8 @@ class Randrum
                 for ( 0 => int j; j < glitchLevel; j++ )
                 {
                     //0.4 => drum.gain;
-                    0 => drum.pos;
+                    //0 => drum.pos;
+					spork ~ drum.play();
                     sampsPerGlitch::samp => now;
                 }
             }
@@ -182,17 +198,22 @@ class Randrum
                 if (hitsOn[i] == 1) {
                     1 => send;
                     hitsGain[i] => sendGain;
-                    hitsGain[i] => drum.gain;
-                    1.0 * baseRate => drum.rate;
+                    //hitsGain[i] => drum.gain;
+                    //1.0 * baseRate => drum.rate;
                     if ( density < 4.0 ) 
                     {
                         if ( Math.rand2(0,1000) / 250.0 < density )
                         { 
-                            0 => drum.pos;
+                            //0 => drum.pos;
+							spork ~ drum.play();
                         }
                         else 0 => send;
                     }
-                    else 0 => drum.pos;
+                    else
+					{
+						//0 => drum.pos;
+						spork ~ drum.play();
+					}
                     // possibly allow random sample to be added on
                     if (Math.rand2(0,100) < randThreshold) {
                         i + Math.rand2f(-1*density, density) $ int => int tempLocation;
@@ -206,9 +227,10 @@ class Randrum
                 if (randHitsOn[i] > 0) {
                     1 => send;
                     randHitsGain[i] => sendGain;
-                    randHitsGain[i] => drum.gain;
-                    baseRate * Math.rand2f(1 - randThreshold/1000, 1 + randThreshold/1000) => drum.rate;
-                    0 => drum.pos;
+                    //randHitsGain[i] => drum.gain;
+                    //baseRate * Math.rand2f(1 - randThreshold/1000, 1 + randThreshold/1000) => drum.rate;
+                    //0 => drum.pos;
+					spork ~ drum.play();
                     1 -=> randHitsOn[i];
                     Math.floor(randThreshold * .01 * randHitsOn[i]) $ int => randHitsOn[i];
                 }
@@ -266,16 +288,16 @@ openhatGain @=> openhat.hitsGain;
 kickHardPattern @=> kickhard.hitsOn;
 kickHardGain @=> kickhard.hitsGain;
 
-1.1 => snare.g.gain;
-1.3 => snare.baseRate;
-0.7 => hihat.baseRate;
-0.9 => kickhard.g.gain;
-0.7 => hihat.g.gain => openhat.g.gain;
-0.9 => kickhard.baseRate;
-0.4 => snarehard.g.gain;
-0.6 => glitch.g.gain;
-0.5 => snarehard.randThreshold;
-0.5 => openhat.g.gain;
+// 1.1 => snare.g.gain;
+// 1.3 => snare.baseRate;
+// 0.7 => hihat.baseRate;
+// 0.9 => kickhard.g.gain;
+// 0.7 => hihat.g.gain => openhat.g.gain;
+// 0.9 => kickhard.baseRate;
+// 0.4 => snarehard.g.gain;
+// 0.6 => glitch.g.gain;
+// 0.5 => snarehard.randThreshold;
+// 0.5 => openhat.g.gain;
 
 0 => int isGlitching;
 
@@ -375,12 +397,12 @@ fun void getDrumControl()
                     fx => kickhard.glitchLevel;
                     fx => snarehard.glitchLevel;
                     
-                    if ( kick.glitchOn ) fy => kick.drum.gain;
-                    else if ( snare.glitchOn ) fy => snare.drum.gain;
-                    else if ( hihat.glitchOn ) fy => hihat.drum.gain;
-                    else if ( openhat.glitchOn ) fy => openhat.drum.gain;
-                    else if ( kickhard.glitchOn ) fy => kickhard.drum.gain;
-                    else if ( snarehard.glitchOn ) fy => snarehard.drum.gain;
+                    //if ( kick.glitchOn ) fy => kick.drum.gain;
+                    //else if ( snare.glitchOn ) fy => snare.drum.gain;
+                    //else if ( hihat.glitchOn ) fy => hihat.drum.gain;
+                    //else if ( openhat.glitchOn ) fy => openhat.drum.gain;
+                    //else if ( kickhard.glitchOn ) fy => kickhard.drum.gain;
+                    //else if ( snarehard.glitchOn ) fy => snarehard.drum.gain;
                     
                 }
                 else
@@ -462,6 +484,6 @@ fun void updateParams()
 
 // "main" loop
 while( true ) {
-    updateParams();
+	//updateParams(); // WHY does this give us null pointer exception
     1::second => now;
 }
