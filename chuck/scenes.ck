@@ -45,7 +45,7 @@ public class Scenes
 		0 => scene0.reverb_base;
 		10 => scene0.hpf_freq_base;
 		0 => scene0.modulation_base;
-		32 => scene0.duration_in_beats;
+		64 => scene0.duration_in_beats;
         1.6 => scene0.drumRandomness;
         
         [ 1, 0, 0, 0,  0, 0, 1, 0,  1, 0, 0, 0,  0, 0, 0, 0,   1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0,  0, 1, 1, 0 ] @=> scene0.kickPattern;
@@ -60,7 +60,7 @@ public class Scenes
 		0.5 => scene1.reverb_base;
 		500 => scene1.hpf_freq_base;
 		20 => scene1.modulation_base;
-		32 => scene1.duration_in_beats;
+		64 => scene1.duration_in_beats;
         4.5 => scene1.drumRandomness;
         
 
@@ -76,7 +76,7 @@ public class Scenes
 		1 => scene2.reverb_base;
 		1000 => scene2.hpf_freq_base;
 		50 => scene2.modulation_base;
-		32 => scene2.duration_in_beats;
+		64 => scene2.duration_in_beats;
         9.0 => scene2.drumRandomness;
 
         [ 1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,   1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0,  1, 0, 1, 0 ] @=> scene2.kickPattern;

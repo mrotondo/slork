@@ -87,10 +87,8 @@ class HPFFreqListener extends FloatListener
 {
     fun void handleEvent()
     {
-		
         event.getFloat() => float f;
-
-		voice.SetHPFFreq(Math.max(10, -1000 + 3300 * f));
+		voice.SetHPFFreq(Math.max(10, f / 10000 - 1000));
     }
 }
 
@@ -98,9 +96,7 @@ class ReverbListener extends FloatListener
 {
     fun void handleEvent()
     {
-		
         event.getFloat() => float f;
-
 		voice.SetReverbMix(f);
     }
 }
@@ -108,7 +104,7 @@ class ReverbListener extends FloatListener
 // Collapse these down into one listener for two floats
 0 => int manual_note_choice;
 class NoteListener extends FeedborkListener
-{    
+{
     fun void init(OscRecv orec, string event_name)
     {
         orec.event("/" + event_name + ",f f") @=> event;
@@ -116,8 +112,6 @@ class NoteListener extends FeedborkListener
 	
     fun void handleEvent()
     {
-		<<< "TAPPED" >>>;
-		
         event.getFloat() => float x;
         event.getFloat() => float y;
 		x < 0.5 => manual_note_choice;
@@ -140,8 +134,8 @@ reverb_listener.init(orec, "centroid_x");
 //spork ~ reverb_listener.go() @=> Shred @ reverb_shred;
 
 HPFFreqListener hpf_freq_listener;
-hpf_freq_listener.init(orec, "centroid_y");
-//spork ~ hpf_freq_listener.go() @=> Shred @ hpf_freq_shred;
+hpf_freq_listener.init(orec, "brightness");
+spork ~ hpf_freq_listener.go() @=> Shred @ hpf_freq_shred;
 
 NoteListener note_listener;
 note_listener.init(orec, "tap");

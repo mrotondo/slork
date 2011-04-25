@@ -519,6 +519,11 @@ static CGRect swapWidthAndHeight(CGRect rect)
     // Thanks, Wikipedia: http://en.wikipedia.org/wiki/Image_moment
     double x = m10 / area;
     double y = m01 / area;
+
+    //NSLog(@"Area: %f", area);
+    
+    
+    [osc sendValue:area withKey:@"brightness"];
     
     CvPoint centroid = cvPoint(x, y);
     cvCircle(img_greyscale, centroid, 20, CV_RGB(255, 255, 255));
@@ -583,8 +588,8 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     
     // Extract features
     [self findCentroidAndAreaOfImage:img_greyscale];
-    [self findContoursInImage:img_greyscale];
-    [self findLinesInImage:img_greyscale];
+    //[self findContoursInImage:img_greyscale];
+    //[self findLinesInImage:img_greyscale];
     
 //    // Convert black and whilte to 24bit image then convert to UIImage to show
 //    IplImage *ipl_result = cvCreateImage(cvGetSize(img_greyscale), IPL_DEPTH_8U, 3);

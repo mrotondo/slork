@@ -161,7 +161,9 @@ public class MelodyVoice extends Voice
 	0 => float hpf_freq_base;
 	0 => float hpf_freq_target;
     
-    ModalBar ugen1 => NRev reverb1 => BPF bf => hpf;
+    ModalBar ugen1 => Delay d => Gain g => d => NRev reverb1 => BPF bf => hpf;
+    0.9 => g.gain;
+    200::ms => d.delay;
     0.0 => reverb1.mix;
 	0.0 => float reverb1_mix_target;
 	0.0 => float reverb1_mix_base;
@@ -174,12 +176,13 @@ public class MelodyVoice extends Voice
 	0.0 => float reverb2_mix_target;
 	0.0 => float reverb2_mix_base;
 
-    Wurley ugen3 => NRev reverb3 => hpf;
+    Blit ugen3 => ADSR env3 => NRev reverb3 => hpf;
     0.0 => reverb3.mix;
 	0.0 => float reverb3_mix_target;
 	0.0 => float reverb3_mix_base;
+400::ms => env3.duration;
     
-    PulseOsc ugen4 => BPF lf => ADSR env4 => NRev reverb4 => hpf;
+    Blit ugen4 => BPF lf => ADSR env4 => NRev reverb4 => hpf;
     0.0 => reverb4.mix;
 	0.0 => float reverb4_mix_target;
 	0.0 => float reverb4_mix_base;
@@ -204,18 +207,22 @@ public class MelodyVoice extends Voice
     {
         gain => ugen1.strike;
         gain / 2 => ugen2.noteOn;
-        gain / 7 => ugen3.noteOn;
+        gain / 7 => env3.value;
+	env3.keyOff();
         gain / 3 => env4.value;
         env4.keyOff();
     }
     
     fun void SetHPFFreq(float freq)
     {
+        	//<<< freq >>>;
 		freq => hpf_freq_target;
+		(freq / 1000) $ int => ugen3.harmonics;
+		(freq / 1000) $ int => ugen4.harmonics;
     }
 
 	fun void SetReverbMix(float mix)
-	{
+	{   
 		mix => reverb1_mix_target;
 		mix / 3 => reverb2_mix_target;
 		mix / 2 => reverb3_mix_target;
@@ -226,6 +233,8 @@ public class MelodyVoice extends Voice
 	{
 		while(true)
 		{
+			//<<< hpf.freq() >>>;
+
 			hpf.freq() + ((hpf_freq_target + Scenes.current_scene.hpf_freq_base) - hpf.freq()) * 0.01 => hpf.freq;
 
 			reverb1.mix() + ((reverb1_mix_target + Scenes.current_scene.reverb_base) - reverb1.mix()) * 0.01 => reverb1.mix;
@@ -233,7 +242,7 @@ public class MelodyVoice extends Voice
 			reverb3.mix() + ((reverb3_mix_target + Scenes.current_scene.reverb_base) - reverb3.mix()) * 0.01 => reverb3.mix;
 			reverb4.mix() + ((reverb4_mix_target + Scenes.current_scene.reverb_base) - reverb4.mix()) * 0.01 => reverb4.mix;
 			
-			second => now;
+			ms => now;
 		}
 	}
 }
