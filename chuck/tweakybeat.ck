@@ -2,8 +2,9 @@
 
 public class TweakyDrum
 {
-	Mix2 mix => dac.chan(0) => dac.chan(1);
+	Mix2 mix => Gain g => dac.chan(0) => dac.chan(1);
 	-1 => mix.pan;
+    0.25 => g.gain;
 
 	SinOsc sin => mix.left;
 	
@@ -27,7 +28,7 @@ public class TweakyDrum
 		Std.rand2f(20, 1000) => freq_start;
 		Std.rand2f(20, 1000) => freq_end;
 		1::second => play_time;
-		Std.rand2f(0.95, 1.0) => exponent;
+		Std.rand2f(0.95, 0.99) => exponent;
 		Std.rand2f(0.1, 1.0)::second => pitch_decay;
 		Std.rand2f(0.5, 1) => volume;
 		Std.randf() => waveform;
@@ -36,7 +37,7 @@ public class TweakyDrum
 	fun void print()
 	{
 		<<< "Freq start: " + freq_start >>>;
-		<<< "Freq end: " + freq_start >>>;
+		<<< "Freq end: " + freq_end >>>;
 		<<< "Exponent: " + exponent >>>;
 		<<< "Pitch decay:" >>>;
 		<<< pitch_decay >>>;
@@ -89,15 +90,15 @@ public class TweakyDrum
 	}
 }
 
-TweakyDrum drum;
-while (true)
-{
-	drum.randomize();
-	drum.print();
-	spork ~ drum.play();
-	drum.play_time => now;
-	spork ~ drum.play();
-	drum.play_time => now;
-	spork ~ drum.play();
-	drum.play_time => now;
-}
+//TweakyDrum drum;
+//while (true)
+//{
+//	drum.randomize();
+//	drum.print();
+//	spork ~ drum.play();
+//	drum.play_time => now;
+//	spork ~ drum.play();
+//	drum.play_time => now;
+//	spork ~ drum.play();
+//	drum.play_time => now;
+//}
