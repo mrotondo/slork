@@ -32,6 +32,18 @@ public class TweakyDrum
 		Std.rand2f(0.5, 1) => volume;
 		Std.randf() => waveform;
 	}
+
+	fun void print()
+	{
+		<<< "Freq start: " + freq_start >>>;
+		<<< "Freq end: " + freq_start >>>;
+		<<< "Exponent: " + exponent >>>;
+		<<< "Pitch decay:" >>>;
+		<<< pitch_decay >>>;
+		<<< "Volume: " + volume >>>;
+		<<< "Waveform: " + waveform >>>;
+		<<< "---------" >>>;
+	}
 	
 	fun void setFrequency(float freq)
 	{
@@ -77,10 +89,15 @@ public class TweakyDrum
 	}
 }
 
-// TweakyDrum drum;
-// while (true)
-// {
-// 	drum.randomize();
-// 	spork ~ drum.play();
-// 	drum.play_time => now;
-// }
+TweakyDrum drum;
+while (true)
+{
+	drum.randomize();
+	drum.print();
+	spork ~ drum.play();
+	drum.play_time => now;
+	spork ~ drum.play();
+	drum.play_time => now;
+	spork ~ drum.play();
+	drum.play_time => now;
+}

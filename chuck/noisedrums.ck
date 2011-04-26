@@ -30,6 +30,20 @@ public class NoiseDrum
 		Std.rand2f(2, 10) => bf.Q;
 		Std.rand2f(2, 10) => lf.Q;
 	}
+
+	fun void print()
+	{
+		<<< "Freq start: " + freq_start >>>;
+		<<< "Freq end: " + freq_start >>>;
+		<<< "Exponent: " + exponent >>>;
+		<<< "Pitch decay: " >>>;
+		<<< pitch_decay >>>;
+		<<< "Volume: " + volume >>>;
+
+		<<< "Bandpass Q: " + bf.Q() >>>;
+		<<< "Lowpass Q: " + lf.Q() >>>;
+		<<< "---------" >>>;
+	}
 	
 	fun void setFrequency(float freq)
 	{
@@ -74,10 +88,15 @@ public class NoiseDrum
 	}
 }
 
-// NoiseDrum drum;
-// while (true)
-// {
-// 	drum.randomize();
-// 	spork ~ drum.play();
-// 	drum.play_time => now;
-// }
+NoiseDrum drum;
+while (true)
+{
+	drum.randomize();
+	drum.print();
+	spork ~ drum.play();
+	drum.play_time => now;
+	spork ~ drum.play();
+	drum.play_time => now;
+	spork ~ drum.play();
+	drum.play_time => now;
+}
