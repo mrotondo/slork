@@ -156,26 +156,28 @@ class Voice
 
 public class Bass extends Voice
 {
-	Gain g => dac;
+	Gain mod_gain => Gain master_gain => dac;
 	
-	Blit ugen1 => LPF f1 => ADSR env1 => g;
+    0.05 => master_gain.gain;
+
+	Blit ugen1 => LPF f1 => ADSR env1 => mod_gain;
 	5 => ugen1.harmonics;	
 	10::ms => env1.attackTime;
 	1500::ms => env1.decayTime;
 	0.1 => env1.sustainLevel;
 
-	Blit ugen2 => ADSR env2 => g;
+	Blit ugen2 => ADSR env2 => mod_gain;
 	10 => ugen2.harmonics;
 	500::ms => env2.attackTime;
 	200::ms => env2.decayTime;
 	0.1 => env2.sustainLevel;
 	
-	BlitSquare ugen3 => BPF f3 => ADSR env3 => g;
+	BlitSquare ugen3 => BPF f3 => ADSR env3 => mod_gain;
 	300::ms => env3.attackTime;
 	600::ms => env3.decayTime;
 	0.1 => env3.sustainLevel;
 	
-	BlitSaw ugen4 => BPF f4 => ADSR env4 => g;
+	BlitSaw ugen4 => BPF f4 => ADSR env4 => mod_gain;
 	2 => ugen4.harmonics;
 	600::ms => env4.attackTime;
 	600::ms => env4.decayTime;
@@ -225,7 +227,7 @@ public class Bass extends Voice
 	{
 		while(true)
 		{
-			//(mod.last() + 1) / 2 => g.gain;
+			0.7 + mod.last() * 0.3 => mod_gain.gain;
 			ms => now;
 		}
 	}
