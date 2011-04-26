@@ -32,7 +32,7 @@ int whichchord[];
 
 // OSC sender
 OscSend xmit;
-xmit.setHost("192.168.177.31", 9999);
+xmit.setHost("10.0.1.4", 9999);
 
 //3::second => ramp.duration;
 //ramp.value( 0.0 );
@@ -48,17 +48,27 @@ e.keyOff();
 
 maj7 @=> whichchord;
 
+fun void updateParams()
+{  
+    while (true)
+    { 
+        Scenes.current_scene.chordFBgain => fb.gain;
+        1::second => now;
+    }
+}
+spork ~ updateParams();
+
 // infinite time loop
 fun void playChord()
 {        
-        // key on
-        e.keyOn();
-        
-        // advance time
-        120::ms => now;
-        
-        // key off
-        e.keyOff();
+    // key on
+    e.keyOn();
+    
+    // advance time
+    120::ms => now;
+    
+    // key off
+    e.keyOff();
 }
 
 // infinite event loop
@@ -99,6 +109,6 @@ while ( true )
         wait => now;
         
         spork ~ playChord();
-
+        
     }
 }

@@ -19,7 +19,10 @@ public class Scenes
         int openhatPattern[];
         int kickHardPattern[];
         0.0 => float drumRandomness;
-        
+        2.0 => float drumDensity;
+		
+		// chord params
+		0.0 => float chordFBgain;
         int duration_in_beats;
 	}
 
@@ -46,7 +49,9 @@ public class Scenes
 		10 => scene0.hpf_freq_base;
 		0 => scene0.modulation_base;
 		64 => scene0.duration_in_beats;
-        1.6 => scene0.drumRandomness;
+        5.6 => scene0.drumRandomness;
+        2.6 => scene0.drumDensity;
+		0.0 => scene0.chordFBgain;
         
         [ 1, 0, 0, 0,  0, 0, 1, 0,  1, 0, 0, 0,  0, 0, 0, 0,   1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0,  0, 1, 1, 0 ] @=> scene0.kickPattern;
         [ 0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0,   0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0 ] @=> scene0.snarePattern;
@@ -61,7 +66,9 @@ public class Scenes
 		500 => scene1.hpf_freq_base;
 		20 => scene1.modulation_base;
 		64 => scene1.duration_in_beats;
-        4.5 => scene1.drumRandomness;
+        50.5 => scene1.drumRandomness;
+        5.6 => scene1.drumDensity;
+		0.99 => scene1.chordFBgain;
         
 
         [ 1, 0, 0, 0,  0, 0, 0, 1,  0, 0, 0, 0,  0, 0, 0, 0,   1, 0, 0, 1,  0, 0, 1, 0,  1, 0, 0, 0,  1, 0, 1, 0 ] @=> scene1.kickPattern;
@@ -77,7 +84,9 @@ public class Scenes
 		1000 => scene2.hpf_freq_base;
 		50 => scene2.modulation_base;
 		64 => scene2.duration_in_beats;
-        9.0 => scene2.drumRandomness;
+        90.0 => scene2.drumRandomness;
+		10.6 => scene2.drumDensity;
+		0.9999 => scene2.chordFBgain;
 
         [ 1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,   1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0,  1, 0, 1, 0 ] @=> scene2.kickPattern;
         [ 0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0,   0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  0, 1, 0, 1 ] @=> scene2.snarePattern;

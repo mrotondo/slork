@@ -480,10 +480,18 @@ fun void updateParams()
     fx => kickhard.randThreshold;
     fx => snarehard.randThreshold;
     fx => openhat.randThreshold;
+    
+    Scenes.current_scene.drumDensity => fx;
+	fx => kick.density;
+	fx => snare.density;
+	fx => hihat.density;
+	fx => kickhard.density;
+	fx => snarehard.density;
+	fx => openhat.density;
 }
 
 // "main" loop
 while( true ) {
-	//updateParams(); // WHY does this give us null pointer exception
+	updateParams(); // WHY does this give us null pointer exception
     1::second => now;
 }
