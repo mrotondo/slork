@@ -12,12 +12,13 @@
 		</object>
 		<object class="NSArray" key="IBDocument.IntegratedClassDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
+			<string>IBUIView</string>
+			<string>IBProxyObject</string>
+			<string>IBUILabel</string>
 			<string>IBUITextField</string>
+			<string>IBUISegmentedControl</string>
 			<string>IBUISlider</string>
 			<string>IBUIButton</string>
-			<string>IBUIView</string>
-			<string>IBUILabel</string>
-			<string>IBProxyObject</string>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -101,7 +102,7 @@
 								<string key="NSFrame">{{83, 15}, {264, 31}}</string>
 								<reference key="NSSuperview" ref="321836072"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView" ref="185050001"/>
+								<reference key="NSNextKeyView" ref="595953499"/>
 								<bool key="IBUIOpaque">NO</bool>
 								<bool key="IBUIClipsSubviews">YES</bool>
 								<string key="targetRuntimeIdentifier">IBIPadFramework</string>
@@ -121,7 +122,6 @@
 									<double key="NSSize">24</double>
 									<int key="NSfFlags">16</int>
 								</object>
-								<int key="IBUITextAlignment">2</int>
 								<bool key="IBUIAdjustsFontSizeToFit">YES</bool>
 								<float key="IBUIMinimumFontSize">17</float>
 								<object class="IBUITextInputTraits" key="IBUITextInputTraits">
@@ -235,6 +235,7 @@
 								<string key="NSFrame">{{14, 206}, {134, 21}}</string>
 								<reference key="NSSuperview" ref="321836072"/>
 								<reference key="NSWindow"/>
+								<reference key="NSNextKeyView"/>
 								<bool key="IBUIOpaque">NO</bool>
 								<bool key="IBUIClipsSubviews">YES</bool>
 								<int key="IBUIContentMode">7</int>
@@ -246,6 +247,44 @@
 								<nil key="IBUIHighlightedColor"/>
 								<int key="IBUIBaselineAdjustment">1</int>
 								<float key="IBUIMinimumFontSize">10</float>
+							</object>
+							<object class="IBUISegmentedControl" id="595953499">
+								<reference key="NSNextResponder" ref="321836072"/>
+								<int key="NSvFlags">292</int>
+								<string key="NSFrame">{{390, 10}, {357, 44}}</string>
+								<reference key="NSSuperview" ref="321836072"/>
+								<reference key="NSWindow"/>
+								<reference key="NSNextKeyView" ref="185050001"/>
+								<bool key="IBUIOpaque">NO</bool>
+								<string key="targetRuntimeIdentifier">IBIPadFramework</string>
+								<int key="IBSegmentControlStyle">3</int>
+								<int key="IBNumberOfSegments">2</int>
+								<int key="IBSelectedSegmentIndex">0</int>
+								<object class="NSArray" key="IBSegmentTitles">
+									<bool key="EncodedWithXMLCoder">YES</bool>
+									<string>Bass</string>
+									<string>Drums and Chords</string>
+								</object>
+								<object class="NSMutableArray" key="IBSegmentWidths">
+									<bool key="EncodedWithXMLCoder">YES</bool>
+									<real value="0.0"/>
+									<real value="0.0"/>
+								</object>
+								<object class="NSMutableArray" key="IBSegmentEnabledStates">
+									<bool key="EncodedWithXMLCoder">YES</bool>
+									<boolean value="YES"/>
+									<boolean value="YES"/>
+								</object>
+								<object class="NSMutableArray" key="IBSegmentContentOffsets">
+									<bool key="EncodedWithXMLCoder">YES</bool>
+									<string>{0, 0}</string>
+									<string>{0, 0}</string>
+								</object>
+								<object class="NSMutableArray" key="IBSegmentImages">
+									<bool key="EncodedWithXMLCoder">YES</bool>
+									<object class="NSNull" id="4"/>
+									<reference ref="4"/>
+								</object>
 							</object>
 						</object>
 						<string key="NSFrame">{{0, 26}, {768, 218}}</string>
@@ -368,6 +407,23 @@
 					</object>
 					<int key="connectionID">55</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchEventConnection" key="connection">
+						<string key="label">changeSegment</string>
+						<reference key="source" ref="595953499"/>
+						<reference key="destination" ref="841351856"/>
+						<int key="IBEventType">13</int>
+					</object>
+					<int key="connectionID">67</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">instSeg</string>
+						<reference key="source" ref="841351856"/>
+						<reference key="destination" ref="595953499"/>
+					</object>
+					<int key="connectionID">68</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -412,6 +468,7 @@
 							<reference ref="853558349"/>
 							<reference ref="369935818"/>
 							<reference ref="185050001"/>
+							<reference ref="595953499"/>
 						</object>
 						<reference key="parent" ref="766721923"/>
 					</object>
@@ -460,6 +517,11 @@
 						<reference key="object" ref="371050746"/>
 						<reference key="parent" ref="321836072"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">66</int>
+						<reference key="object" ref="595953499"/>
+						<reference key="parent" ref="321836072"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -479,6 +541,7 @@
 					<string>4.IBPluginDependency</string>
 					<string>5.IBPluginDependency</string>
 					<string>56.IBPluginDependency</string>
+					<string>66.IBPluginDependency</string>
 					<string>7.IBPluginDependency</string>
 					<string>8.IBPluginDependency</string>
 				</object>
@@ -490,6 +553,7 @@
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>{{513, 0}, {783, 856}}</string>
+					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 					<string>com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
@@ -513,7 +577,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">65</int>
+			<int key="maxID">68</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -536,6 +600,7 @@
 							<string>changeAlpha:</string>
 							<string>changeBorder:</string>
 							<string>changeIP:</string>
+							<string>changeSegment</string>
 							<string>closeMenu</string>
 							<string>lockExposure</string>
 						</object>
@@ -544,6 +609,7 @@
 							<string>UISlider</string>
 							<string>UISlider</string>
 							<string>UITextField</string>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 						</object>
@@ -555,6 +621,7 @@
 							<string>changeAlpha:</string>
 							<string>changeBorder:</string>
 							<string>changeIP:</string>
+							<string>changeSegment</string>
 							<string>closeMenu</string>
 							<string>lockExposure</string>
 						</object>
@@ -573,6 +640,10 @@
 								<string key="candidateClassName">UITextField</string>
 							</object>
 							<object class="IBActionInfo">
+								<string key="name">changeSegment</string>
+								<string key="candidateClassName">id</string>
+							</object>
+							<object class="IBActionInfo">
 								<string key="name">closeMenu</string>
 								<string key="candidateClassName">id</string>
 							</object>
@@ -589,6 +660,7 @@
 							<string>IPTextField</string>
 							<string>borderSlider</string>
 							<string>exposureLockButton</string>
+							<string>instSeg</string>
 							<string>menuView</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
@@ -596,6 +668,7 @@
 							<string>UITextField</string>
 							<string>UISlider</string>
 							<string>UIToggleButton</string>
+							<string>UISegmentedControl</string>
 							<string>UIView</string>
 						</object>
 					</object>
@@ -606,6 +679,7 @@
 							<string>IPTextField</string>
 							<string>borderSlider</string>
 							<string>exposureLockButton</string>
+							<string>instSeg</string>
 							<string>menuView</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
@@ -621,6 +695,10 @@
 							<object class="IBToOneOutletInfo">
 								<string key="name">exposureLockButton</string>
 								<string key="candidateClassName">UIToggleButton</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">instSeg</string>
+								<string key="candidateClassName">UISegmentedControl</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">menuView</string>

@@ -34,6 +34,7 @@ feedborkDoodadDelegate, feedborkOSCdelegate> {
     IBOutlet UITextField *IPTextField;
     IBOutlet UISlider *borderSlider;
     IBOutlet UIToggleButton * exposureLockButton;
+    IBOutlet UISegmentedControl *instSeg;
     
     // quadrant stuff
     CGRect quadrant[4];
@@ -61,6 +62,7 @@ feedborkDoodadDelegate, feedborkOSCdelegate> {
 // menu functions
 - (IBAction)closeMenu;
 - (IBAction)changeIP:(UITextField*)sender;
+- (IBAction)changeSegment;
 - (IBAction)lockExposure;
 - (IBAction)changeAlpha:(UISlider*)slider;
 - (IBAction)changeBorder:(UISlider*)slider;
