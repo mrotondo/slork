@@ -75,7 +75,7 @@ class Randrum
     {
 		drum.randomize();
         //_filename => drum.read;
-        //_name => myname;
+        _name => myname;
         //drum.samples() => drum.pos;
     }
     
@@ -109,7 +109,7 @@ class Randrum
             if ( glitchOn == 0 )
             {
                 (((now - offset)/(sampsPerBeat/quantizationSize)) % gridSize) $ int  => int i;
-                0.0 => float sendGain;
+                1.0 => float sendGain;
                 0 => int send;
                 
                 if (hitsOn[i] == 1) {
@@ -157,7 +157,7 @@ class Randrum
                 {
                     xmit.startMsg("/drum, s, f");
                     xmit.addString( myname );
-                    xmit.addFloat(sendGain); 
+                    xmit.addFloat(sendGain);
                 }
                 
                 (now - offset) % (sampsPerBeat/quantizationSize) => dur mod;

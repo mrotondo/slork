@@ -20,6 +20,7 @@ public class TweakyDrum
 	0.15::second => dur pitch_decay;
 	0.8 => float volume;
 	0.0 => float waveform;
+    0.0 => mix.gain;
 
 	fun void randomize()
 	{

@@ -183,6 +183,11 @@ public class Bass extends Voice
 
 	SinOsc mod => blackhole;
 	3 => mod.freq;
+    
+    env1.keyOff();
+    env2.keyOff();
+    env3.keyOff();
+    env4.keyOff();
 	
 	fun void SetFrequency(float freq)
     {

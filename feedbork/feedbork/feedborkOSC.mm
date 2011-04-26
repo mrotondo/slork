@@ -103,7 +103,7 @@ void drum_callback( osc::ReceivedMessageArgumentStream & oscin, void * data )
     const char* drumname;
     float vel;
     oscin >> drumname >> vel;
-    //NSLog(@"test: %s %f",drumname, test);
+    //NSLog(@"vel: %s %f",drumname, vel);
     
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     NSString * dname = [NSString stringWithCString:drumname encoding:NSStringEncodingConversionAllowLossy];
