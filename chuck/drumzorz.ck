@@ -53,7 +53,7 @@ now % (totalBeatsPerMeasure * totalMeasures * sampsPerBeat) => dur offset;
 class Randrum
 {
     //SndBuf drum => Gain g => dac;
-	TweakyDrum drum;
+	NoiseDrum drum;
 	
     int hitsOn[gridSize];
     int randHitsOn[gridSize];
@@ -346,11 +346,9 @@ fun void getDrumControl()
             }
             else if (x[s] == x["glitch"])
             { 
-                
+                fx * 0.75 => fx;
                 if ( fx > 0 )
                 {
-                    
-                    
                     if ( !isGlitching )
                     {
                         1 => isGlitching;

@@ -14,6 +14,10 @@
 #define IPHONE_WIDTH 320.0
 #define IPHONE_HEIGHT 480.0
 
+#define CURRENT_MODE [instSeg selectedSegmentIndex]
+#define BASS_MODE ([instSeg selectedSegmentIndex] == 0)
+#define DRUMS_AND_CHORDS_MODE ([instSeg selectedSegmentIndex] == 1)
+
 @implementation feedborkViewController
 @synthesize captureSession, previewLayer, imageView;
 
@@ -65,7 +69,7 @@
     # endif
     [self initMenu];
     [self initQuadrants];
-    [self initTapRecognizer];
+    //[self initTapRecognizer];
     
     # if TARGET_IPHONE_SIMULATOR
     [self createMenuAccess];
@@ -199,6 +203,10 @@
         [[NSUserDefaults standardUserDefaults] setObject:IPTextField.text forKey:@"IP"];
     }
     
+    // set up current selected segment
+    if ( [[NSUserDefaults standardUserDefaults] integerForKey:@"instrument"] )
+        [instSeg setSelectedSegmentIndex:[[NSUserDefaults standardUserDefaults] integerForKey:@"instrument"]];
+    
     menuView.transform = CGAffineTransformMakeTranslation(1000.0, 0.0);
     
     // Create a swipe gesture recognizer to recognize right swipes, three finger
@@ -253,7 +261,7 @@
 {
     CGPoint loc = [recognizer locationInView:self.view];
     CGPoint tapPoint = CGPointMake(loc.x / self.view.bounds.size.width, 1 - (loc.y / self.view.bounds.size.height));
-    [osc sendPoint:tapPoint withKey:@"tap"];
+    if BASS_MODE [osc sendPoint:tapPoint withKey:@"tap"];
 }
 
 // handle received swipe gestures 
@@ -306,6 +314,12 @@
     [osc changeIP:IPTextField.text];
     
     [[NSUserDefaults standardUserDefaults] setObject:IPTextField.text forKey:@"IP"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+- (IBAction)changeSegment
+{
+    [[NSUserDefaults standardUserDefaults] setInteger:instSeg.selectedSegmentIndex forKey:@"instrument"];
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
@@ -693,61 +707,68 @@ const float thresh = 50.0;
     {
         CGPoint thisPoint = [touch locationInView:self.view];
         if ( [self point:thisPoint isInside: quadrant[0]] ) 
-        {
             quadTouches[0]++;
-        }
         else if ( [self point:thisPoint isInside: quadrant[1]] ) 
-        {
             quadTouches[1]++;
-        }
-        
         else if ( [self point:thisPoint isInside: quadrant[2]] ) 
-        {
             quadTouches[2]++;
-        }
         else if ( [self point:thisPoint isInside: quadrant[3]] )
-        {
             quadTouches[3]++;
-        }
     }
-//    NSLog(@"q1: %d ---\n q2: %d ---\n q3: %d ---\n q4: %d ---", quadTouches[0], quadTouches[1], 
-//                                                      quadTouches[2], quadTouches[3] );
     
-    // this will just count new touches to the screen
-    for ( UITouch * touch in touches )
+    if DRUMS_AND_CHORDS_MODE
     {
-        CGPoint thisPoint = [touch locationInView:self.view];
-        if ( [touches count] > 1 ) [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(25.0,25.0) color:[UIColor yellowColor] delegate:self];
-        if ( [self point:thisPoint isInside: quadrant[0]] ) 
+        // this will just count new touches to the screen
+        for ( UITouch * touch in touches )
         {
-            if ( thisPoint.x > IPAD_WIDTH - thresh ) [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"random"];
-            //else if ( [touches count] == 1 ) [osc sendValue:0.0 withKey:@"chord"];
-        }
-        else if ( [self point:thisPoint isInside: quadrant[1]] ) 
-        {
-            if ( thisPoint.x < thresh ) [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"density"];
-            //else if ( [touches count] == 1 ) [osc sendValue:1.0 withKey:@"chord"];
-        }
-        else if ( [self point:thisPoint isInside: quadrant[2]] ) 
-        {
-            if ( thisPoint.x < thresh ) [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"density"];
-            else if ( [touches count] == 1 ) 
+            CGPoint thisPoint = [touch locationInView:self.view];
+            if ( [touches count] > 1 ) [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(25.0,25.0) color:[UIColor yellowColor] delegate:self];
+            if ( [self point:thisPoint isInside: quadrant[0]] ) 
             {
-                [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(100.0,100.0) color:[UIColor yellowColor] delegate:self];
-                [osc sendValue:2.0 withKey:@"chord"];
+                if ( thisPoint.x > IPAD_WIDTH - thresh ) [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"random"];
+                //else if ( [touches count] == 1 ) [osc sendValue:0.0 withKey:@"chord"];
             }
-            
-        }
-        else if ( [self point:thisPoint isInside: quadrant[3]] ) 
-        {
-            if ( thisPoint.x > IPAD_WIDTH - thresh ) [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"random"];
-            else if ( [touches count] == 1 ) 
+            else if ( [self point:thisPoint isInside: quadrant[1]] ) 
             {
-                [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(100.0,100.0) color:[UIColor yellowColor] delegate:self];
-                [osc sendValue:3.0 withKey:@"chord"];
+                if ( thisPoint.x < thresh ) [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"density"];
+                //else if ( [touches count] == 1 ) [osc sendValue:1.0 withKey:@"chord"];
             }
+            else if ( [self point:thisPoint isInside: quadrant[2]] ) 
+            {
+                if ( thisPoint.x < thresh ) [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"density"];
+                else if ( [touches count] == 1 ) 
+                {
+                    [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(100.0,100.0) color:[UIColor yellowColor] delegate:self];
+                    [osc sendValue:2.0 withKey:@"chord"];
+                }
+                
+            }
+            else if ( [self point:thisPoint isInside: quadrant[3]] ) 
+            {
+                if ( thisPoint.x > IPAD_WIDTH - thresh ) [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"random"];
+                else if ( [touches count] == 1 ) 
+                {
+                    [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(100.0,100.0) color:[UIColor yellowColor] delegate:self];
+                    [osc sendValue:3.0 withKey:@"chord"];
+                }
+            }
+        }    
+    }
+    else // BASS_MODE
+    {
+        float xtouch = 0; float ytouch = 0;
+        for ( UITouch * touch in [event allTouches] )
+        {
+            CGPoint thisPoint = [touch locationInView:self.view];
+            xtouch += thisPoint.x; ytouch += thisPoint.y;
+            [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(10.0,10.0) color:[UIColor yellowColor] delegate:self];
         }
-    }    
+        xtouch /= [[event allTouches] count]; ytouch /= [[event allTouches] count];
+        CGPoint tapPoint = CGPointMake(xtouch / self.view.bounds.size.width, 1 - (ytouch / self.view.bounds.size.height));
+        [osc sendPoint:tapPoint withKey:@"tap"];
+        [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:CGPointMake(xtouch, ytouch) size:CGSizeMake(70.0,70.0) color:[UIColor orangeColor] delegate:self];
+
+    }
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
@@ -765,34 +786,59 @@ const float thresh = 50.0;
         else if ( [self point:thisPoint isInside: quadrant[3]] ) 
             quadTouches[3]++;
     }
-//    NSLog(@"q1: %d ---\n q2: %d ---\n q3: %d ---\n q4: %d ---", quadTouches[0], quadTouches[1], 
-//          quadTouches[2], quadTouches[3] );
-    
-    if ( [touches count] < 3 )
+
+    if DRUMS_AND_CHORDS_MODE
     {
-        for ( UITouch * touch in touches )
+        if ( [touches count] < 3 )
         {
-            CGPoint thisPoint = [touch locationInView:self.view];
-            [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(10.0,10.0) color:[UIColor yellowColor] delegate:self];
-            if ( [self point:thisPoint isInside: quadrant[0]] ) 
+            for ( UITouch * touch in touches )
             {
-                if ( thisPoint.x > IPAD_WIDTH - thresh ) [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"random"];
-            }
-            else if ( [self point:thisPoint isInside: quadrant[1]] ) 
+                CGPoint thisPoint = [touch locationInView:self.view];
+                [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(10.0,10.0) color:[UIColor yellowColor] delegate:self];
+                if ( [self point:thisPoint isInside: quadrant[0]] ) 
+                {
+                    if ( thisPoint.x > IPAD_WIDTH - thresh ) [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"random"];
+                }
+                else if ( [self point:thisPoint isInside: quadrant[1]] ) 
+                {
+                    if ( thisPoint.x < thresh ) [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"density"];
+                }
+                else if ( [self point:thisPoint isInside: quadrant[2]] ) 
+                {
+                    if ( thisPoint.x < thresh ) [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"density"];
+                }
+                else if ( [self point:thisPoint isInside: quadrant[3]] ) 
+                {
+                    if ( thisPoint.x > IPAD_WIDTH - thresh ) [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"random"];
+                }
+            } 
+        }
+        if ( [[event allTouches] count] == 4 )
+        {
+            float xtouch = 0; float ytouch = 0;
+            for ( UITouch * touch in [event allTouches] )
             {
-                if ( thisPoint.x < thresh ) [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"density"];
+                CGPoint thisPoint = [touch locationInView:self.view];
+                xtouch += thisPoint.x; ytouch += thisPoint.y;
+                [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(10.0,10.0) color:[UIColor yellowColor] delegate:self];
             }
-            else if ( [self point:thisPoint isInside: quadrant[2]] ) 
+            xtouch *= 0.25; ytouch *= 0.25;
+            [osc sendDrumControlX:ytouch/11.0 Y:xtouch/8.0 withKey:@"glitch"];
+        }
+        if ( [[event allTouches] count] == 3 )
+        {
+            float xtouch = 0; float ytouch = 0;
+            for ( UITouch * touch in [event allTouches] )
             {
-                if ( thisPoint.x < thresh ) [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"density"];
+                CGPoint thisPoint = [touch locationInView:self.view];
+                xtouch += thisPoint.x; ytouch += thisPoint.y;
+                [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(10.0,10.0) color:[UIColor yellowColor] delegate:self];
             }
-            else if ( [self point:thisPoint isInside: quadrant[3]] ) 
-            {
-                if ( thisPoint.x > IPAD_WIDTH - thresh ) [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"random"];
-            }
-        } 
+            xtouch *= 0.3333; ytouch *= 0.3333;
+            [osc sendDrumControlX:ytouch/11.0 Y:xtouch/8.0 withKey:@"stutter"];
+        }
     }
-    if ( [[event allTouches] count] == 4 )
+    else // BASS_MODE
     {
         float xtouch = 0; float ytouch = 0;
         for ( UITouch * touch in [event allTouches] )
@@ -801,34 +847,13 @@ const float thresh = 50.0;
             xtouch += thisPoint.x; ytouch += thisPoint.y;
             [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(10.0,10.0) color:[UIColor yellowColor] delegate:self];
         }
-        xtouch *= 0.25; ytouch *= 0.25;
-        [osc sendDrumControlX:ytouch/11.0 Y:xtouch/8.0 withKey:@"glitch"];
-    }
-    if ( [[event allTouches] count] == 3 )
-    {
-        float xtouch = 0; float ytouch = 0;
-        for ( UITouch * touch in [event allTouches] )
-        {
-            CGPoint thisPoint = [touch locationInView:self.view];
-            xtouch += thisPoint.x; ytouch += thisPoint.y;
-            [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(10.0,10.0) color:[UIColor yellowColor] delegate:self];
-        }
-        xtouch *= 0.3333; ytouch *= 0.3333;
-        [osc sendDrumControlX:ytouch/11.0 Y:xtouch/8.0 withKey:@"stutter"];
+        xtouch /= [[event allTouches] count]; ytouch /= [[event allTouches] count];
+        [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:CGPointMake(xtouch, ytouch) size:CGSizeMake(10.0,10.0) color:[UIColor orangeColor] delegate:self];
     }
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    // see if we've lifted fingers off
-    if ( [[event allTouches] count] != 4 || [touches count] == 4 )
-    {
-        [osc sendDrumControlX:-10.0 Y:0.0 withKey:@"glitch"];
-    }
-    if ( [[event allTouches] count] != 3 || [touches count] == 3 )
-    {
-        [osc sendDrumControlX:-10.0 Y:0.0 withKey:@"stutter"];
-    }
     
     for ( UITouch * touch in touches )
     {
@@ -842,8 +867,23 @@ const float thresh = 50.0;
         else if ( [self point:thisPoint isInside: quadrant[3]] ) 
             quadTouches[3]--;
     }
-//    NSLog(@"q1: %d ---\n q2: %d ---\n q3: %d ---\n q4: %d ---", quadTouches[0], quadTouches[1], 
-//          quadTouches[2], quadTouches[3] );
+    
+    if DRUMS_AND_CHORDS_MODE
+    {
+        // see if we've lifted fingers off
+        if ( [[event allTouches] count] != 4 || [touches count] == 4 )
+        {
+            [osc sendDrumControlX:-10.0 Y:0.0 withKey:@"glitch"];
+        }
+        if ( [[event allTouches] count] != 3 || [touches count] == 3 )
+        {
+            [osc sendDrumControlX:-10.0 Y:0.0 withKey:@"stutter"];
+        }
+    }
+    else // BASS_MODE
+    {
+    
+    }
 }
 
 @end
