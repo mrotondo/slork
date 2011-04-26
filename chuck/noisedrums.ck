@@ -57,21 +57,16 @@ public class NoiseDrum
 	{
 		gain => mix.gain;
 	}
+
+
+	0.0 => float current_gain;
+	now => time pitch_end;
+	now => time start;
+	0.0 => float freq_diff;
 	
-	fun void play()
+	fun void go()
 	{
-		1.0 => float current_gain;
-		setGain(volume * current_gain);
-		setFrequency(freq_start);
-		
-		now => time start;
-		now + play_time => time play_end;
-
-		now + pitch_decay => time pitch_end;
-		freq_end - freq_start => float freq_diff;
-
-		1 => impulse.next;
-		while (now < play_end)
+		while (true)
 		{
 			while (now < pitch_end)
 			{
@@ -88,17 +83,24 @@ public class NoiseDrum
 			setGain(volume * current_gain);
 		}
 	}
+	
+	fun void play()
+	{
+		1.0 => current_gain;
+		setGain(volume * current_gain);
+		setFrequency(freq_start);
+		
+		now => start;
+		now + pitch_decay => pitch_end;
+		freq_end - freq_start => freq_diff;
+	}
 }
 
-//NoiseDrum drum;
-//while (true)
-//{
-//	drum.randomize();
-//	drum.print();
-//	spork ~ drum.play();
-//	drum.play_time => now;
-//	spork ~ drum.play();
-//	drum.play_time => now;
-//	spork ~ drum.play();
-//	drum.play_time => now;
-//}
+// NoiseDrum drum;
+// drum.randomize();
+// spork ~ drum.go();
+// while (true)
+// {	
+// 	drum.play();
+// 	100::ms => now;
+// }
