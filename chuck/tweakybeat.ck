@@ -2,9 +2,10 @@
 
 public class TweakyDrum
 {
-	Mix2 mix => Gain g => dac.chan(0) => dac.chan(1);
+    Gain masta_g;
+	Mix2 mix => Gain master_gain => dac.chan(0) => dac.chan(1);
 	-1 => mix.pan;
-    0.25 => g.gain;
+    0.25 => master_gain.gain;
 
 	SinOsc sin => mix.left;
 	
@@ -22,6 +23,7 @@ public class TweakyDrum
 	0.8 => float volume;
 	0.0 => float waveform;
     0.0 => mix.gain;
+    0.0 => masta_g.gain;
 
 	fun void randomize()
 	{
@@ -55,7 +57,7 @@ public class TweakyDrum
 
 	fun void setGain(float gain)
 	{
-		gain => mix.gain;
+		gain*masta_g.gain() => mix.gain;
 	}
 	
 	fun void play()

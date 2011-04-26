@@ -2,7 +2,7 @@
 
 public class NoiseDrum
 {
-	Mix2 mix => Gain master_gain => dac.chan(0) => dac.chan(1);
+	Mix2 mix => Gain masta_g => Gain master_gain => dac.chan(0) => dac.chan(1);
 	0.0 => mix.pan;
     0.5 => master_gain.gain;
 
@@ -18,6 +18,7 @@ public class NoiseDrum
 	0.99 => float exponent;
 	0.15::second => dur pitch_decay;
 	1.0 => float volume;
+    1.0 => masta_g.gain;
 
 	fun void randomize()
 	{
@@ -28,8 +29,8 @@ public class NoiseDrum
 		Std.rand2f(0.1, 1.0)::second => pitch_decay;
 		Std.rand2f(0.5, 1) => volume;
 
-		Std.rand2f(2, 10) => bf.Q;
-		Std.rand2f(2, 10) => lf.Q;
+		Std.rand2f(2, 4) => bf.Q;
+		Std.rand2f(2, 4) => lf.Q;
 	}
 
 	fun void print()
