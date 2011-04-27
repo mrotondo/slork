@@ -337,7 +337,7 @@ fun void getDrumControl()
             }
             else if (x[s] == x["density"])
             { 
-                //<<< "density!", f >>>;
+                //<<< "density!", fx >>>;
                 fx => kick.density;
                 fx => snare.density;
                 fx => hihat.density;
@@ -462,8 +462,17 @@ spork ~ glitch.playback();
 spork ~ getIP();
 spork ~ getDrumControl();
 
+-1 => int index;
+
 fun void updateParams()
 {   
+        
+    if ( index == Scenes.current_scene_index ) return;
+    
+    Scenes.current_scene_index => index;
+
+<<< "blah" >>>;
+    
     Scenes.current_scene.kickPattern @=> kick.hitsOn;
     Scenes.current_scene.snarePattern @=> snare.hitsOn;
     Scenes.current_scene.snareHardPattern @=> snarehard.hitsOn;
@@ -472,6 +481,8 @@ fun void updateParams()
     Scenes.current_scene.kickHardPattern @=> kickhard.hitsOn;
     
     Scenes.current_scene.drumRandomness => float fx;
+    
+    
     
     fx => kick.randThreshold;
     fx => snare.randThreshold;

@@ -14,6 +14,7 @@ Eighth * 0.5 => dur Sixteenth;
 16.0 => float quantizationSize;
 
 BlowBotl s => JCRev rev => Gain gain => dac;
+
 0.0 => s.noiseGain;
 
 0.5 => gain.gain;
@@ -22,13 +23,22 @@ s => Delay dly => rev;
 dly => Gain fb => dly;
 rev.mix(0.1);
 rev.gain(0.35);
-dly.gain(0.7);
+dly.gain(0.9);
 TimeUnit => dly.max;
 Half => dly.delay;
-0.99 => fb.gain;
+0.9999 => fb.gain;
 
-[0,3,5,7,8, 10,12,15,17, 19,20,22,24,27, 
- 29,31,32,34,36, 39,41,43,44,46, 48,51,53,55,56] @=> int notes[];
+s => Delay dly2 => rev;
+dly2 => Gain fb2 => dly2;
+//rev.mix(0.1);
+//rev.gain(0.35);
+dly2.gain(0.9);
+TimeUnit => dly2.max;
+Half + 200::ms => dly2.delay;
+0.9999 => fb2.gain;
+
+[0,4,5,7,8, 10,12,16,17, 19,20,22,24,28, 
+ 29,31,32,34,36, 40,41,43,44,46, 48,52,53,55,56] @=> int notes[];
 
 0 => int thenote;
 0.0 => float vel;
@@ -38,7 +48,7 @@ fun void slewFreq()
 {
     while (true)
     {
-        0.05*(fTarget-s.freq()) + s.freq() => s.freq;
+        0.005*(fTarget-s.freq()) + s.freq() => s.freq;
         //fTarget => s.freq;
         1::samp => now;
     }
