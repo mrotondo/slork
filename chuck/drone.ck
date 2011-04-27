@@ -1,7 +1,7 @@
 TriOsc t1 => JCRev revL => Gain gL => dac.chan(0);
 Blit t2 => JCRev revR => Gain gR => dac.chan(1);
 
-0.3 => gR.gain => gL.gain;
+0.03 => gR.gain => gL.gain;
 
 TriOsc t3 => revL;
 Blit t4 => revR;

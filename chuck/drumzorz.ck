@@ -52,8 +52,7 @@ now % (totalBeatsPerMeasure * totalMeasures * sampsPerBeat) => dur offset;
 // class for randrumly generated drums
 class Randrum
 {
-    //SndBuf 
-    //drum => Gain g => dac;
+    //SndBuf drum => Gain g => dac;
 	NoiseDrum drum;
 	
     int hitsOn[gridSize];
