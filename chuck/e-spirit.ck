@@ -41,13 +41,26 @@ xmit.setHost("10.0.1.4", 9999);
 e.set( 5::ms, 20::ms, .3, 150::ms );
 e.keyOff();
 
-[ [0, 5, 11, 16], [0, 4, 11, 12], [5, 7, 12, 16] ] @=> int c[][];
-[0,4,7,11] @=> int maj7[];
-[0,3,7,10] @=> int min7[];
-[0,4,7,12] @=> int maj[];
+[0,5,7,10] @=> int maj7[];
+[0,2,7,10] @=> int min7[];
+[5,9,12,16] @=> int maj[];
 [0,3,7,12] @=> int min[];
 
 maj7 @=> whichchord;
+
+// HID
+Hid hi;
+HidMsg msg;
+
+// which keyboard
+0 => int device;
+// get from command line
+if( me.args() ) me.arg(0) => Std.atoi => device;
+
+// open keyboard (get device number from command line)
+if( !hi.openKeyboard( device ) ) me.exit();
+<<< "keyboard '" + hi.name() + "' ready", "" >>>;
+spork ~ keys();
 
 fun void updateParams()
 {  
@@ -101,7 +114,7 @@ while ( true )
         }
         for( 0 => int i; i<4; i++ )
         {
-            Std.mtof( whichchord[i] + 45 + Std.rand2(0,3) * 12 ) => chord[i].freq;
+            Std.mtof( whichchord[i] + 43 + Std.rand2(0,3) * 12 ) => chord[i].freq;
             Std.rand2( 1, 5 ) => chord[i].harmonics;
         }
         now % (TimeUnit/quantizationSize) => dur mod;
@@ -111,5 +124,45 @@ while ( true )
         
         spork ~ playChord();
         
+    }
+}
+
+
+fun void keys()
+{
+    // infinite event loop
+    while( true )
+    {
+        // wait for event
+        hi => now;
+        
+        // get message
+        while( hi.recv( msg ) )
+        {
+            // check
+            if( msg.isButtonDown() )
+            {
+                if ( msg.which == 225 )
+                {
+                    min7 @=> whichchord;
+                }
+                else if ( msg.which == 229 )
+                {
+                    maj7 @=> whichchord;
+                }
+                else continue;
+                for( 0 => int i; i<4; i++ )
+                {
+                    Std.mtof( whichchord[i] + 45 + Std.rand2(0,3) * 12 ) => chord[i].freq;
+                    Std.rand2( 1, 5 ) => chord[i].harmonics;
+                }
+                now % (TimeUnit/quantizationSize) => dur mod;
+                // advance time by the quantization size in samps
+                (TimeUnit/quantizationSize) - mod => dur wait;
+                wait => now;
+
+                spork ~ playChord();
+            }
+        }
     }
 }

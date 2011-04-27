@@ -695,6 +695,21 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
              thisPoint.y < thisRect.origin.y + thisRect.size.height);
 }
 
+CGPoint prevTouch;
+
+- (bool)didCross:(float)cross with:(CGPoint)touch
+{
+    return ( (prevTouch.x >= cross && touch.x <= cross) ||
+            (prevTouch.x <= cross && touch.x >= cross) );
+}
+
+- (void)processStrings:(CGPoint)touch
+{
+    for ( int i = 0; i < 28; i++ )
+        if ( [self didCross:i*25 with:touch] ) [osc sendPoint:CGPointMake(i*1.0, touch.y/1024.0) withKey:@"string"];
+    prevTouch = touch;
+}
+
 const float thresh = 50.0;
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
@@ -741,7 +756,7 @@ const float thresh = 50.0;
                 if ( thisPoint.x < thresh ) [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"density"];
                 else if ( [touches count] == 1 ) 
                 {
-                    [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(100.0,100.0) color:[UIColor yellowColor] delegate:self];
+                    [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(100.0,100.0) color:[UIColor greenColor] delegate:self];
                     [osc sendValue:2.0 withKey:@"chord"];
                 }
                 
@@ -751,7 +766,7 @@ const float thresh = 50.0;
                 if ( thisPoint.x > IPAD_WIDTH - thresh ) [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"random"];
                 else if ( [touches count] == 1 ) 
                 {
-                    [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(100.0,100.0) color:[UIColor yellowColor] delegate:self];
+                    [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(100.0,100.0) color:[UIColor greenColor] delegate:self];
                     [osc sendValue:3.0 withKey:@"chord"];
                 }
             }
@@ -822,6 +837,12 @@ const float thresh = 50.0;
                 }
             } 
         }
+        
+        if ( [touches count] == 1 )
+        {
+            [self processStrings:[[touches anyObject] locationInView:self.view]];
+        }
+        
         if ( [[event allTouches] count] == 4 )
         {
             float xtouch = 0; float ytouch = 0;
@@ -832,6 +853,7 @@ const float thresh = 50.0;
                 [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(10.0,10.0) color:[UIColor yellowColor] delegate:self];
             }
             xtouch *= 0.25; ytouch *= 0.25;
+            [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:CGPointMake(xtouch, ytouch) size:CGSizeMake(10.0,10.0) color:[UIColor greenColor] delegate:self];
             [osc sendDrumControlX:ytouch/11.0 Y:xtouch/8.0 withKey:@"glitch"];
         }
         if ( [[event allTouches] count] == 3 )
@@ -844,6 +866,7 @@ const float thresh = 50.0;
                 [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(10.0,10.0) color:[UIColor yellowColor] delegate:self];
             }
             xtouch *= 0.3333; ytouch *= 0.3333;
+            [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:CGPointMake(xtouch, ytouch) size:CGSizeMake(10.0,10.0) color:[UIColor greenColor] delegate:self];
             [osc sendDrumControlX:ytouch/11.0 Y:xtouch/8.0 withKey:@"stutter"];
         }
     }
@@ -893,6 +916,7 @@ const float thresh = 50.0;
         {
             [osc sendDrumControlX:-10.0 Y:0.0 withKey:@"stutter"];
         }
+        [osc sendPoint:CGPointMake(-1.0, 0.0) withKey:@"string"];
     }
     else // BASS_MODE
     {
