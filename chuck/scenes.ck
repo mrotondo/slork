@@ -23,6 +23,12 @@ public class Scenes
 		
 		// chord params
 		0.0 => float chordFBgain;
+		0.0 => float chordFB;
+        
+        // strings params
+        0.0 => float stringsFBgain;
+		0.0 => float stringsFB;
+        
         int duration_in_beats;
 	}
 
@@ -52,6 +58,10 @@ public class Scenes
         5.6 => scene0.drumRandomness;
         2.6 => scene0.drumDensity;
 		0.0 => scene0.chordFBgain;
+        0.0 => scene0.chordFB;
+        0.4 => scene0.stringsFBgain;
+        0.3 => scene0.stringsFB;
+
         
         [ 1, 0, 0, 0,  0, 0, 1, 0,  1, 0, 0, 0,  0, 0, 0, 0,   1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0,  0, 1, 1, 0 ] @=> scene0.kickPattern;
         [ 0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0,   0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0 ] @=> scene0.snarePattern;
@@ -69,6 +79,10 @@ public class Scenes
         50.5 => scene1.drumRandomness;
         5.6 => scene1.drumDensity;
 		0.99 => scene1.chordFBgain;
+        0.6 => scene1.chordFB;
+        0.999 => scene1.stringsFBgain;
+        0.7 => scene1.stringsFB;
+
         
 
         [ 1, 0, 0, 0,  0, 0, 0, 1,  0, 0, 0, 0,  0, 0, 0, 0,   1, 0, 0, 1,  0, 0, 1, 0,  1, 0, 0, 0,  1, 0, 1, 0 ] @=> scene1.kickPattern;
@@ -87,6 +101,10 @@ public class Scenes
         90.0 => scene2.drumRandomness;
 		10.6 => scene2.drumDensity;
 		0.9999 => scene2.chordFBgain;
+        0.9 => scene2.chordFB;
+        0.999 => scene2.stringsFBgain;
+        0.94 => scene2.stringsFB;
+
 
         [ 1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,   1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0,  1, 0, 1, 0 ] @=> scene2.kickPattern;
         [ 0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0,   0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  0, 1, 0, 1 ] @=> scene2.snarePattern;

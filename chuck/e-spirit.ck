@@ -16,7 +16,7 @@ Eighth * 0.5 => dur Sixteenth;
 
 Blit chord[4];
 ADSR e => NRev rev => Gain master_gain => dac;
-0.15 => master_gain.gain;
+0.07 => master_gain.gain;
 e => Delay dly => rev;
 dly => Gain fb => dly;
 for ( 0 => int i; i<4; i++ ) chord[i] => e;
@@ -67,6 +67,7 @@ fun void updateParams()
     while (true)
     { 
         Scenes.current_scene.chordFBgain => fb.gain;
+		dly.gain(Scenes.current_scene.chordFB);
         1::second => now;
     }
 }
