@@ -143,6 +143,7 @@
 
 - (void)initCapture
 {
+    frameCounter = 0;
     AVCaptureDeviceInput *captureInput = [AVCaptureDeviceInput 
 										  deviceInputWithDevice:[self frontFacingCameraIfAvailable] 
 										  error:nil];
@@ -569,8 +570,12 @@ static CGRect swapWidthAndHeight(CGRect rect)
 didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer 
 	   fromConnection:(AVCaptureConnection *)connection 
 {
+    frameCounter++;
+    if ( frameCounter == 11 ) frameCounter = 0;
+    else return;
+    
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-
+    
     CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer); 
     CVPixelBufferLockBaseAddress(imageBuffer,0); 
 
@@ -602,8 +607,8 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     
     // Extract features
     [self findCentroidAndAreaOfImage:img_greyscale];
-    //[self findContoursInImage:img_greyscale];
-    //[self findLinesInImage:img_greyscale];
+    [self findContoursInImage:img_greyscale];
+    [self findLinesInImage:img_greyscale];
     
 //    // Convert black and whilte to 24bit image then convert to UIImage to show
 //    IplImage *ipl_result = cvCreateImage(cvGetSize(img_greyscale), IPL_DEPTH_8U, 3);

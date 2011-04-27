@@ -42,6 +42,8 @@ feedborkDoodadDelegate, feedborkOSCdelegate> {
     float sWidth, sHeight;
     
     int totaltouches;
+    
+    int frameCounter;
 }
 
 @property (nonatomic, retain) AVCaptureSession *captureSession;
