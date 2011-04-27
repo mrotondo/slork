@@ -35,8 +35,8 @@ public class NoiseDrum
 		Std.rand2f(0.1, 1.0)::second => pitch_decay;
 		Std.rand2f(0.5, 1) => volume;
 
-		Std.rand2f(2, 4) => bf.Q;
-		Std.rand2f(2, 4) => lf.Q;
+		Std.rand2f(1, 3) => bf.Q;
+		Std.rand2f(1, 3) => lf.Q;
 	}
 
 	fun void print()
