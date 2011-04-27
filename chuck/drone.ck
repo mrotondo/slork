@@ -1,13 +1,13 @@
 TriOsc t1 => JCRev revL => Gain gL => dac.chan(0);
 Blit t2 => JCRev revR => Gain gR => dac.chan(1);
 
-0.03 => gR.gain => gL.gain;
+0.3 => gR.gain => gL.gain;
 
 TriOsc t3 => revL;
 Blit t4 => revR;
 
-TriOsc t5 => blackhole;// revL;
-Blit t6 => blackhole;// revR;
+TriOsc t5 => revL;
+Blit t6 => revR;
 
 4 => t2.harmonics;
 5 => t4.harmonics;
@@ -35,7 +35,7 @@ Std.mtof(base+7) + .3 => float cf4 => t4.freq;
 Std.mtof(base+12) => float cf5 => t5.freq;
 Std.mtof(base+12) + .3 => float cf6 => t6.freq;
 
-4.0 => float index;
+1.0 => float index;
 
 0.5 => float g1;
 
@@ -48,10 +48,10 @@ while (true)
    cf5 + index*(m3.last()) => t5.freq;
    cf6 + index*(m4.last()) => t6.freq;
  
-   g1 + 0.3*(m4.last()) => t1.gain;
-   g1 + 0.3*(m3.last()) => t2.gain;
-   g1 + 0.3*(m2.last()) => t3.gain;
-   g1 + 0.3*(m1.last()) => t4.gain;
+   //g1 + 0.3*(m4.last()) => t1.gain;
+   //g1 + 0.3*(m3.last()) => t2.gain;
+   //g1 + 0.3*(m2.last()) => t3.gain;
+   //g1 + 0.3*(m1.last()) => t4.gain;
    g1 + 0.3*(m6.last()) => t5.gain;
    g1 + 0.3*(m5.last()) => t6.gain;
  
