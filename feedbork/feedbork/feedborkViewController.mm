@@ -699,6 +699,7 @@ const float thresh = 50.0;
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {    
+    int prevTotal = totaltouches;
     // reset touches
     quadTouches[0] = quadTouches[1] = quadTouches[2] = quadTouches[3] = 0;
     
@@ -715,6 +716,8 @@ const float thresh = 50.0;
         else if ( [self point:thisPoint isInside: quadrant[3]] )
             quadTouches[3]++;
     }
+    
+    totaltouches = quadTouches[0] + quadTouches[1] + quadTouches[2] + quadTouches[3];
     
     if DRUMS_AND_CHORDS_MODE
     {
@@ -765,7 +768,11 @@ const float thresh = 50.0;
         }
         xtouch /= [[event allTouches] count]; ytouch /= [[event allTouches] count];
         CGPoint tapPoint = CGPointMake(xtouch / self.view.bounds.size.width, 1 - (ytouch / self.view.bounds.size.height));
-        [osc sendPoint:tapPoint withKey:@"tap"];
+        if ( prevTotal == 0 )
+        {
+            [osc sendPoint:tapPoint withKey:@"bassTouchBegan"];
+            NSLog(@"bass touch started");
+        }
         [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:CGPointMake(xtouch, ytouch) size:CGSizeMake(70.0,70.0) color:[UIColor orangeColor] delegate:self];
 
     }
@@ -786,6 +793,8 @@ const float thresh = 50.0;
         else if ( [self point:thisPoint isInside: quadrant[3]] ) 
             quadTouches[3]++;
     }
+    
+    totaltouches = quadTouches[0] + quadTouches[1] + quadTouches[2] + quadTouches[3];
 
     if DRUMS_AND_CHORDS_MODE
     {
@@ -848,6 +857,9 @@ const float thresh = 50.0;
             [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(10.0,10.0) color:[UIColor yellowColor] delegate:self];
         }
         xtouch /= [[event allTouches] count]; ytouch /= [[event allTouches] count];
+        CGPoint tapPoint = CGPointMake(xtouch / self.view.bounds.size.width, 1 - (ytouch / self.view.bounds.size.height));
+        [osc sendPoint:tapPoint withKey:@"bassTouchMoved"];
+
         [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:CGPointMake(xtouch, ytouch) size:CGSizeMake(10.0,10.0) color:[UIColor orangeColor] delegate:self];
     }
 }
@@ -868,6 +880,8 @@ const float thresh = 50.0;
             quadTouches[3]--;
     }
     
+    totaltouches = quadTouches[0] + quadTouches[1] + quadTouches[2] + quadTouches[3];
+    
     if DRUMS_AND_CHORDS_MODE
     {
         // see if we've lifted fingers off
@@ -882,7 +896,12 @@ const float thresh = 50.0;
     }
     else // BASS_MODE
     {
-    
+        if ( totaltouches == 0 ) 
+        {
+            [osc sendPoint:CGPointMake(0.0, 0.0) withKey:@"bassTouchEnded"];
+            NSLog(@"bass touch ended");
+        }
+
     }
 }
 

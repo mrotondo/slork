@@ -96,12 +96,3 @@ public class NoiseDrum
 		freq_end - freq_start => freq_diff;
 	}
 }
-
-// NoiseDrum drum;
-// drum.randomize();
-// spork ~ drum.go();
-// while (true)
-// {	
-// 	500::ms => now;
-// 	drum.play();
-// }

@@ -100,13 +100,3 @@ public class TweakyDrum
 		freq_end - freq_start => freq_diff;
 	}
 }
-
-TweakyDrum drum;
-drum.randomize();
-spork ~ drum.go();
-while (true)
-{
-    drum.play();
-    500::ms => now;
-}
-
