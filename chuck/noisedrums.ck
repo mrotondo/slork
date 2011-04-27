@@ -5,7 +5,7 @@ public class NoiseDrum
 {
 	Mix2 mix => Gain masta_g => Gain master_gain => dac.chan(0) => dac.chan(1);
 	0.0 => mix.pan;
-    0.5 => master_gain.gain;
+    0.75 => master_gain.gain;
 
 	Noise n => BPF bf => mix.left;
 	5 => bf.Q;
@@ -15,24 +15,38 @@ public class NoiseDrum
 	// DRUM SPEC
 	60 => float freq_start;
 	40 => float freq_end;
-	1::second => dur play_time;
 	0.99 => float exponent;
 	0.15::second => dur pitch_decay;
 	1.0 => float volume;
     1.0 => masta_g.gain;
 
+	fun void setOutput(UGen output)
+	{
+		master_gain => output;
+	}
+	
 	fun void randomize()
 	{
 		Std.rand2f(20, 1000) => freq_start;
 		Std.rand2f(20, 1000) => freq_end;
-		1::second => play_time;
 		Std.rand2f(0.97, 0.99) => exponent;
 		Std.rand2f(0.1, 1.0)::second => pitch_decay;
 		Std.rand2f(0.5, 1) => volume;
 
-		Std.rand2f(2, 4) => bf.Q;
-		Std.rand2f(2, 4) => lf.Q;
+		Std.rand2f(1, 3) => bf.Q;
+		Std.rand2f(1, 3) => lf.Q;
 	}
+    
+    fun void init(float new_freq_start, float new_freq_end, float new_exponent, float new_pitch_decay_samps, float new_volume, float new_bfQ, float new_lfQ)
+    {
+        new_freq_start => freq_start;
+        new_freq_end => freq_end;
+        new_exponent => exponent;
+        new_pitch_decay_samps::samp => pitch_decay;
+        new_volume => volume;
+        new_bfQ => bf.Q;
+        new_lfQ => lf.Q;
+    }
 
 	fun void print()
 	{

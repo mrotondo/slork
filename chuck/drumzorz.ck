@@ -70,15 +70,40 @@ class Randrum
     1.0 => float baseRate;
     0 => int isIn;
     
+    // Assuming the order of drums stays the same!!
+    [
+    [113.9, 688.7, 0.9786, 12614, 0.7025, 2.2669, 2.1123], //kick
+    [596.9, 993.5, 0.9788, 7934, 0.6665, 2.9815, 2.04], //snare
+    [128.7, 830.8, 0.9772, 10729, 0.517, 3.0782, 2.8611], //hihat
+    [924.6, 210.8, 0.9815, 14458, 0.5463, 2.9771, 2.8721], //kickhard
+    [104.2, 81.4, 0.9701, 25957, 0.7896, 2.2302, 2.6559], //snarehard
+    [916.2, 603.5, 0.9818, 24622, 0.5581, 2.1879, 2.0338], //openhat
+    [211.5, 854.1, 0.9753, 26527, 0.6415, 2.6134, 3.4866] //glitch
+    ] @=> float d[][];
+
     // setup the filepath for the sample as well as a unique name
-    fun void setup( string _filename, string _name )
+    fun void setup( string _filename, string _name, UGen output )
     {
-		drum.randomize();
+        0 => int i;
+        if (_name == "kick") 0 => i;
+        if (_name == "snare") 1 => i;
+        if (_name == "hihat") 2 => i;
+        if (_name == "kickhard") 3 => i;
+        if (_name == "snarehard") 4 => i;
+        if (_name == "openhat") 5 => i;
+        if (_name == "glitch") 6 => i;
+        //drum.randomize();
+        drum.init(d[i][0], d[i][1], d[i][2], d[i][3], d[i][4], d[i][5], d[i][6]);
+		
+        drum.setOutput(output);
 		spork ~ drum.go();
+        
         //_filename => drum.read;
         _name => myname;
         //drum.samples() => drum.pos;
-    }
+        <<< myname >>>;
+        drum.print();
+	}
     
     // clear out everything in that player
     fun void clear()
@@ -143,7 +168,7 @@ class Randrum
                 }
                 // handle the case that a random sample got triggered in the previous run
                 if (randHitsOn[i] > 0) {
-                    1 => send;
+                    //1 => send;
                     randHitsGain[i] => sendGain;
                     randHitsGain[i] => drum.masta_g.gain;
                     //baseRate * Math.rand2f(1 - randThreshold/1000, 1 + randThreshold/1000) => drum.rate;
@@ -254,16 +279,37 @@ class Randrum
     }
 };
 
+DelayL d => Gain g => d => NRev rev => dac;
+0.0 => g.gain;
+5::second => d.max;
+0::ms => d.delay;
+
+0.0 => rev.mix;
+
+fun void setDelay(dur delay)
+{
+	if (delay < d.max())
+	{
+        .97 => g.gain;
+		delay => d.delay;
+	}
+}
+
+fun void setReverb(float mix)
+{
+	mix => rev.mix;
+}
+
 // Randrum setups
 Randrum kick,snare,hihat,kickhard,openhat,snarehard,glitch;
 "jason/" => string path;
-kick.setup(path+"kickmed.wav", "kick");
-snare.setup(path+"snarerealdry.wav", "snare");
-hihat.setup(path+"hihatthin.wav", "hihat");
-kickhard.setup(path+"kickbig.wav", "kickhard");
-snarehard.setup(path+"snarehigh.wav", "snarehard");
-openhat.setup(path+"hihatopen.wav","openhat");
-glitch.setup("snare.aiff", "glitch");
+kick.setup(path+"kickmed.wav", "kick", d);
+snare.setup(path+"snarerealdry.wav", "snare", d);
+hihat.setup(path+"hihatthin.wav", "hihat", d);
+kickhard.setup(path+"kickbig.wav", "kickhard", d);
+snarehard.setup(path+"snarehigh.wav", "snarehard", d);
+openhat.setup(path+"hihatopen.wav","openhat", d);
+glitch.setup("snare.aiff", "glitch", d);
 [ 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0 ] @=> int kickPattern[];
 [ 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 ] @=> float kickGain[];
 [ 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 ] @=> int snarePattern[];
@@ -502,6 +548,6 @@ fun void updateParams()
 
 // "main" loop
 while( true ) {
-	updateParams(); // WHY does this give us null pointer exception
+	updateParams();
     1::second => now;
 }

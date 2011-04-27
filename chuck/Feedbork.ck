@@ -58,8 +58,6 @@ time_orec.listen();
 OscEvent @ now_event;
 time_orec.event("/now, i") @=> now_event;
 
-spork ~ Scenes.startPiece() @=> Shred @ scenes_shred;
-me.yield();
 <<< "BPM in feedbork is: " + Scenes.bpm >>>;
 
 Bass voice;
@@ -116,6 +114,7 @@ class NoteStartListener extends PointListener
         event.getFloat() => float x;
         event.getFloat() => float y;
 		x < 0.5 => int manual_note_choice;
+		voice.setStartPoint(x, y);
 		voice.ChooseNextNote(manual_note_choice, y);
 		voice.PlayNextNote();
     }

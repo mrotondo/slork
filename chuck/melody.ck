@@ -10,7 +10,7 @@ fun float SumFloats(float floats[])
 
 class Voice
 {
-    45 => int root;
+    43 => int root;
     root => int pitch;
     0 => int prev_pitch;
 
@@ -18,7 +18,7 @@ class Voice
 	
     0::ms => dur note_duration;
     
-    [0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23, 24] @=> int intervals[];
+    [0, 2, 3, 5, 7, 9, 10, 12, 14, 16, 17, 19, 21, 23, 24] @=> int intervals[];
     
     // start on the root
     [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0] @=> float weights[];
@@ -33,7 +33,7 @@ class Voice
 	{
 		if (major_minor == 0)
 		{
-			[0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23, 24] @=> intervals;
+			[0, 2, 3, 5, 7, 9, 10, 12, 14, 16, 17, 19, 21, 23, 24] @=> intervals; // change 3 to 4 and 10 to 11 to make this major again
 		}
 		else
 		{
@@ -189,7 +189,7 @@ public class Bass extends Voice
 
 	SinOsc mod => blackhole;
 	3 => mod.freq;
-	0 => float mod_depth;
+	0.1 => float mod_depth;
     
     env1.keyOff();
     env2.keyOff();
@@ -199,7 +199,7 @@ public class Bass extends Voice
 	0 => float start_x;
 	0 => float start_y;
 	
-	1 => float alpha;
+	5 => float alpha;
 	fun float AtanDrive(UGen input, UGen output) 
 	{ 
 		Step result => output; 
@@ -211,7 +211,7 @@ public class Bass extends Voice
 
 	fun void setDistortion(float new_alpha)
 	{
-		5 + 20 * new_alpha => alpha;
+		5 + 20 * Math.fabs(new_alpha - start_x) => alpha;
 	}
 	
 	fun void StopPlayingNote()
@@ -220,6 +220,16 @@ public class Bass extends Voice
 		1 => env2.keyOff;
 		1 => env3.keyOff;
 		1 => env4.keyOff;
+	}
+
+	fun void setStartPoint(float new_x, float new_y)
+	{
+		5 => alpha;
+		0.1 => mod_depth;
+		3 => mod.freq;
+		
+		new_x => start_x;
+		new_y => start_y;
 	}
 	
 	fun void SetFrequency(float freq)
@@ -256,19 +266,19 @@ public class Bass extends Voice
 
 	fun void setModDepth(float depth)
 	{
-		depth * 0.4 => mod_depth;
+		Math.fabs(start_y - depth) * 0.49 => mod_depth;
 	}
 
 	fun void setModRate(float rate)
 	{
-		rate * 10 => mod.freq;
+		Math.fabs(start_y - rate) * 10 => mod.freq;
 	}
 	
 	fun void updateParams()
 	{
 		while(true)
 		{
-			0.6 + mod.last() * mod_depth => mod_gain.gain;
+			0.5 + mod.last() * mod_depth => mod_gain.gain;
 			ms => now;
 		}
 	}

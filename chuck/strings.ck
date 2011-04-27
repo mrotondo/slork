@@ -17,7 +17,7 @@ BlowBotl s => JCRev rev => Gain gain => dac;
 
 0.0 => s.noiseGain;
 
-0.5 => gain.gain;
+0.3 => gain.gain;
 
 s => Delay dly => rev;
 dly => Gain fb => dly;
@@ -55,6 +55,19 @@ fun void slewFreq()
 }
 
 if (smooth) spork ~ slewFreq();
+
+fun void updateParams()
+{  
+    while (true)
+    { 
+        Scenes.current_scene.stringsFBgain => fb.gain => fb2.gain;
+        dly.gain(Scenes.current_scene.stringsFB);
+        dly2.gain(Scenes.current_scene.stringsFB);
+
+        1::second => now;
+    }
+}
+spork ~ updateParams();
 
 // create an address in the receiver, store in new variable
 recv.event( "/string, f, f" ) @=> OscEvent oe;
