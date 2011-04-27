@@ -101,13 +101,16 @@ class ReverbListener extends FloatListener
     }
 }
 
-class NoteStartListener extends FeedborkListener
+class PointListener extends FeedborkListener
 {
     fun void init(OscRecv orec, string event_name)
     {
         orec.event("/" + event_name + ",f f") @=> event;
-    }
-	
+    }	
+}
+
+class NoteStartListener extends PointListener
+{
     fun void handleEvent()
     {
         event.getFloat() => float x;
@@ -118,13 +121,20 @@ class NoteStartListener extends FeedborkListener
     }
 }
 
-class NoteStopListener extends FeedborkListener
+class NoteModListener extends PointListener
 {
-    fun void init(OscRecv orec, string event_name)
-    {
-        orec.event("/" + event_name + ",f f") @=> event;
-    }
-	
+	fun void handleEvent()
+	{
+        event.getFloat() => float x;
+        event.getFloat() => float y;
+		voice.setDistortion(x);
+		voice.setModDepth(y);
+		voice.setModRate(y);
+	}
+}
+
+class NoteStopListener extends PointListener
+{
     fun void handleEvent()
     {
         event.getFloat() => float x;
@@ -153,6 +163,10 @@ class KeyListener extends IntListener
 NoteStartListener note_start_listener;
 note_start_listener.init(orec, "bassTouchBegan");
 spork ~ note_start_listener.go();
+
+NoteModListener note_mod_listener;
+note_mod_listener.init(orec, "bassTouchMoved");
+spork ~ note_mod_listener.go();
 
 NoteStopListener note_stop_listener;
 note_stop_listener.init(orec, "bassTouchEnded");

@@ -156,7 +156,7 @@ class Voice
 
 public class Bass extends Voice
 {
-	Gain mod_gain => Gain master_gain => dac;
+	Gain mod_gain => Gain master_gain => blackhole;//dac;
 	
     0.05 => master_gain.gain;
 
@@ -164,33 +164,56 @@ public class Bass extends Voice
 	5 => ugen1.harmonics;	
 	10::ms => env1.attackTime;
 	1500::ms => env1.decayTime;
-	0.1 => env1.sustainLevel;
+	0.4 => env1.sustainLevel;
+	200::ms => env1.releaseTime;
 
 	Blit ugen2 => ADSR env2 => mod_gain;
 	10 => ugen2.harmonics;
 	500::ms => env2.attackTime;
 	200::ms => env2.decayTime;
-	0.1 => env2.sustainLevel;
+	0.2 => env2.sustainLevel;
+	100::ms => env2.releaseTime;
 	
 	BlitSquare ugen3 => BPF f3 => ADSR env3 => mod_gain;
 	300::ms => env3.attackTime;
 	600::ms => env3.decayTime;
-	0.1 => env3.sustainLevel;
+	0.3 => env3.sustainLevel;
+	400::ms => env3.releaseTime;
 	
 	BlitSaw ugen4 => BPF f4 => ADSR env4 => mod_gain;
 	2 => ugen4.harmonics;
 	600::ms => env4.attackTime;
 	600::ms => env4.decayTime;
-	0.1 => env4.sustainLevel;
+	0.2 => env4.sustainLevel;
+	500::ms =>env4.releaseTime;
 
 	SinOsc mod => blackhole;
 	3 => mod.freq;
+	0 => float mod_depth;
     
     env1.keyOff();
     env2.keyOff();
     env3.keyOff();
     env4.keyOff();
 
+	0 => float start_x;
+	0 => float start_y;
+	
+	1 => float alpha;
+	fun float AtanDrive(UGen input, UGen output) 
+	{ 
+		Step result => output; 
+		do 2 * Math.atan(alpha * input.last()) / pi => result.next; 
+		while (samp => now);
+	}
+
+	spork ~ AtanDrive(master_gain, dac);
+
+	fun void setDistortion(float new_alpha)
+	{
+		5 + 20 * new_alpha => alpha;
+	}
+	
 	fun void StopPlayingNote()
 	{
 		1 => env1.keyOff;
@@ -230,12 +253,22 @@ public class Bass extends Voice
         gain => ugen4.gain;
 		1 => env4.keyOn;
     }
-    
+
+	fun void setModDepth(float depth)
+	{
+		depth * 0.4 => mod_depth;
+	}
+
+	fun void setModRate(float rate)
+	{
+		rate * 10 => mod.freq;
+	}
+	
 	fun void updateParams()
 	{
 		while(true)
 		{
-			0.7 + mod.last() * 0.3 => mod_gain.gain;
+			0.6 + mod.last() * mod_depth => mod_gain.gain;
 			ms => now;
 		}
 	}
