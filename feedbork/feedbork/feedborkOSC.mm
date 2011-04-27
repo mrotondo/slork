@@ -131,10 +131,10 @@ void drum_callback( osc::ReceivedMessageArgumentStream & oscin, void * data )
 - (void)updateColor:(NSTimer*)timer
 {
     r += 0.01;
-    g += 0.0052;
+    g += 0.00052;
     
     if ( r > 1.0 ) r = 0.0;
-    if ( g > 1.0 ) g = 0.0;
+    if ( g > 0.1 ) g = 0.0;
 }
 
 - (void)dealloc
