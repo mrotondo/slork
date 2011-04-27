@@ -101,9 +101,7 @@ class ReverbListener extends FloatListener
     }
 }
 
-// Collapse these down into one listener for two floats
-0 => int manual_note_choice;
-class NoteListener extends FeedborkListener
+class NoteStartListener extends FeedborkListener
 {
     fun void init(OscRecv orec, string event_name)
     {
@@ -114,9 +112,24 @@ class NoteListener extends FeedborkListener
     {
         event.getFloat() => float x;
         event.getFloat() => float y;
-		x < 0.5 => manual_note_choice;
+		x < 0.5 => int manual_note_choice;
 		voice.ChooseNextNote(manual_note_choice, y);
 		voice.PlayNextNote();
+    }
+}
+
+class NoteStopListener extends FeedborkListener
+{
+    fun void init(OscRecv orec, string event_name)
+    {
+        orec.event("/" + event_name + ",f f") @=> event;
+    }
+	
+    fun void handleEvent()
+    {
+        event.getFloat() => float x;
+        event.getFloat() => float y;
+		voice.StopPlayingNote();
     }
 }
 
@@ -129,17 +142,21 @@ class KeyListener extends IntListener
     }
 }
 
-ReverbListener reverb_listener;
-reverb_listener.init(orec, "centroid_x");
-//spork ~ reverb_listener.go() @=> Shred @ reverb_shred;
+// ReverbListener reverb_listener;
+// reverb_listener.init(orec, "centroid_x");
+// spork ~ reverb_listener.go() @=> Shred @ reverb_shred;
 
-HPFFreqListener hpf_freq_listener;
-hpf_freq_listener.init(orec, "brightness");
-//spork ~ hpf_freq_listener.go() @=> Shred @ hpf_freq_shred;
+// HPFFreqListener hpf_freq_listener;
+// hpf_freq_listener.init(orec, "brightness");
+// spork ~ hpf_freq_listener.go() @=> Shred @ hpf_freq_shred;
 
-NoteListener note_listener;
-note_listener.init(orec, "tap");
-spork ~ note_listener.go() @=> Shred @ note_shred;
+NoteStartListener note_start_listener;
+note_start_listener.init(orec, "bassTouchBegan");
+spork ~ note_start_listener.go();
+
+NoteStopListener note_stop_listener;
+note_stop_listener.init(orec, "bassTouchEnded");
+spork ~ note_stop_listener.go();
 
 KeyListener key_listener;
 key_listener.init(orec, "chord");

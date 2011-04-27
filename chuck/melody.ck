@@ -190,6 +190,14 @@ public class Bass extends Voice
     env2.keyOff();
     env3.keyOff();
     env4.keyOff();
+
+	fun void StopPlayingNote()
+	{
+		1 => env1.keyOff;
+		1 => env2.keyOff;
+		1 => env3.keyOff;
+		1 => env4.keyOff;
+	}
 	
 	fun void SetFrequency(float freq)
     {
