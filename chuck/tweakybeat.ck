@@ -3,7 +3,7 @@
 public class TweakyDrum
 {
     Gain masta_g;
-	Mix2 mix => Gain master_gain => dac.chan(0) => dac.chan(1);
+	Mix2 mix => Gain master_gain;// => dac.chan(0) => dac.chan(1);
 	-1 => mix.pan;
     0.25 => master_gain.gain;
 
@@ -12,7 +12,6 @@ public class TweakyDrum
 	Blit impulse => LPF f => mix.right;
 	1 => impulse.gain;
 	10 => impulse.harmonics;
-
 
 	// DRUM SPEC
 	160 => float freq_start;
@@ -24,6 +23,11 @@ public class TweakyDrum
 	0.0 => float waveform;
     0.0 => mix.gain;
     0.0 => masta_g.gain;
+
+	fun void setOutput(UGen output)
+	{
+		master_gain => output;
+	}
 
 	fun void randomize()
 	{

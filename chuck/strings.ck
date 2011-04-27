@@ -38,7 +38,7 @@ fun void slewFreq()
 {
     while (true)
     {
-        0.05*(fTarget-s.freq()) + s.freq() => s.freq;
+        0.0005*(fTarget-s.freq()) + s.freq() => s.freq;
         //fTarget => s.freq;
         1::samp => now;
     }
