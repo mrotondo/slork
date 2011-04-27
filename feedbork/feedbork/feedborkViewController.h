@@ -40,6 +40,8 @@ feedborkDoodadDelegate, feedborkOSCdelegate> {
     CGRect quadrant[4];
     int quadTouches[4];
     float sWidth, sHeight;
+    
+    int totaltouches;
 }
 
 @property (nonatomic, retain) AVCaptureSession *captureSession;

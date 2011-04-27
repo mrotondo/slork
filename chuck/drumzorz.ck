@@ -52,8 +52,9 @@ now % (totalBeatsPerMeasure * totalMeasures * sampsPerBeat) => dur offset;
 // class for randrumly generated drums
 class Randrum
 {
-    //SndBuf drum => Gain g => dac;
-	NoiseDrum drum;
+    //SndBuf 
+    //drum => Gain g => dac;
+	TweakyDrum drum;
 	
     int hitsOn[gridSize];
     int randHitsOn[gridSize];
@@ -116,7 +117,7 @@ class Randrum
                 if (hitsOn[i] == 1) {
                     1 => send;
                     hitsGain[i] => sendGain;
-                    //hitsGain[i] => drum.gain;
+                    hitsGain[i] => drum.masta_g.gain;
                     //1.0 * baseRate => drum.rate;
                     if ( density < 3.0 ) 
                     {
@@ -145,7 +146,7 @@ class Randrum
                 if (randHitsOn[i] > 0) {
                     1 => send;
                     randHitsGain[i] => sendGain;
-                    //randHitsGain[i] => drum.gain;
+                    randHitsGain[i] => drum.masta_g.gain;
                     //baseRate * Math.rand2f(1 - randThreshold/1000, 1 + randThreshold/1000) => drum.rate;
                     //0 => drum.pos;
 					drum.play();
@@ -173,7 +174,7 @@ class Randrum
                 Math.floor((sampsPerBeat/1::samp)/(quantizationSize))/glitchLevel => float sampsPerGlitch;
                 for ( 0 => int j; j < glitchLevel; j++ )
                 {
-                    //0.4 => drum.gain;
+                    0.4 => drum.masta_g.gain;
                     //0 => drum.pos;
 					drum.play();
                     sampsPerGlitch::samp => now;
@@ -199,7 +200,7 @@ class Randrum
                 if (hitsOn[i] == 1) {
                     1 => send;
                     hitsGain[i] => sendGain;
-                    //hitsGain[i] => drum.gain;
+                    hitsGain[i] => drum.masta_g.gain;
                     //1.0 * baseRate => drum.rate;
                     if ( density < 4.0 ) 
                     {
@@ -228,7 +229,7 @@ class Randrum
                 if (randHitsOn[i] > 0) {
                     1 => send;
                     randHitsGain[i] => sendGain;
-                    //randHitsGain[i] => drum.gain;
+                    randHitsGain[i] => drum.masta_g.gain;
                     //baseRate * Math.rand2f(1 - randThreshold/1000, 1 + randThreshold/1000) => drum.rate;
                     //0 => drum.pos;
 					drum.play();
@@ -316,7 +317,7 @@ fun void getDrumControl()
         while( Drum_event.nextMsg() != 0 )
         {   
             Drum_event.getString() => s;
-            Drum_event.getFloat()/10.0 => fx;
+            Drum_event.getFloat()/5.0 => fx;
             Drum_event.getFloat()/200.0 => fy;
             //<<< s, f >>>;
             int x[0];
@@ -347,7 +348,7 @@ fun void getDrumControl()
             }
             else if (x[s] == x["glitch"])
             { 
-                fx * 0.75 => fx;
+                fx * 0.5 => fx;
                 if ( fx > 0 )
                 {
                     if ( !isGlitching )
@@ -396,12 +397,12 @@ fun void getDrumControl()
                     fx => kickhard.glitchLevel;
                     fx => snarehard.glitchLevel;
                     
-                    //if ( kick.glitchOn ) fy => kick.drum.gain;
-                    //else if ( snare.glitchOn ) fy => snare.drum.gain;
-                    //else if ( hihat.glitchOn ) fy => hihat.drum.gain;
-                    //else if ( openhat.glitchOn ) fy => openhat.drum.gain;
-                    //else if ( kickhard.glitchOn ) fy => kickhard.drum.gain;
-                    //else if ( snarehard.glitchOn ) fy => snarehard.drum.gain;
+                    if ( kick.glitchOn ) fy => kick.drum.masta_g.gain;
+                    else if ( snare.glitchOn ) fy => snare.drum.masta_g.gain;
+                    else if ( hihat.glitchOn ) fy => hihat.drum.masta_g.gain;
+                    else if ( openhat.glitchOn ) fy => openhat.drum.masta_g.gain;
+                    else if ( kickhard.glitchOn ) fy => kickhard.drum.masta_g.gain;
+                    else if ( snarehard.glitchOn ) fy => snarehard.drum.masta_g.gain;
                     
                 }
                 else
