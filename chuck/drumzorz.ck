@@ -75,8 +75,7 @@ class Randrum
     fun void setup( string _filename, string _name )
     {
 		drum.randomize();
-        drum.print();
-        spork ~ drum.go();
+		spork ~ drum.go();
         //_filename => drum.read;
         _name => myname;
         //drum.samples() => drum.pos;
