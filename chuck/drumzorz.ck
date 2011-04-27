@@ -71,14 +71,15 @@ class Randrum
     0 => int isIn;
     
     // setup the filepath for the sample as well as a unique name
-    fun void setup( string _filename, string _name )
+    fun void setup( string _filename, string _name, UGen output )
     {
 		drum.randomize();
+		drum.setOutput(output);
 		spork ~ drum.go();
         //_filename => drum.read;
         _name => myname;
         //drum.samples() => drum.pos;
-    }
+	}
     
     // clear out everything in that player
     fun void clear()
@@ -254,16 +255,36 @@ class Randrum
     }
 };
 
+DelayL d => Gain g => d => NRev rev => dac;
+0.95 => g.gain;
+5::second => d.max;
+0::ms => d.delay;
+
+0.0 => rev.mix;
+
+fun void setDelay(dur delay)
+{
+	if (delay < d.max())
+	{
+		delay => d.delay;
+	}
+}
+
+fun void setReverb(float mix)
+{
+	mix => rev.mix;
+}
+
 // Randrum setups
 Randrum kick,snare,hihat,kickhard,openhat,snarehard,glitch;
 "jason/" => string path;
-kick.setup(path+"kickmed.wav", "kick");
-snare.setup(path+"snarerealdry.wav", "snare");
-hihat.setup(path+"hihatthin.wav", "hihat");
-kickhard.setup(path+"kickbig.wav", "kickhard");
-snarehard.setup(path+"snarehigh.wav", "snarehard");
-openhat.setup(path+"hihatopen.wav","openhat");
-glitch.setup("snare.aiff", "glitch");
+kick.setup(path+"kickmed.wav", "kick", d);
+snare.setup(path+"snarerealdry.wav", "snare", d);
+hihat.setup(path+"hihatthin.wav", "hihat", d);
+kickhard.setup(path+"kickbig.wav", "kickhard", d);
+snarehard.setup(path+"snarehigh.wav", "snarehard", d);
+openhat.setup(path+"hihatopen.wav","openhat", d);
+glitch.setup("snare.aiff", "glitch", d);
 [ 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0 ] @=> int kickPattern[];
 [ 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 ] @=> float kickGain[];
 [ 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 ] @=> int snarePattern[];
@@ -502,6 +523,6 @@ fun void updateParams()
 
 // "main" loop
 while( true ) {
-	updateParams(); // WHY does this give us null pointer exception
+	updateParams();
     1::second => now;
 }

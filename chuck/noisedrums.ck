@@ -3,9 +3,9 @@
 
 public class NoiseDrum
 {
-	Mix2 mix => Gain masta_g => Gain master_gain => dac.chan(0) => dac.chan(1);
+	Mix2 mix => Gain masta_g => Gain master_gain;// => dac.chan(0) => dac.chan(1);
 	0.0 => mix.pan;
-    0.5 => master_gain.gain;
+    0.75 => master_gain.gain;
 
 	Noise n => BPF bf => mix.left;
 	5 => bf.Q;
@@ -21,6 +21,11 @@ public class NoiseDrum
 	1.0 => float volume;
     1.0 => masta_g.gain;
 
+	fun void setOutput(UGen output)
+	{
+		master_gain => output;
+	}
+	
 	fun void randomize()
 	{
 		Std.rand2f(20, 1000) => freq_start;

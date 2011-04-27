@@ -116,6 +116,7 @@ class NoteStartListener extends PointListener
         event.getFloat() => float x;
         event.getFloat() => float y;
 		x < 0.5 => int manual_note_choice;
+		voice.setStartPoint(x, y);
 		voice.ChooseNextNote(manual_note_choice, y);
 		voice.PlayNextNote();
     }
