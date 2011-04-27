@@ -255,10 +255,12 @@ class Randrum
     }
 };
 
-DelayL d => Gain g => d => dac;
-0.97 => g.gain;
+DelayL d => Gain g => d => NRev rev => dac;
+0.95 => g.gain;
 5::second => d.max;
 0::ms => d.delay;
+
+0.0 => rev.mix;
 
 fun void setDelay(dur delay)
 {
@@ -266,6 +268,11 @@ fun void setDelay(dur delay)
 	{
 		delay => d.delay;
 	}
+}
+
+fun void setReverb(float mix)
+{
+	mix => rev.mix;
 }
 
 // Randrum setups

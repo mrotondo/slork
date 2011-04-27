@@ -266,7 +266,7 @@ public class Bass extends Voice
 
 	fun void setModDepth(float depth)
 	{
-		Math.fabs(start_y - depth) * 0.6 => mod_depth;
+		Math.fabs(start_y - depth) * 0.49 => mod_depth;
 	}
 
 	fun void setModRate(float rate)
@@ -278,7 +278,7 @@ public class Bass extends Voice
 	{
 		while(true)
 		{
-			0.6 + mod.last() * mod_depth => mod_gain.gain;
+			0.5 + mod.last() * mod_depth => mod_gain.gain;
 			ms => now;
 		}
 	}
