@@ -1,4 +1,5 @@
 // TODO: Sometimes the random parameters OR something being changed too fast/mid-playback cause this to blow up. Figure out how to avoid that (Maybe talk to chris about detecting blown filters)
+// TODO: Figure out why the drum seems balanced towards the right
 
 public class NoiseDrum
 {
@@ -100,6 +101,6 @@ public class NoiseDrum
 // spork ~ drum.go();
 // while (true)
 // {	
+// 	500::ms => now;
 // 	drum.play();
-// 	100::ms => now;
 // }

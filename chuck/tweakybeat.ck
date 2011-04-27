@@ -64,24 +64,27 @@ public class TweakyDrum
 	0.0 => float freq_diff;
 	setFrequency(0.0);
 	setGain(0.0);
+
+	waveform => mix.pan;
 	
 	fun void go()
 	{
-		waveform => mix.pan;
-		
-		while (now < pitch_end)
+		while (true)
 		{
+			while (now < pitch_end)
+			{
+				ms => now;
+				(now - start) / pitch_decay => float percent; // Might need to replace this with some linear increase instead of a linear percent, because there will be no absolute play length
+				Math.min(percent, 1) => percent;
+				setFrequency(freq_start + percent * freq_diff);
+				exponent *=> current_gain;
+				setGain(volume * current_gain);
+			}
+			
 			ms => now;
-			(now - start) / pitch_decay => float percent; // Might need to replace this with some linear increase instead of a linear percent, because there will be no absolute play length
-			Math.min(percent, 1) => percent;
-			setFrequency(freq_start + percent * freq_diff);
 			exponent *=> current_gain;
 			setGain(volume * current_gain);
 		}
-		
-		ms => now;
-		exponent *=> current_gain;
-		setGain(volume * current_gain);
 	}
 	
 	fun void play()
@@ -99,8 +102,9 @@ public class TweakyDrum
 // TweakyDrum drum;
 // drum.randomize();
 // spork ~ drum.go();
+
 // while (true)
 // {
+// 	500::ms => now;
 // 	drum.play();
-// 	50::ms => now;
 // }
