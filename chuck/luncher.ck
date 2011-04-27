@@ -12,3 +12,7 @@ Machine.add("drumzorz.ck");
 me.yield();
 Machine.add("e-spirit.ck");
 me.yield();
+Machine.add("drone.ck");
+me.yield();
+Machine.add("strings.ck");
+me.yield();

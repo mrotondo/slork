@@ -54,7 +54,7 @@ class Randrum
 {
     //SndBuf 
     //drum => Gain g => dac;
-	TweakyDrum drum;
+	NoiseDrum drum;
 	
     int hitsOn[gridSize];
     int randHitsOn[gridSize];
