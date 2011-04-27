@@ -70,15 +70,39 @@ class Randrum
     1.0 => float baseRate;
     0 => int isIn;
     
+    // Assuming the order of drums stays the same!!
+    [
+    [113.9, 688.7, 0.9786, 12614, 0.7025, 2.2669, 2.1123], //kick
+    [596.9, 993.5, 0.9788, 7934, 0.6665, 2.9815, 2.04], //snare
+    [128.7, 830.8, 0.9772, 10729, 0.517, 3.0782, 2.8611], //hihat
+    [924.6, 210.8, 0.9815, 14458, 0.5463, 2.9771, 2.8721], //kickhard
+    [104.2, 81.4, 0.9701, 25957, 0.7896, 2.2302, 2.6559], //snarehard
+    [916.2, 603.5, 0.9818, 24622, 0.5581, 2.1879, 2.0338], //openhat
+    [211.5, 854.1, 0.9753, 26527, 0.6415, 2.6134, 3.4866] //glitch
+    ] @=> float d[][];
+
     // setup the filepath for the sample as well as a unique name
     fun void setup( string _filename, string _name, UGen output )
     {
-		drum.randomize();
-		drum.setOutput(output);
+        0 => int i;
+        if (_name == "kick") 0 => i;
+        if (_name == "snare") 1 => i;
+        if (_name == "hihat") 2 => i;
+        if (_name == "kickhard") 3 => i;
+        if (_name == "snarehard") 4 => i;
+        if (_name == "openhat") 5 => i;
+        if (_name == "glitch") 6 => i;
+        //drum.randomize();
+        drum.init(d[i][0], d[i][1], d[i][2], d[i][3], d[i][4], d[i][5], d[i][6]);
+		
+        drum.setOutput(output);
 		spork ~ drum.go();
+        
         //_filename => drum.read;
         _name => myname;
         //drum.samples() => drum.pos;
+        <<< myname >>>;
+        drum.print();
 	}
     
     // clear out everything in that player

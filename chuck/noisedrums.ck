@@ -15,7 +15,6 @@ public class NoiseDrum
 	// DRUM SPEC
 	60 => float freq_start;
 	40 => float freq_end;
-	1::second => dur play_time;
 	0.99 => float exponent;
 	0.15::second => dur pitch_decay;
 	1.0 => float volume;
@@ -30,7 +29,6 @@ public class NoiseDrum
 	{
 		Std.rand2f(20, 1000) => freq_start;
 		Std.rand2f(20, 1000) => freq_end;
-		1::second => play_time;
 		Std.rand2f(0.97, 0.99) => exponent;
 		Std.rand2f(0.1, 1.0)::second => pitch_decay;
 		Std.rand2f(0.5, 1) => volume;
@@ -38,6 +36,17 @@ public class NoiseDrum
 		Std.rand2f(1, 3) => bf.Q;
 		Std.rand2f(1, 3) => lf.Q;
 	}
+    
+    fun void init(float new_freq_start, float new_freq_end, float new_exponent, float new_pitch_decay_samps, float new_volume, float new_bfQ, float new_lfQ)
+    {
+        new_freq_start => freq_start;
+        new_freq_end => freq_end;
+        new_exponent => exponent;
+        new_pitch_decay_samps::samp => pitch_decay;
+        new_volume => volume;
+        new_bfQ => bf.Q;
+        new_lfQ => lf.Q;
+    }
 
 	fun void print()
 	{
