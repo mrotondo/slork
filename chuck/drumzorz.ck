@@ -76,6 +76,7 @@ class Randrum
     {
 		drum.randomize();
         drum.print();
+        spork ~ drum.go();
         //_filename => drum.read;
         _name => myname;
         //drum.samples() => drum.pos;
@@ -124,14 +125,14 @@ class Randrum
                         if ( Math.rand2(0,100) / 33.0 < density )
                         { 
                             //0 => drum.pos;
-							spork ~ drum.play();
+							drum.play();
                         }
                         else 0 => send;
                     }
                     else
 					{
 						//0 => drum.pos;
-						spork ~ drum.play();
+						drum.play();
 					}
                     // possibly allow random sample to be added on
                     if (Math.rand2(0,100) < randThreshold) {
@@ -149,7 +150,7 @@ class Randrum
                     randHitsGain[i] => drum.masta_g.gain;
                     //baseRate * Math.rand2f(1 - randThreshold/1000, 1 + randThreshold/1000) => drum.rate;
                     //0 => drum.pos;
-					spork ~ drum.play();
+					drum.play();
                     1 -=> randHitsOn[i];
                     Math.floor(randThreshold * .01 * randHitsOn[i]) $ int => randHitsOn[i];
                 }
@@ -176,7 +177,7 @@ class Randrum
                 {
                     0.4 => drum.masta_g.gain;
                     //0 => drum.pos;
-					spork ~ drum.play();
+					drum.play();
                     sampsPerGlitch::samp => now;
                 }
             }
@@ -207,14 +208,14 @@ class Randrum
                         if ( Math.rand2(0,1000) / 250.0 < density )
                         { 
                             //0 => drum.pos;
-							spork ~ drum.play();
+							drum.play();
                         }
                         else 0 => send;
                     }
                     else
 					{
 						//0 => drum.pos;
-						spork ~ drum.play();
+						drum.play();
 					}
                     // possibly allow random sample to be added on
                     if (Math.rand2(0,100) < randThreshold) {
@@ -232,7 +233,7 @@ class Randrum
                     randHitsGain[i] => drum.masta_g.gain;
                     //baseRate * Math.rand2f(1 - randThreshold/1000, 1 + randThreshold/1000) => drum.rate;
                     //0 => drum.pos;
-					spork ~ drum.play();
+					drum.play();
                     1 -=> randHitsOn[i];
                     Math.floor(randThreshold * .01 * randHitsOn[i]) $ int => randHitsOn[i];
                 }

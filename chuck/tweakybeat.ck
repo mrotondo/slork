@@ -57,7 +57,7 @@ public class TweakyDrum
 
 	fun void setGain(float gain)
 	{
-		gain*masta_g.gain() => mix.gain;
+		gain => mix.gain;
 	}
 
 	0.0 => float current_gain;
@@ -98,11 +98,11 @@ public class TweakyDrum
 	}
 }
 
-// TweakyDrum drum;
-// drum.randomize();
-// spork ~ drum.go();
-// while (true)
-// {
-// 	drum.play();
-// 	50::ms => now;
-// }
+TweakyDrum drum;
+drum.randomize();
+spork ~ drum.go();
+while (true)
+{
+    drum.play();
+    500::ms => now;
+}
