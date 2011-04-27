@@ -113,7 +113,7 @@ public class Scenes
         [ 0, 0, 1, 0,  0, 0, 1, 0,  0, 0, 1, 0,  0, 0, 1, 0,   0, 0, 1, 0,  0, 0, 1, 0,  0, 0, 1, 0,  0, 1, 0, 1 ] @=> scene2.openhatPattern;
         [ 1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,   1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0 ] @=> scene2.kickHardPattern;
 
-		145 => bpm;
+		144 => bpm;
 
 		0 => current_scene_index;
 		scenes[current_scene_index] @=> current_scene;
@@ -137,3 +137,6 @@ public class Scenes
 		}
 	}
 }
+
+spork ~ Scenes.startPiece() @=> Shred @ scenes_shred;
+me.yield();

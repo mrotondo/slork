@@ -144,7 +144,7 @@ class Randrum
                 }
                 // handle the case that a random sample got triggered in the previous run
                 if (randHitsOn[i] > 0) {
-                    1 => send;
+                    //1 => send;
                     randHitsGain[i] => sendGain;
                     randHitsGain[i] => drum.masta_g.gain;
                     //baseRate * Math.rand2f(1 - randThreshold/1000, 1 + randThreshold/1000) => drum.rate;

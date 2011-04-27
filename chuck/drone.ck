@@ -1,7 +1,7 @@
 TriOsc t1 => JCRev revL => Gain gL => dac.chan(0);
 Blit t2 => JCRev revR => Gain gR => dac.chan(1);
 
-0.003 => gR.gain => gL.gain;
+0.005 => gR.gain => gL.gain;
 
 TriOsc t3 => revL;
 Blit t4 => revR;
@@ -25,7 +25,7 @@ SinOsc m5 => blackhole;
 0.0075 => m5.freq;
 SinOsc m6 => blackhole;
 0.007 => m6.freq;
-43 => int base;
+55 => int base;
 Std.mtof(base) => float cf1 => t1.freq;
 Std.mtof(base) + .3 => float cf2 => t2.freq;
 
@@ -35,7 +35,7 @@ Std.mtof(base+7) + .3 => float cf4 => t4.freq;
 Std.mtof(base+12) => float cf5 => t5.freq;
 Std.mtof(base+12) + .3 => float cf6 => t6.freq;
 
-1.0 => float index;
+4.0 => float index;
 
 0.5 => float g1;
 

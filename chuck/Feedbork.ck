@@ -58,8 +58,6 @@ time_orec.listen();
 OscEvent @ now_event;
 time_orec.event("/now, i") @=> now_event;
 
-spork ~ Scenes.startPiece() @=> Shred @ scenes_shred;
-me.yield();
 <<< "BPM in feedbork is: " + Scenes.bpm >>>;
 
 Bass voice;
