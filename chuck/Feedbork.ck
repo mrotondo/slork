@@ -41,6 +41,14 @@ class IntListener extends FeedborkListener
     }
 }
 
+class PointListener extends FeedborkListener
+{
+    fun void init(OscRecv orec, string event_name)
+    {
+        orec.event("/" + event_name + ",f f") @=> event;
+    }	
+}
+
 // create our OSC receiver for messages from the iPad
 OscRecv orec;
 // port 9999
@@ -97,14 +105,6 @@ class ReverbListener extends FloatListener
         event.getFloat() => float f;
 		//voice.SetReverbMix(f);
     }
-}
-
-class PointListener extends FeedborkListener
-{
-    fun void init(OscRecv orec, string event_name)
-    {
-        orec.event("/" + event_name + ",f f") @=> event;
-    }	
 }
 
 class NoteStartListener extends PointListener

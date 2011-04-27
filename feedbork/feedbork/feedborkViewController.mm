@@ -534,11 +534,13 @@ static CGRect swapWidthAndHeight(CGRect rect)
     // Thanks, Wikipedia: http://en.wikipedia.org/wiki/Image_moment
     double x = m10 / area;
     double y = m01 / area;
-
-    //NSLog(@"Area: %f", area);
     
+    //normalize that bitch    
+    double normalized_area = MIN(MAX(0, area - 1000000), 40000000) / 40000000;
     
-    [osc sendValue:area withKey:@"brightness"];
+    NSLog(@"Area: %f", normalized_area);
+    
+    [osc sendValue:normalized_area withKey:@"brightness"];
     
     CvPoint centroid = cvPoint(x, y);
     cvCircle(img_greyscale, centroid, 20, CV_RGB(255, 255, 255));
@@ -571,7 +573,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 	   fromConnection:(AVCaptureConnection *)connection 
 {
     frameCounter++;
-    if ( frameCounter == 11 ) frameCounter = 0;
+    if ( frameCounter == 5 ) frameCounter = 0;
     else return;
     
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];

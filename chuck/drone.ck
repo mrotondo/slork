@@ -1,3 +1,54 @@
+class FeedborkListener
+{
+    OscEvent @ event;
+    
+    fun void init(OscRecv orec, string event_name, string event_type)
+    {
+        orec.event("/" + event_name + "," + event_type) @=> event;
+    }
+    
+    fun void go()
+    {
+        while (true)
+        {
+            event => now;
+            
+            while (event.nextMsg() != 0)
+            {
+                handleEvent();
+            }
+        }
+    }
+    
+    fun void handleEvent()
+    {
+}
+}
+
+class FloatListener extends FeedborkListener
+{    
+    fun void init(OscRecv orec, string event_name)
+    {
+        orec.event("/" + event_name + ",f") @=> event;
+    }
+}
+
+class IntListener extends FeedborkListener
+{    
+    fun void init(OscRecv orec, string event_name)
+    {
+        orec.event("/" + event_name + ",i") @=> event;
+    }
+}
+
+class PointListener extends FeedborkListener
+{
+    fun void init(OscRecv orec, string event_name)
+    {
+        orec.event("/" + event_name + ",f f") @=> event;
+    }	
+}
+
 TriOsc t1 => JCRev revL => Gain gL => dac.chan(0);
 Blit t2 => JCRev revR => Gain gR => dac.chan(1);
 
@@ -37,23 +88,54 @@ Std.mtof(base+12) + .3 => float cf6 => t6.freq;
 
 4.0 => float index;
 
+0.005 => float gain_target;
+
 0.5 => float g1;
+
+
+
+// create our OSC receiver for messages from the iPad
+OscRecv orec;
+// port 9999
+9999 => orec.port;
+// start listening (launch thread)
+orec.listen();
+
+class IndexListener extends FloatListener
+{
+    fun void handleEvent()
+    {
+        event.getFloat() => float f;
+		0.2 * f => gain_target;
+		Math.max(gain_target, 0.01) => gain_target;
+	}
+}
+IndexListener index_listener;
+index_listener.init(orec, "brightness");
+spork ~ index_listener.go();
 
 while (true)
 {
-   cf1 + index*(m1.last()) => t1.freq;
-   cf2 + index*(m2.last()) => t2.freq;
-   cf3 + index*(m3.last()) => t3.freq;
-   cf4 + index*(m4.last()) => t4.freq;
-   cf5 + index*(m3.last()) => t5.freq;
-   cf6 + index*(m4.last()) => t6.freq;
- 
-   //g1 + 0.3*(m4.last()) => t1.gain;
-   //g1 + 0.3*(m3.last()) => t2.gain;
-   //g1 + 0.3*(m2.last()) => t3.gain;
-   //g1 + 0.3*(m1.last()) => t4.gain;
-   g1 + 0.3*(m6.last()) => t5.gain;
-   g1 + 0.3*(m5.last()) => t6.gain;
- 
-   1::samp => now; 
+	//<<< (gain_target - gL.gain()) + gL.gain() >>>;
+	0.00001 => float slew_rate;
+	if (gain_target < gL.gain()) {
+		0.0001 => slew_rate;
+	}
+	slew_rate * (gain_target - gL.gain()) + gL.gain() => gL.gain => gR.gain;
+	
+	cf1 + index*(m1.last()) => t1.freq;
+	cf2 + index*(m2.last()) => t2.freq;
+	cf3 + index*(m3.last()) => t3.freq;
+	cf4 + index*(m4.last()) => t4.freq;
+	cf5 + index*(m3.last()) => t5.freq;
+	cf6 + index*(m4.last()) => t6.freq;
+
+	//g1 + 0.3*(m4.last()) => t1.gain;
+	//g1 + 0.3*(m3.last()) => t2.gain;
+	//g1 + 0.3*(m2.last()) => t3.gain;
+	//g1 + 0.3*(m1.last()) => t4.gain;
+	g1 + 0.3*(m6.last()) => t5.gain;
+	g1 + 0.3*(m5.last()) => t6.gain;
+	
+	1::samp => now; 
 }
