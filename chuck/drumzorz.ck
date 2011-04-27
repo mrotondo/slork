@@ -256,7 +256,7 @@ class Randrum
 };
 
 DelayL d => Gain g => d => NRev rev => dac;
-0.95 => g.gain;
+0.0 => g.gain;
 5::second => d.max;
 0::ms => d.delay;
 
@@ -266,6 +266,7 @@ fun void setDelay(dur delay)
 {
 	if (delay < d.max())
 	{
+        .97 => g.gain;
 		delay => d.delay;
 	}
 }

@@ -3,7 +3,7 @@
 
 public class NoiseDrum
 {
-	Mix2 mix => Gain masta_g => Gain master_gain;// => dac.chan(0) => dac.chan(1);
+	Mix2 mix => Gain masta_g => Gain master_gain => dac.chan(0) => dac.chan(1);
 	0.0 => mix.pan;
     0.75 => master_gain.gain;
 
