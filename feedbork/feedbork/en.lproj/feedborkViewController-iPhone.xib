@@ -2,13 +2,13 @@
 <archive type="com.apple.InterfaceBuilder3.CocoaTouch.iPad.XIB" version="7.10">
 	<data>
 		<int key="IBDocument.SystemTarget">800</int>
-		<string key="IBDocument.SystemVersion">10J567</string>
-		<string key="IBDocument.InterfaceBuilderVersion">1306</string>
+		<string key="IBDocument.SystemVersion">10J869</string>
+		<string key="IBDocument.InterfaceBuilderVersion">1305</string>
 		<string key="IBDocument.AppKitVersion">1038.35</string>
-		<string key="IBDocument.HIToolboxVersion">462.00</string>
+		<string key="IBDocument.HIToolboxVersion">461.00</string>
 		<object class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="NS.key.0">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
-			<string key="NS.object.0">301</string>
+			<string key="NS.object.0">300</string>
 		</object>
 		<object class="NSArray" key="IBDocument.IntegratedClassDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -82,7 +82,6 @@
 								<string key="NSFrame">{{5, 114}, {50, 21}}</string>
 								<reference key="NSSuperview" ref="321836072"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView"/>
 								<bool key="IBUIOpaque">NO</bool>
 								<bool key="IBUIClipsSubviews">YES</bool>
 								<int key="IBUIContentMode">7</int>
@@ -116,10 +115,10 @@
 										<int key="NSID">2</int>
 									</object>
 								</object>
-								<int key="IBUITextAlignment">2</int>
 								<bool key="IBUIAdjustsFontSizeToFit">YES</bool>
 								<float key="IBUIMinimumFontSize">17</float>
 								<object class="IBUITextInputTraits" key="IBUITextInputTraits">
+									<int key="IBUIKeyboardType">2</int>
 									<int key="IBUIReturnKeyType">5</int>
 									<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 								</object>
@@ -196,7 +195,6 @@
 								<string key="NSFrame">{{5, 157}, {72, 21}}</string>
 								<reference key="NSSuperview" ref="321836072"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView"/>
 								<bool key="IBUIOpaque">NO</bool>
 								<bool key="IBUIClipsSubviews">YES</bool>
 								<int key="IBUIContentMode">7</int>
@@ -229,7 +227,6 @@
 								<string key="NSFrame">{{5, 206}, {134, 21}}</string>
 								<reference key="NSSuperview" ref="321836072"/>
 								<reference key="NSWindow"/>
-								<reference key="NSNextKeyView"/>
 								<bool key="IBUIOpaque">NO</bool>
 								<bool key="IBUIClipsSubviews">YES</bool>
 								<int key="IBUIContentMode">7</int>
@@ -530,10 +527,8 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>changeAlpha:</string>
 							<string>changeBorder:</string>
-							<string>changeColorThreshold:</string>
 							<string>changeIP:</string>
-							<string>chooseMyColor:</string>
-							<string>chooseMyFriendsColor:</string>
+							<string>changeSegment</string>
 							<string>closeMenu</string>
 							<string>lockExposure</string>
 						</object>
@@ -541,10 +536,8 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>UISlider</string>
 							<string>UISlider</string>
-							<string>UISlider</string>
 							<string>UITextField</string>
-							<string>UIButton</string>
-							<string>UIButton</string>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 						</object>
@@ -555,10 +548,8 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>changeAlpha:</string>
 							<string>changeBorder:</string>
-							<string>changeColorThreshold:</string>
 							<string>changeIP:</string>
-							<string>chooseMyColor:</string>
-							<string>chooseMyFriendsColor:</string>
+							<string>changeSegment</string>
 							<string>closeMenu</string>
 							<string>lockExposure</string>
 						</object>
@@ -573,20 +564,12 @@
 								<string key="candidateClassName">UISlider</string>
 							</object>
 							<object class="IBActionInfo">
-								<string key="name">changeColorThreshold:</string>
-								<string key="candidateClassName">UISlider</string>
-							</object>
-							<object class="IBActionInfo">
 								<string key="name">changeIP:</string>
 								<string key="candidateClassName">UITextField</string>
 							</object>
 							<object class="IBActionInfo">
-								<string key="name">chooseMyColor:</string>
-								<string key="candidateClassName">UIButton</string>
-							</object>
-							<object class="IBActionInfo">
-								<string key="name">chooseMyFriendsColor:</string>
-								<string key="candidateClassName">UIButton</string>
+								<string key="name">changeSegment</string>
+								<string key="candidateClassName">id</string>
 							</object>
 							<object class="IBActionInfo">
 								<string key="name">closeMenu</string>
@@ -605,17 +588,15 @@
 							<string>IPTextField</string>
 							<string>borderSlider</string>
 							<string>exposureLockButton</string>
+							<string>instSeg</string>
 							<string>menuView</string>
-							<string>myColorPicker</string>
-							<string>myFriendsColorPicker</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>UITextField</string>
 							<string>UISlider</string>
 							<string>UIToggleButton</string>
-							<string>UIView</string>
-							<string>UIView</string>
+							<string>UISegmentedControl</string>
 							<string>UIView</string>
 						</object>
 					</object>
@@ -626,9 +607,8 @@
 							<string>IPTextField</string>
 							<string>borderSlider</string>
 							<string>exposureLockButton</string>
+							<string>instSeg</string>
 							<string>menuView</string>
-							<string>myColorPicker</string>
-							<string>myFriendsColorPicker</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
@@ -645,15 +625,11 @@
 								<string key="candidateClassName">UIToggleButton</string>
 							</object>
 							<object class="IBToOneOutletInfo">
+								<string key="name">instSeg</string>
+								<string key="candidateClassName">UISegmentedControl</string>
+							</object>
+							<object class="IBToOneOutletInfo">
 								<string key="name">menuView</string>
-								<string key="candidateClassName">UIView</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">myColorPicker</string>
-								<string key="candidateClassName">UIView</string>
-							</object>
-							<object class="IBToOneOutletInfo">
-								<string key="name">myFriendsColorPicker</string>
 								<string key="candidateClassName">UIView</string>
 							</object>
 						</object>
@@ -677,6 +653,6 @@
 		</object>
 		<bool key="IBDocument.PluginDeclaredDependenciesTrackSystemTargetVersion">YES</bool>
 		<int key="IBDocument.defaultPropertyAccessControl">3</int>
-		<string key="IBCocoaTouchPluginVersion">301</string>
+		<string key="IBCocoaTouchPluginVersion">300</string>
 	</data>
 </archive>
