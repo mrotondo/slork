@@ -8,6 +8,7 @@ fun float SumFloats(float floats[])
     return sum;
 }
 
+
 class Voice
 {
     43 => int root;
@@ -156,8 +157,30 @@ class Voice
 
 public class Bass extends Voice
 {
+    144.0 => float tempo;
+    (44100*60.0/tempo)::samp => dur TimeUnit;
+    TimeUnit * 0.5 => dur Half;
+    Half * 0.5 => dur Quarter;
+    Quarter * 0.5 => dur Eighth;
+    Eighth * 0.5 => dur Sixteenth;
+    16.0 => float quantizationSize;
+    
+    // create our receiver
+    OscRecv recv;
+    9999 => recv.port;
+    recv.listen();
+    
+    Delay dly;
+    dly => Gain fb => dly;
+    dly.gain(0.9);
+    TimeUnit => dly.max;
+    Half => dly.delay;
+    0.9999 => fb.gain;
+
 	Gain mod_gain => Gain master_gain => blackhole;//dac;
 	
+    mod_gain => dly => master_gain;
+    
     0.01 => master_gain.gain;
 
 	Blit ugen1 => LPF f1 => ADSR env1 => mod_gain;
@@ -198,7 +221,14 @@ public class Bass extends Voice
 
 	0 => float start_x;
 	0 => float start_y;
-	
+    
+    0 => float brightness;
+    0 => float brightness_target;
+    fun void setBrightness(float brightness)
+    {
+        brightness => brightness_target;
+    }
+    
 	5 => float alpha;
 	fun float AtanDrive(UGen input, UGen output) 
 	{ 
@@ -209,6 +239,22 @@ public class Bass extends Voice
 
 	spork ~ AtanDrive(master_gain, dac);
 
+    recv.event( "/recurse, f" ) @=> OscEvent recurse;
+    fun void listenRecurse()
+    {
+        while (true)
+        {
+            recurse => now;
+            while ( recurse.nextMsg() != 0 )
+            {
+                recurse.getFloat() * 2.0 => float blah;
+                if ( blah > 0.96 ) 0.96 => blah;
+                dly.gain( blah );
+                blah => fb.gain;
+            }
+        }
+    }
+    spork ~ listenRecurse();
 	fun void setDistortion(float new_alpha)
 	{
 		5 + 20 * Math.fabs(new_alpha - start_x) => alpha;
@@ -273,11 +319,15 @@ public class Bass extends Voice
 	{
 		Math.fabs(start_y - rate) * 10 => mod.freq;
 	}
-	
+    
 	fun void updateParams()
 	{
 		while(true)
 		{
+            0.01 * (brightness_target - brightness) + brightness => brightness;
+            brightness + 1 => ugen2.gain;
+            10 + 10 * (brightness $ int) => ugen2.harmonics;
+            
 			0.5 + mod.last() * mod_depth => mod_gain.gain;
 			ms => now;
 		}

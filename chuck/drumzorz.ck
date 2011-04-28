@@ -4,6 +4,9 @@
 // TODO: Add a real kick in with the synth drums in sections where we want to get SERIOUS BUSINESS
 // TODO: Make the gain of the tweaky- and noise-drums settable so that the randomizer can emphasize/de-emphasize different beats
 
+0 => float sceneDrumRandomness;
+0 => float sceneDrumDensity;
+
 .7 => float startGain;
 0 => int currentBeat;
 
@@ -29,6 +32,7 @@ OscRecv orec;
 orec.listen();
 orec.event("/IP,s") @=> OscEvent IP_event;
 orec.event("/drumcontrol,s,f,f") @=> OscEvent Drum_event;
+orec.event( "/recurse, f" ) @=> OscEvent recurse;
 
 // IP listener
 fun void getIP()
@@ -372,7 +376,7 @@ fun void getDrumControl()
             4 => x["stutter"];
             if (x[s] == x["random"])
             { 
-                fx*10.0 => fx;
+                fx * sceneDrumRandomness => fx;
                 //<<< "random!", fx >>>;
                 fx => kick.randThreshold;
                 fx => snare.randThreshold;
@@ -384,6 +388,7 @@ fun void getDrumControl()
             else if (x[s] == x["density"])
             { 
                 //<<< "density!", fx >>>;
+                fx * sceneDrumDensity => fx;
                 fx => kick.density;
                 fx => snare.density;
                 fx => hihat.density;
@@ -494,6 +499,32 @@ fun void getDrumControl()
         }
     }
 }
+0.0 => float revT;
+fun void slewVerb()
+{
+    while (true)
+    {
+        0.0003*(revT-rev.mix()) + rev.mix() => rev.mix;
+        //fTarget => s.freq;
+        1::samp => now;
+    }
+}
+spork ~ slewVerb();
+fun void listenRecurse()
+{
+    <<<"yep">>>;
+    while (true)
+    {
+        recurse => now;
+        while ( recurse.nextMsg() != 0 )
+        {
+            recurse.getFloat() * 0.25 => float blah;
+            if ( blah > 0.3 ) 0.3 => blah;
+            blah => revT;
+        }
+    }
+}
+spork ~ listenRecurse();
 
 // spork all playback shreds
 spork ~ kick.playback();
@@ -510,6 +541,7 @@ spork ~ getDrumControl();
 
 -1 => int index;
 
+
 fun void updateParams()
 {   
     if ( index == Scenes.current_scene_index ) return;
@@ -523,7 +555,7 @@ fun void updateParams()
     Scenes.current_scene.kickHardPattern @=> kickhard.hitsOn;
     
     Scenes.current_scene.drumRandomness => float fx;
-    
+    Scenes.current_scene.drumRandomness / 100.0 => sceneDrumRandomness;
     
     
     fx => kick.randThreshold;
@@ -534,6 +566,8 @@ fun void updateParams()
     fx => openhat.randThreshold;
     
     Scenes.current_scene.drumDensity => fx;
+    Scenes.current_scene.drumDensity / 10.0 => sceneDrumDensity;
+
 	fx => kick.density;
 	fx => snare.density;
 	fx => hihat.density;
