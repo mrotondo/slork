@@ -495,6 +495,17 @@ fun void getDrumControl()
         }
     }
 }
+0.0 => float revT;
+fun void slewVerb()
+{
+    while (true)
+    {
+        0.0003*(revT-rev.mix()) + rev.mix() => rev.mix;
+        //fTarget => s.freq;
+        1::samp => now;
+    }
+}
+spork ~ slewVerb();
 fun void listenRecurse()
 {
     <<<"yep">>>;
@@ -503,11 +514,9 @@ fun void listenRecurse()
         recurse => now;
         while ( recurse.nextMsg() != 0 )
         {
-            recurse.getFloat() * 0.2 => float blah;
-            if ( blah > 0.4 ) 0.4 => blah;
-            setReverb(blah);
-            <<<blah>>>;
-            d.gain(blah);
+            recurse.getFloat() * 0.25 => float blah;
+            if ( blah > 0.3 ) 0.3 => blah;
+            blah => revT;
         }
     }
 }
