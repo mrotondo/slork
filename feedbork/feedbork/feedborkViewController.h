@@ -36,6 +36,7 @@ feedborkDoodadDelegate, feedborkOSCdelegate> {
     IBOutlet UIToggleButton * exposureLockButton;
     IBOutlet UISegmentedControl *instSeg;
     IBOutlet UIImageView *circle;
+    IBOutlet UIView *whiteView;
     
     // quadrant stuff
     CGRect quadrant[4];
@@ -72,6 +73,7 @@ feedborkDoodadDelegate, feedborkOSCdelegate> {
 - (IBAction)changeAlpha:(UISlider*)slider;
 - (IBAction)changeBorder:(UISlider*)slider;
 - (IBAction)circle:(UIButton*)sender;
+- (IBAction)fadeBackground;
 
 @end
 

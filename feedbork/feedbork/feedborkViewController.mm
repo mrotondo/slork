@@ -315,10 +315,24 @@
 {
     [self.view bringSubviewToFront:circle];
     [UIView beginAnimations:nil context:nil];
-    [UIView setAnimationDuration:0.5];
+    [UIView setAnimationDuration:0.2];
     if ( !circle.alpha ) circle.alpha = 1.0;
     else circle.alpha = 0.0;
-    [UIView commitAnimations];}
+    [UIView commitAnimations];
+
+    if ( circle.alpha > 0.0 )[self performSelector:@selector(circle:) withObject:nil afterDelay:0.21];
+    
+}
+
+- (IBAction)fadeBackground
+{
+    NSLog(@"fading now");
+    [UIView beginAnimations:nil context:nil];
+    [UIView setAnimationDuration:40.0];
+    //if ( !whiteView.alpha ) whiteView.alpha = 1.0;
+    whiteView.alpha = 0.0;
+    [UIView commitAnimations];
+}
 
 - (IBAction)changeIP:(UITextField*)sender
 {

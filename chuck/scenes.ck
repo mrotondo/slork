@@ -60,16 +60,16 @@ fun void makecoolsound()
     0.25 => s.noteOn;
     4000 => fTarget;
     0.0 => gain.gain;
-    while ( gain.gain() < 0.1 )
+    while ( gain.gain() < 0.02 )
     {
-        gain.gain() + 0.0002 => gain.gain;
+        gain.gain() + 0.00002 => gain.gain;
         4::samp => now;
     }
     4::second => now;
     while ( gain.gain() > 0 )
     {
-        gain.gain() - 0.000002 => gain.gain;
-        noiseGain.gain() - 0.000007 => noiseGain.gain;
+        gain.gain() - 0.0000003 => gain.gain;
+        noiseGain.gain() - 0.0000014 => noiseGain.gain;
         4::samp => now;
     }
 }
@@ -132,7 +132,7 @@ public class Scenes
 		0 => scene0.reverb_base;
 		10 => scene0.hpf_freq_base;
 		0 => scene0.modulation_base;
-        192 => scene0.duration_in_beats;
+        220 => scene0.duration_in_beats;
         5.6 => scene0.drumRandomness;
         2.6 => scene0.drumDensity;
 		0.0 => scene0.chordFBgain;

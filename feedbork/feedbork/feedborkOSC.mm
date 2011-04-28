@@ -8,6 +8,8 @@
 
 #import "feedborkOSC.h"
 #import "mo_net.h"
+#import "feedborkAppDelegate.h"
+#import "feedborkViewController.h"
 
 @implementation feedborkOSC
 @synthesize delegate;
@@ -117,14 +119,25 @@ void drum_callback( osc::ReceivedMessageArgumentStream & oscin, void * data )
         [me.delegate makeDoodad:CGPointMake(250.0, 824.0) size:vel image:@"flare3.png" color:[UIColor colorWithRed:r green:g blue:4*b/5.0 alpha:1.0]];
     else if ( [dname isEqualToString:@"snarehard"] )
         [me.delegate makeDoodad:CGPointMake(384.0, 562.0) size:vel image:@"flare3.png" color:[UIColor colorWithRed:r green:g blue:1.0 alpha:1.0]];
-    else if ( [dname isEqualToString:@"cym1"] )
-        [me.delegate makeDoodad:CGPointMake(150.0, 800.0) size:vel image:@"shine1.png" color:[UIColor lightGrayColor]];
-    else if ( [dname isEqualToString:@"cym2"] )
-        [me.delegate makeDoodad:CGPointMake(300.0, 800.0) size:vel image:@"shine2.png" color:[UIColor cyanColor]];
-    else if ( [dname isEqualToString:@"cym3"] )
-        [me.delegate makeDoodad:CGPointMake(450.0, 800.0) size:vel image:@"shine1.png" color:[UIColor magentaColor]];
-    else if ( [dname isEqualToString:@"cym4"] )
-        [me.delegate makeDoodad:CGPointMake(600.0, 800.0) size:vel image:@"shine2.png" color:[UIColor brownColor]];
+//    else if ( [dname isEqualToString:@"cym1"] )
+//        [me.delegate makeDoodad:CGPointMake(150.0, 800.0) size:vel image:@"shine1.png" color:[UIColor lightGrayColor]];
+//    else if ( [dname isEqualToString:@"cym2"] )
+//        [me.delegate makeDoodad:CGPointMake(300.0, 800.0) size:vel image:@"shine2.png" color:[UIColor cyanColor]];
+//    else if ( [dname isEqualToString:@"cym3"] )
+//        [me.delegate makeDoodad:CGPointMake(450.0, 800.0) size:vel image:@"shine1.png" color:[UIColor magentaColor]];
+//    else if ( [dname isEqualToString:@"cym4"] )
+//        [me.delegate makeDoodad:CGPointMake(600.0, 800.0) size:vel image:@"shine2.png" color:[UIColor brownColor]];
+    else if ( [dname isEqualToString:@"circle"] )
+    {
+        feedborkAppDelegate * app = (feedborkAppDelegate*)[[UIApplication sharedApplication] delegate];
+        [app.viewController performSelectorOnMainThread:@selector(circle:) withObject:nil waitUntilDone:NO];
+    }
+    else if ( [dname isEqualToString:@"fade"] )
+    {
+        NSLog(@"fade out");
+        feedborkAppDelegate * app = (feedborkAppDelegate*)[[UIApplication sharedApplication] delegate];
+        [app.viewController performSelectorOnMainThread:@selector(fadeBackground) withObject:nil waitUntilDone:NO];
+    }
     [pool drain];
 }
 

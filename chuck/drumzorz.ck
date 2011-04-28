@@ -9,6 +9,7 @@
 
 .7 => float startGain;
 0 => int currentBeat;
+0 => int circleTime;
 
 // total number of measures in the loop
 2 => int totalMeasures;
@@ -23,7 +24,7 @@
 quantizationSize * totalBeatsPerMeasure * totalMeasures => int gridSize;
 // OSC sender
 OscSend xmit;
-xmit.setHost("10.0.1.9", 9998);
+xmit.setHost("192.168.176.226", 9998);
 // create our OSC receiver
 OscRecv orec;
 // port 9999
@@ -33,6 +34,47 @@ orec.listen();
 orec.event("/IP,s") @=> OscEvent IP_event;
 orec.event("/drumcontrol,s,f,f") @=> OscEvent Drum_event;
 orec.event( "/recurse, f" ) @=> OscEvent recurse;
+
+// HID
+Hid hi;
+HidMsg msg;
+
+// which keyboard
+0 => int device;
+// get from command line
+if( me.args() ) me.arg(0) => Std.atoi => device;
+
+// open keyboard (get device number from command line)
+if( !hi.openKeyboard( device ) ) me.exit();
+<<< "keyboard '" + hi.name() + "' ready", "" >>>;
+spork ~ keys();
+
+fun void keys()
+{
+    // infinite event loop
+    while( true )
+    {
+        // wait for event
+        hi => now;
+        
+        // get message
+        while( hi.recv( msg ) )
+        {
+            // check
+            if( msg.isButtonDown() )
+            {
+                if ( msg.which == 44 ) //space bar
+                {
+                    xmit.startMsg("/drum, s, f");
+                    xmit.addString( "fade" );
+                    xmit.addFloat(0.0);
+                    1 => circleTime;
+                }
+            }
+        }
+    }
+}
+
 
 // IP listener
 fun void getIP()
@@ -189,7 +231,8 @@ class Randrum
                 if ( send == 1 )
                 {
                     xmit.startMsg("/drum, s, f");
-                    xmit.addString( myname );
+                    if ( circleTime && special ) xmit.addString ( "circle" );
+                    else xmit.addString( myname );
                     xmit.addFloat(sendGain);
                 }
                 

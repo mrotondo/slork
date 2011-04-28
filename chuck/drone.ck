@@ -49,8 +49,8 @@ class PointListener extends FeedborkListener
     }	
 }
 
-TriOsc t1 => JCRev revL => Gain gL => Gain gFinL => dac.chan(0) => dac.chan(2) =>dac.chan(4);
-Blit t2   => JCRev revR => Gain gR => Gain gFinR => dac.chan(1) => dac.chan(3) => dac.chan(5);
+TriOsc t1 => JCRev revL => Gain gL => Gain gFinL => dac.chan(0);// => dac.chan(2) =>dac.chan(4);
+Blit t2   => JCRev revR => Gain gR => Gain gFinR => dac.chan(1);// => dac.chan(3) => dac.chan(5);
 
 //Std.mtof(43) => lfL.freq;
 //0 => lfL.Q;
