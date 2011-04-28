@@ -160,7 +160,7 @@ while (true)
     
     //Std.mtof(base) + 100 + 400 * m7.last() => lfL.freq;
     
-    //Std.mtof(base) + 200 + 600 * m8.last() => lfR.freq;
+//Std.mtof(base) + 200 + 600 * m8.last() => lfR.freq;
 
 	//g1 + 0.3*(m4.last()) => t1.gain;
 	//g1 + 0.3*(m3.last()) => t2.gain;

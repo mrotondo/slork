@@ -17,7 +17,7 @@ BlowBotl s => JCRev rev => Gain gain => dac;
 
 0.0 => s.noiseGain;
 
-0.55 => gain.gain;
+0.45 => gain.gain;
 
 s => Delay dly => rev;
 dly => Gain fb => dly;
