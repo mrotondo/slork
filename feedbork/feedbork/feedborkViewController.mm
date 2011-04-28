@@ -510,10 +510,16 @@ static CGRect swapWidthAndHeight(CGRect rect)
         cvLine( img_greyscale, p1, p2, CV_RGB(255,0,0), 3, 8 );
         
         angle = fmod(fabs(atan2f(p1.y - p2.y, p1.x - p2.x)), M_PI / 2.0);
-        [osc sendValue:angle withKey:@"line_angle"];
-        [osc sendValue:sqrt(max_line_length) withKey:@"line_length"];
+        
+        float normalized_length = MIN(MAX(0, max_line_length - 8000), 180000) / 180000.0;
+        float recursiveness = MIN(lines->total, 50) / 50.0;
+        
+        NSLog(@"angle: %f and maxline: %f total: %f",angle,normalized_length,recursiveness);
+        [osc sendValue:recursiveness withKey:@"recurse"];
+        [osc sendValue:sqrt(normalized_length) withKey:@"line_length"];
+        
     } else {
-        [osc sendValue:0 withKey:@"line_angle"];
+        [osc sendValue:0 withKey:@"recurse"];
         [osc sendValue:0 withKey:@"line_length"];
     }
     
@@ -538,7 +544,7 @@ static CGRect swapWidthAndHeight(CGRect rect)
     //normalize that bitch    
     double normalized_area = MIN(MAX(0, area - 1000000), 40000000) / 40000000;
     
-    NSLog(@"Area: %f", normalized_area);
+    //NSLog(@"Area: %f", normalized_area);
     
     [osc sendValue:normalized_area withKey:@"brightness"];
     
@@ -562,6 +568,7 @@ static CGRect swapWidthAndHeight(CGRect rect)
     int numContours = cvFindContours( img_threshold , contour_storage, &contours, sizeof(CvContour),
                                      CV_RETR_LIST, CV_CHAIN_APPROX_SIMPLE, cvPoint(0,0) );
     
+    NSLog(@"%d",numContours);
     [osc sendValue:numContours withKey:@"num_contours"];
     
     cvReleaseMemStorage(&contour_storage);
@@ -609,7 +616,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
     
     // Extract features
     [self findCentroidAndAreaOfImage:img_greyscale];
-    [self findContoursInImage:img_greyscale];
+    //[self findContoursInImage:img_greyscale];
     [self findLinesInImage:img_greyscale];
     
 //    // Convert black and whilte to 24bit image then convert to UIImage to show
