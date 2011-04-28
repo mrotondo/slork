@@ -29,6 +29,7 @@ OscRecv orec;
 orec.listen();
 orec.event("/IP,s") @=> OscEvent IP_event;
 orec.event("/drumcontrol,s,f,f") @=> OscEvent Drum_event;
+orec.event( "/recurse, f" ) @=> OscEvent recurse;
 
 // IP listener
 fun void getIP()
@@ -494,6 +495,23 @@ fun void getDrumControl()
         }
     }
 }
+fun void listenRecurse()
+{
+    <<<"yep">>>;
+    while (true)
+    {
+        recurse => now;
+        while ( recurse.nextMsg() != 0 )
+        {
+            recurse.getFloat() * 0.2 => float blah;
+            if ( blah > 0.4 ) 0.4 => blah;
+            setReverb(blah);
+            <<<blah>>>;
+            d.gain(blah);
+        }
+    }
+}
+spork ~ listenRecurse();
 
 // spork all playback shreds
 spork ~ kick.playback();
