@@ -49,10 +49,12 @@ class PointListener extends FeedborkListener
     }	
 }
 
-TriOsc t1 => JCRev revL => Gain gL => dac.chan(0);
-Blit t2 => JCRev revR => Gain gR => dac.chan(1);
+TriOsc t1 => JCRev revL => Gain gL => Gain gFinL => dac.chan(0);
+Blit t2   => JCRev revR => Gain gR => Gain gFinR => dac.chan(1);
 
-0.005 => gR.gain => gL.gain;
+0.4 => gFinL.gain => gFinR.gain;
+
+0.003 => gR.gain => gL.gain;
 
 TriOsc t3 => revL;
 Blit t4 => revR;
@@ -106,8 +108,8 @@ class IndexListener extends FloatListener
     fun void handleEvent()
     {
         event.getFloat() => float f;
-		0.2 * f => gain_target;
-		Math.max(gain_target, 0.01) => gain_target;
+		0.08 * f => gain_target;
+		Math.max(gain_target, 0.005) => gain_target;
 	}
 }
 IndexListener index_listener;
@@ -116,13 +118,15 @@ spork ~ index_listener.go();
 
 while (true)
 {
-	//<<< (gain_target - gL.gain()) + gL.gain() >>>;
+	//<<< (gain_target - gL.gain()) +5 gL.gain() >>>;
 	0.00001 => float slew_rate;
 	if (gain_target < gL.gain()) {
 		0.0001 => slew_rate;
 	}
 	slew_rate * (gain_target - gL.gain()) + gL.gain() => gL.gain => gR.gain;
 	
+    gL.gain() * 30.0 => index;
+    
 	cf1 + index*(m1.last()) => t1.freq;
 	cf2 + index*(m2.last()) => t2.freq;
 	cf3 + index*(m3.last()) => t3.freq;

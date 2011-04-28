@@ -158,7 +158,7 @@ public class Bass extends Voice
 {
 	Gain mod_gain => Gain master_gain => blackhole;//dac;
 	
-    0.05 => master_gain.gain;
+    0.01 => master_gain.gain;
 
 	Blit ugen1 => LPF f1 => ADSR env1 => mod_gain;
 	5 => ugen1.harmonics;	
