@@ -198,7 +198,14 @@ public class Bass extends Voice
 
 	0 => float start_x;
 	0 => float start_y;
-	
+    
+    0 => float brightness;
+    0 => float brightness_target;
+    fun void setBrightness(float brightness)
+    {
+        brightness => brightness_target;
+    }
+    
 	5 => float alpha;
 	fun float AtanDrive(UGen input, UGen output) 
 	{ 
@@ -273,11 +280,15 @@ public class Bass extends Voice
 	{
 		Math.fabs(start_y - rate) * 10 => mod.freq;
 	}
-	
+    
 	fun void updateParams()
 	{
 		while(true)
 		{
+            0.01 * (brightness_target - brightness) + brightness => brightness;
+            brightness + 1 => ugen2.gain;
+            10 + 10 * (brightness $ int) => ugen2.harmonics;
+            
 			0.5 + mod.last() * mod_depth => mod_gain.gain;
 			ms => now;
 		}

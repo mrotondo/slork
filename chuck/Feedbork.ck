@@ -98,12 +98,12 @@ class HPFFreqListener extends FloatListener
     }
 }
 
-class ReverbListener extends FloatListener
+class BrightnessListener extends FloatListener
 {
     fun void handleEvent()
     {
         event.getFloat() => float f;
-		//voice.SetReverbMix(f);
+		voice.setBrightness(f);
     }
 }
 
@@ -155,9 +155,9 @@ class KeyListener extends IntListener
 // reverb_listener.init(orec, "centroid_x");
 // spork ~ reverb_listener.go() @=> Shred @ reverb_shred;
 
-// HPFFreqListener hpf_freq_listener;
-// hpf_freq_listener.init(orec, "brightness");
-// spork ~ hpf_freq_listener.go() @=> Shred @ hpf_freq_shred;
+BrightnessListener brightness_listener;
+brightness_listener.init(orec, "brightness");
+spork ~ brightness_listener.go();
 
 NoteStartListener note_start_listener;
 note_start_listener.init(orec, "bassTouchBegan");
