@@ -52,7 +52,7 @@ class PointListener extends FeedborkListener
 TriOsc t1 => JCRev revL => Gain gL => Gain gFinL => dac.chan(0);
 Blit t2   => JCRev revR => Gain gR => Gain gFinR => dac.chan(1);
 
-0.05 => gFinL.gain => gFinR.gain;
+0.3 => gFinL.gain => gFinR.gain;
 
 0.003 => gR.gain => gL.gain;
 
