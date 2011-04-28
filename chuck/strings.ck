@@ -55,23 +55,43 @@ fun void slewFreq()
 }
 
 if (smooth) spork ~ slewFreq();
-
+-1 => int index;
 fun void updateParams()
 {  
     while (true)
     { 
+        if ( index == Scenes.current_scene_index ) return;
+        Scenes.current_scene_index => index;
+        
         Scenes.current_scene.stringsFBgain => fb.gain => fb2.gain;
         dly.gain(Scenes.current_scene.stringsFB);
         dly2.gain(Scenes.current_scene.stringsFB);
-
+        
         1::second => now;
     }
 }
+       
 spork ~ updateParams();
 
 // create an address in the receiver, store in new variable
 recv.event( "/string, f, f" ) @=> OscEvent oe;
-
+recv.event( "/recurse, f" ) @=> OscEvent recurse;
+fun void listenRecurse()
+{
+    while (true)
+    {
+        recurse => now;
+        while ( recurse.nextMsg() != 0 )
+        {
+            recurse.getFloat() * 2.0 => float blah;
+            if ( blah > 0.96 ) 0.96 => blah;
+            dly.gain( blah );
+            dly2.gain( blah );
+            blah => fb.gain => fb2.gain;
+        }
+    }
+}
+spork ~ listenRecurse();
 // infinite event loop
 while ( true )
 {

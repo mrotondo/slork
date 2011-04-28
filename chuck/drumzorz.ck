@@ -101,8 +101,8 @@ class Randrum
         //_filename => drum.read;
         _name => myname;
         //drum.samples() => drum.pos;
-        <<< myname >>>;
-        drum.print();
+        //<<< myname >>>;
+        //drum.print();
 	}
     
     // clear out everything in that player
@@ -512,13 +512,9 @@ spork ~ getDrumControl();
 
 fun void updateParams()
 {   
-        
     if ( index == Scenes.current_scene_index ) return;
-    
     Scenes.current_scene_index => index;
-
-<<< "blah" >>>;
-    
+     
     Scenes.current_scene.kickPattern @=> kick.hitsOn;
     Scenes.current_scene.snarePattern @=> snare.hitsOn;
     Scenes.current_scene.snareHardPattern @=> snarehard.hitsOn;

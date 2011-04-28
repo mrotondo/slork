@@ -31,6 +31,23 @@ Half => dly.delay;
 0 => int thechord;
 int whichchord[];
 
+recv.event( "/recurse, f" ) @=> OscEvent recurse;
+fun void listenRecurse()
+{
+    while (true)
+    {
+        recurse => now;
+        while ( recurse.nextMsg() != 0 )
+        {
+            recurse.getFloat() * 2.0 => float blah;
+            if ( blah > 0.96 ) 0.96 => blah;
+            dly.gain( blah );
+            blah => fb.gain;
+        }
+    }
+}
+spork ~ listenRecurse();
+
 // OSC sender
 OscSend xmit;
 xmit.setHost("10.0.1.4", 9999);
@@ -61,11 +78,14 @@ if( me.args() ) me.arg(0) => Std.atoi => device;
 if( !hi.openKeyboard( device ) ) me.exit();
 <<< "keyboard '" + hi.name() + "' ready", "" >>>;
 spork ~ keys();
-
+-1 => int index;
 fun void updateParams()
 {  
     while (true)
     { 
+        if ( index == Scenes.current_scene_index ) return;
+        Scenes.current_scene_index => index;
+        
         Scenes.current_scene.chordFBgain => fb.gain;
 		dly.gain(Scenes.current_scene.chordFB);
         1::second => now;
