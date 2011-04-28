@@ -23,7 +23,7 @@
 quantizationSize * totalBeatsPerMeasure * totalMeasures => int gridSize;
 // OSC sender
 OscSend xmit;
-xmit.setHost("192.168.176.226", 9998);
+xmit.setHost("10.0.1.9", 9998);
 // create our OSC receiver
 OscRecv orec;
 // port 9999
@@ -286,11 +286,14 @@ class Randrum
     }
 };
 
-DelayL d => Gain g => d => NRev rev => dac;
+DelayL d => Gain g => d => NRev rev => Gain finalgain => dac;
 0.0 => g.gain;
 5::second => d.max;
 0::ms => d.delay;
 
+0.3 => finalgain.gain;
+
+//0.13 => rev.gain;
 0.0 => rev.mix;
 
 fun void setDelay(dur delay)
@@ -508,7 +511,7 @@ fun void slewVerb()
 {
     while (true)
     {
-        0.0003*(revT-rev.mix()) + rev.mix() => rev.mix;
+        0.00003*(revT-rev.mix()) + rev.mix() => rev.mix;
         //fTarget => s.freq;
         1::samp => now;
     }
@@ -524,7 +527,7 @@ fun void listenRecurse()
         {
             recurse.getFloat() * 0.25 => float blah;
             if ( blah > 0.3 ) 0.3 => blah;
-            blah => revT;
+            blah + 0.1 => revT;
         }
     }
 }

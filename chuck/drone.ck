@@ -49,8 +49,13 @@ class PointListener extends FeedborkListener
     }	
 }
 
-TriOsc t1 => JCRev revL => Gain gL => Gain gFinL => dac.chan(0);
-Blit t2   => JCRev revR => Gain gR => Gain gFinR => dac.chan(1);
+TriOsc t1 => JCRev revL => Gain gL => Gain gFinL => dac.chan(0) => dac.chan(2) =>dac.chan(4);
+Blit t2   => JCRev revR => Gain gR => Gain gFinR => dac.chan(1) => dac.chan(3) => dac.chan(5);
+
+//Std.mtof(43) => lfL.freq;
+//0 => lfL.Q;
+//Std.mtof(43) => lfR.freq;
+//0 => lfR.Q;
 
 0.1 => gFinL.gain => gFinR.gain;
 
@@ -78,7 +83,12 @@ SinOsc m5 => blackhole;
 0.0075 => m5.freq;
 SinOsc m6 => blackhole;
 0.007 => m6.freq;
-55 => int base;
+SinOsc m7 => blackhole;
+0.13 => m7.freq;
+SinOsc m8 => blackhole;
+0.33 => m8.freq;
+
+43 => int base;
 Std.mtof(base) => float cf1 => t1.freq;
 Std.mtof(base) + .3 => float cf2 => t2.freq;
 
@@ -147,6 +157,10 @@ while (true)
 	cf4 + index*(m4.last()) => t4.freq;
 	cf5 + index*(m3.last()) => t5.freq;
 	cf6 + index*(m4.last()) => t6.freq;
+    
+    //Std.mtof(base) + 100 + 400 * m7.last() => lfL.freq;
+    
+//Std.mtof(base) + 200 + 600 * m8.last() => lfR.freq;
 
 	//g1 + 0.3*(m4.last()) => t1.gain;
 	//g1 + 0.3*(m3.last()) => t2.gain;

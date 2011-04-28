@@ -19,7 +19,7 @@ class Voice
 	
     0::ms => dur note_duration;
     
-    [0, 2, 3, 5, 7, 9, 10, 12, 14, 16, 17, 19, 21, 23, 24] @=> int intervals[];
+    [0, 2, 5, 7, 8, 10, 12, 14, 17, 18, 20, 23, 24] @=> int intervals[];
     
     // start on the root
     [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0] @=> float weights[];
@@ -172,10 +172,10 @@ public class Bass extends Voice
     
     Delay dly;
     dly => Gain fb => dly;
-    dly.gain(0.9);
+    dly.gain(0.0);
     TimeUnit => dly.max;
     Half => dly.delay;
-    0.9999 => fb.gain;
+    0.0 => fb.gain;
 
 	Gain mod_gain => Gain master_gain => blackhole;//dac;
 	
