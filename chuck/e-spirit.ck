@@ -15,8 +15,9 @@ Eighth * 0.5 => dur Sixteenth;
 16.0 => float quantizationSize;
 
 Blit chord[4];
-ADSR e => NRev rev => Gain master_gain => dac;
-0.07 => master_gain.gain;
+ADSR e => NRev rev => Gain master_gain => PoleZero pzf => dac;
+0.99999 => pzf.blockZero;
+0.04 => master_gain.gain;
 e => Delay dly => rev;
 dly => Gain fb => dly;
 for ( 0 => int i; i<4; i++ ) chord[i] => e;
