@@ -4,9 +4,10 @@ if ( !me.args() )
     me.exit();
 }
 
-<<<"argument is " + me.arg(0)>>>;
-
 Std.atoi(me.arg(0)) => int which;
+
+if ( which == 0 ) <<<"-------YOU ARE BASS, BRAH!-------">>>;
+if ( which == 1 ) <<<"-------YOU ARE CHORDS, BRO!-------">>>;
 
 Machine.add("scenes.ck");
 me.yield();

@@ -52,7 +52,7 @@ class PointListener extends FeedborkListener
 TriOsc t1 => JCRev revL => Gain gL => Gain gFinL => dac.chan(0);
 Blit t2   => JCRev revR => Gain gR => Gain gFinR => dac.chan(1);
 
-0.3 => gFinL.gain => gFinR.gain;
+0.1 => gFinL.gain => gFinR.gain;
 
 0.003 => gR.gain => gL.gain;
 
@@ -116,6 +116,20 @@ IndexListener index_listener;
 index_listener.init(orec, "brightness");
 spork ~ index_listener.go();
 
+-1 => int blahindex;
+fun void updateParams()
+{  
+    while (true)
+    { 
+        if ( blahindex == Scenes.current_scene_index ) return;
+        Scenes.current_scene_index => blahindex;
+        
+        Scenes.current_scene.paddington => gFinL.gain => gFinR.gain;
+        1::second => now;
+    }
+}
+spork ~ updateParams();
+
 while (true)
 {
 	//<<< (gain_target - gL.gain()) +5 gL.gain() >>>;
@@ -125,7 +139,7 @@ while (true)
 	}
 	slew_rate * (gain_target - gL.gain()) + gL.gain() => gL.gain => gR.gain;
 	
-    gL.gain() * 30.0 => index;
+    gL.gain() * 100.0 * gFinL.gain() => index;
     
 	cf1 + index*(m1.last()) => t1.freq;
 	cf2 + index*(m2.last()) => t2.freq;
@@ -138,8 +152,8 @@ while (true)
 	//g1 + 0.3*(m3.last()) => t2.gain;
 	//g1 + 0.3*(m2.last()) => t3.gain;
 	//g1 + 0.3*(m1.last()) => t4.gain;
-	g1 + 0.3*(m6.last()) => t5.gain;
-	g1 + 0.3*(m5.last()) => t6.gain;
+	//g1 + 0.3*(m6.last()) => t5.gain;
+	//g1 + 0.3*(m5.last()) => t6.gain;
 	
 	1::samp => now; 
 }

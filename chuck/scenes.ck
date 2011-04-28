@@ -14,6 +14,8 @@ Noise n => BPF bpf => Gain noiseGain => rev;
 8.0 => bpf.Q;
 0.8 => noiseGain.gain;
 
+1.0 => float lightadjuster;
+
 
 //0.4 => s.lfoDepth;
 
@@ -100,6 +102,9 @@ public class Scenes
         0.0 => float stringsFBgain;
 		0.0 => float stringsFB;
         
+        // paddington params
+        0.0 => float paddington;
+        
         int duration_in_beats;
 	}
 
@@ -127,13 +132,14 @@ public class Scenes
 		0 => scene0.reverb_base;
 		10 => scene0.hpf_freq_base;
 		0 => scene0.modulation_base;
-        64=> scene0.duration_in_beats;
+        64 => scene0.duration_in_beats;
         5.6 => scene0.drumRandomness;
         2.6 => scene0.drumDensity;
 		0.0 => scene0.chordFBgain;
         0.0 => scene0.chordFB;
         0.4 => scene0.stringsFBgain;
         0.3 => scene0.stringsFB;
+        0.1*lightadjuster => scene0.paddington;
 
         
         //[ 1, 0, 1, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,   0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 1 ] @=> scene0.kickPattern;
@@ -164,13 +170,22 @@ public class Scenes
         0.6 => scene1.chordFB;
         0.999 => scene1.stringsFBgain;
         0.7 => scene1.stringsFB;
+        0.2*lightadjuster => scene1.paddington;
 
-        [ 1, 0, 0, 0,  0, 0, 0, 1,  0, 0, 0, 0,  0, 0, 0, 0,   1, 0, 0, 1,  0, 0, 1, 0,  1, 0, 0, 0,  1, 0, 1, 0 ] @=> scene1.kickPattern;
-        [ 0, 0, 0, 0,  1, 0, 0, 0,  0, 1, 0, 0,  1, 0, 0, 0,   0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0 ] @=> scene1.snarePattern;
-        [ 0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0,   0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0 ] @=> scene1.snareHardPattern;
-        [ 0, 0, 1, 0,  1, 0, 0, 0,  1, 0, 1, 0,  1, 0, 0, 0,   1, 1, 0, 0,  1, 0, 0, 0,  0, 0, 1, 0,  1, 0, 0, 0 ] @=> scene1.hihatPattern;
-        [ 0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,   0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 1, 0 ] @=> scene1.openhatPattern;
-        [ 0, 0, 0, 0,  0, 0, 0, 1,  0, 0, 0, 0,  0, 0, 0, 0,   0, 0, 0, 0,  0, 0, 0, 1,  0, 0, 0, 0,  0, 0, 0, 0 ] @=> scene1.kickHardPattern;
+
+        //[ 1, 0, 0, 0,  0, 0, 0, 1,  0, 0, 0, 0,  0, 0, 0, 0,   1, 0, 0, 1,  0, 0, 1, 0,  1, 0, 0, 0,  1, 0, 1, 0 ] @=> scene1.kickPattern;
+        //[ 0, 0, 0, 0,  1, 0, 0, 0,  0, 1, 0, 0,  1, 0, 0, 0,   0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0 ] @=> scene1.snarePattern;
+        //[ 0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0,   0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0 ] @=> scene1.snareHardPattern;
+        //[ 0, 0, 1, 0,  1, 0, 0, 0,  1, 0, 1, 0,  1, 0, 0, 0,   1, 1, 0, 0,  1, 0, 0, 0,  0, 0, 1, 0,  1, 0, 0, 0 ] @=> scene1.hihatPattern;
+        //[ 0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,   0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 1, 0 ] @=> scene1.openhatPattern;
+        //[ 0, 0, 0, 0,  0, 0, 0, 1,  0, 0, 0, 0,  0, 0, 0, 0,   0, 0, 0, 0,  0, 0, 0, 1,  0, 0, 0, 0,  0, 0, 0, 0 ] @=> scene1.kickHardPattern;
+
+        [ 1, 0, 1, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,   0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 1 ] @=> scene1.kickPattern;
+        [ 0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0,   0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0 ] @=> scene1.snarePattern;
+        [ 0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,   0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0 ] @=> scene1.snareHardPattern;
+        [ 1, 0, 0, 0,  1, 0, 0, 0,  1, 0, 1, 0,  1, 0, 0, 0,   1, 0, 1, 0,  0, 0, 0, 0,  1, 0, 1, 0,  1, 0, 0, 0 ] @=> scene1.hihatPattern;
+        [ 0, 0, 1, 0,  0, 0, 1, 0,  0, 1, 0, 0,  0, 0, 1, 0,   0, 0, 0, 1,  0, 1, 0, 0,  0, 0, 1, 0,  0, 0, 1, 0 ] @=> scene1.openhatPattern;
+        [ 1, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,   1, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0 ] @=> scene1.kickHardPattern;
 
 		scene2 @=> scenes[2];
 		0.5 => scene2.reverb_base;
@@ -183,9 +198,10 @@ public class Scenes
         0.6 => scene2.chordFB;
         0.999 => scene2.stringsFBgain;
         0.7 => scene2.stringsFB;
+        0.3*lightadjuster => scene2.paddington;
 
-        [ 1, 0, 0, 0,  0, 0, 0, 1,  0, 0, 0, 0,  0, 0, 0, 0,   1, 0, 0, 1,  0, 0, 1, 0,  1, 0, 0, 0,  1, 0, 1, 0 ] @=> scene2.kickPattern;
-        [ 0, 0, 0, 0,  1, 0, 0, 0,  0, 1, 0, 0,  1, 0, 0, 0,   0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0 ] @=> scene2.snarePattern;
+        [ 1, 0, 0, 0,  0, 0, 0, 1,  0, 0, 1, 0,  0, 1, 0, 0,   1, 0, 0, 0,  0, 0, 1, 0,  1, 0, 0, 0,  0, 0, 1, 0 ] @=> scene2.kickPattern;
+        [ 0, 0, 0, 0,  1, 0, 0, 0,  1, 0, 0, 0,  1, 0, 0, 0,   0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0 ] @=> scene2.snarePattern;
         [ 0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0,   0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0 ] @=> scene2.snareHardPattern;
         [ 0, 0, 1, 0,  1, 0, 0, 0,  1, 0, 1, 0,  1, 0, 0, 0,   1, 1, 0, 0,  1, 0, 0, 0,  0, 0, 1, 0,  1, 0, 0, 0 ] @=> scene2.hihatPattern;
         [ 0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,   0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 1, 0 ] @=> scene2.openhatPattern;
@@ -202,9 +218,10 @@ public class Scenes
         0.9 => scene3.chordFB;
         0.999 => scene3.stringsFBgain;
         0.94 => scene3.stringsFB;
+        0.4*lightadjuster => scene3.paddington;
 
-        [ 1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,   1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0,  1, 0, 1, 0 ] @=> scene3.kickPattern;
-        [ 0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0,   0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  0, 1, 0, 1 ] @=> scene3.snarePattern;
+        [ 1, 0, 0, 1,  0, 0, 1, 0,  1, 0, 0, 0,  0, 0, 0, 0,   1, 0, 1, 0,  0, 1, 0, 1,  1, 0, 1, 0,  0, 0, 1, 0 ] @=> scene3.kickPattern;
+        [ 0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 1, 0,  1, 0, 0, 0,   0, 0, 0, 0,  1, 0, 0, 0,  0, 1, 0, 0,  1, 0, 0, 1 ] @=> scene3.snarePattern;
         [ 0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0,   0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 1, 0, 0 ] @=> scene3.snareHardPattern;
         [ 1, 0, 0, 0,  1, 0, 0, 0,  1, 0, 0, 0,  1, 0, 0, 0,   1, 0, 0, 0,  1, 0, 0, 0,  1, 0, 0, 0,  1, 0, 1, 0 ] @=> scene3.hihatPattern;
         [ 0, 0, 1, 0,  0, 0, 1, 0,  0, 0, 1, 0,  0, 0, 1, 0,   0, 0, 1, 0,  0, 0, 1, 0,  0, 0, 1, 0,  0, 1, 0, 1 ] @=> scene3.openhatPattern;
@@ -221,9 +238,10 @@ public class Scenes
         0.9 => scene4.chordFB;
         0.999 => scene4.stringsFBgain;
         0.94 => scene4.stringsFB;
+        0.42*lightadjuster => scene4.paddington;
 
-        [ 1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,   1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0,  1, 0, 1, 0 ] @=> scene4.kickPattern;
-        [ 0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0,   0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  0, 1, 0, 1 ] @=> scene4.snarePattern;
+        [ 1, 0, 1, 0,  0, 1, 0, 1,  1, 0, 1, 0,  0, 0, 0, 0,   1, 0, 0, 0,  0, 1, 0, 1,  1, 0, 0, 0,  0, 0, 1, 0 ] @=> scene4.kickPattern;
+        [ 0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0,   0, 0, 0, 0,  1, 0, 0, 0,  0, 0, 1, 0,  1, 1, 0, 0 ] @=> scene4.snarePattern;
         [ 0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  1, 0, 0, 0,   0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 1, 0, 0 ] @=> scene4.snareHardPattern;
         [ 1, 0, 0, 0,  1, 0, 0, 0,  1, 0, 0, 0,  1, 0, 0, 0,   1, 0, 0, 0,  1, 0, 0, 0,  1, 0, 0, 0,  1, 0, 1, 0 ] @=> scene4.hihatPattern;
         [ 0, 0, 1, 0,  0, 0, 1, 0,  0, 0, 1, 0,  0, 0, 1, 0,   0, 0, 1, 0,  0, 0, 1, 0,  0, 0, 1, 0,  0, 1, 0, 1 ] @=> scene4.openhatPattern;
@@ -251,7 +269,7 @@ public class Scenes
 			beat_count++;
             
             if (current_scene_index == 0 && 
-            beat_count == current_scene.duration_in_beats - 4) {
+            beat_count == current_scene.duration_in_beats - 8) {
                 <<< "GO!" >>>;
                 spork ~ makecoolsound();
             }

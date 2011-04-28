@@ -56,13 +56,15 @@ now % (totalBeatsPerMeasure * totalMeasures * sampsPerBeat) => dur offset;
 // class for randrumly generated drums
 class Randrum
 {
-    //SndBuf drum => Gain g => dac;
+    SndBuf sampdrum => Gain g => dac;
 	NoiseDrum drum;
 	
     int hitsOn[gridSize];
     int randHitsOn[gridSize];
     float hitsGain[gridSize];
     float randHitsGain[gridSize];
+    
+    0 => int special;
     
     //10.0 => float randThreshold;
     0.0 => float randThreshold;
@@ -76,13 +78,13 @@ class Randrum
     
     // Assuming the order of drums stays the same!!
     [
-    [113.9, 688.7, 0.9786, 12614, 0.7025, 2.2669, 2.1123], //kick
-    [596.9, 993.5, 0.9788, 7934, 0.6665, 2.9815, 2.04], //snare
+    [113.9, 288.7, 0.9686, 22614, 1.1025, 2.2669, 2.1123], //kick
+    [596.9, 993.5, 0.9788, 7934, 0.8665, 2.9815, 2.04], //snare
     [128.7, 830.8, 0.9772, 10729, 0.517, 3.0782, 2.8611], //hihat
-    [924.6, 210.8, 0.9815, 14458, 0.5463, 2.9771, 2.8721], //kickhard
-    [104.2, 81.4, 0.9701, 25957, 0.7896, 2.2302, 2.6559], //snarehard
-    [916.2, 603.5, 0.9818, 24622, 0.5581, 2.1879, 2.0338], //openhat
-    [211.5, 854.1, 0.9753, 26527, 0.6415, 2.6134, 3.4866] //glitch
+    [424.6, 400.8, 0.9715, 14458, 0.5463, 3.0771, 2.8721], //kickhard
+    [104.2, 81.4, 0.9401, 25957, 0.4896, 2.2302, 2.6559], //snarehard
+    [916.2, 603.5, 0.9718, 12622, 0.3581, 2.1879, 2.0338], //openhat
+    [211.5, 854.1, 0.9353, 26527, 0.4415, 2.6134, 3.4866] //glitch
     ] @=> float d[][];
 
     // setup the filepath for the sample as well as a unique name
@@ -102,9 +104,9 @@ class Randrum
         drum.setOutput(output);
 		spork ~ drum.go();
         
-        //_filename => drum.read;
+        if ( special )_filename => sampdrum.read;
         _name => myname;
-        //drum.samples() => drum.pos;
+        sampdrum.samples() => sampdrum.pos;
         //<<< myname >>>;
         //drum.print();
 	}
@@ -151,14 +153,14 @@ class Randrum
                     {
                         if ( Math.rand2(0,100) / 33.0 < density )
                         { 
-                            //0 => drum.pos;
+                            if ( special ) 0 => sampdrum.pos;
 							drum.play();
                         }
                         else 0 => send;
                     }
                     else
 					{
-						//0 => drum.pos;
+						if ( special ) 0 => sampdrum.pos;
 						drum.play();
 					}
                     // possibly allow random sample to be added on
@@ -175,8 +177,9 @@ class Randrum
                     //1 => send;
                     randHitsGain[i] => sendGain;
                     randHitsGain[i] => drum.masta_g.gain;
+                    //if ( special ) sendGain => g.gain;
                     //baseRate * Math.rand2f(1 - randThreshold/1000, 1 + randThreshold/1000) => drum.rate;
-                    //0 => drum.pos;
+                    if ( special )  0 => sampdrum.pos;
 					drum.play();
                     1 -=> randHitsOn[i];
                     Math.floor(randThreshold * .01 * randHitsOn[i]) $ int => randHitsOn[i];
@@ -338,6 +341,7 @@ openhatPattern @=> openhat.hitsOn;
 openhatGain @=> openhat.hitsGain;
 kickHardPattern @=> kickhard.hitsOn;
 kickHardGain @=> kickhard.hitsGain;
+1 => kick.special;
 
 // 1.1 => snare.g.gain;
 // 1.3 => snare.baseRate;

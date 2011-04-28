@@ -102,8 +102,8 @@ public class NoiseDrum
 	fun void play()
 	{
 		1.0 => current_gain;
-		setGain(volume * current_gain);
-		setFrequency(freq_start);
+		setGain(volume * current_gain+Math.rand2f(-0.03,0.03));
+		setFrequency(freq_start + Math.rand2f(-10.0,10.1));
 		
 		now => start;
 		now + pitch_decay => pitch_end;
