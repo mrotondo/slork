@@ -33,6 +33,7 @@
 		B287BB94135507E4006D0BCD /* TVOutManager.m in Sources */ = {isa = PBXBuildFile; fileRef = B287BB93135507E4006D0BCD /* TVOutManager.m */; };
 		B287BBA613555006006D0BCD /* feedborkDoodad.mm in Sources */ = {isa = PBXBuildFile; fileRef = B287BBA513555005006D0BCD /* feedborkDoodad.mm */; };
 		B2B54DE8135660D30003B20A /* particle.png in Resources */ = {isa = PBXBuildFile; fileRef = B2B54DE7135660D30003B20A /* particle.png */; };
+		B2DEAE9113696108001201F0 /* circle.png in Resources */ = {isa = PBXBuildFile; fileRef = B2DEAE9013696108001201F0 /* circle.png */; };
 		D508B5F11356921A000D54D2 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D508B5F01356921A000D54D2 /* QuartzCore.framework */; };
 		D52B9B0D13469E8800BF4E99 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D52B9B0C13469E8800BF4E99 /* UIKit.framework */; };
 		D52B9B0F13469E8800BF4E99 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D52B9B0E13469E8800BF4E99 /* Foundation.framework */; };
@@ -97,6 +98,7 @@
 		B287BBA413555005006D0BCD /* feedborkDoodad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = feedborkDoodad.h; sourceTree = "<group>"; };
 		B287BBA513555005006D0BCD /* feedborkDoodad.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = feedborkDoodad.mm; sourceTree = "<group>"; };
 		B2B54DE7135660D30003B20A /* particle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = particle.png; sourceTree = "<group>"; };
+		B2DEAE9013696108001201F0 /* circle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = circle.png; sourceTree = "<group>"; };
 		D508B5F01356921A000D54D2 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		D52B9B0813469E8800BF4E99 /* feedbork.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = feedbork.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D52B9B0C13469E8800BF4E99 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
@@ -143,6 +145,7 @@
 		B2400175134AD269001C4090 /* pics */ = {
 			isa = PBXGroup;
 			children = (
+				B2DEAE9013696108001201F0 /* circle.png */,
 				B24BF30A135564BD00F19EDF /* splat.png */,
 				B24001CC134BB38D001C4090 /* switchDown.png */,
 				B24001CD134BB38D001C4090 /* switchUp.png */,
@@ -362,6 +365,7 @@
 				B25EA5D8135665DD0074C8AB /* flare3.png in Resources */,
 				B25EA5D9135665DD0074C8AB /* shine1.png in Resources */,
 				B25EA5DA135665DD0074C8AB /* shine2.png in Resources */,
+				B2DEAE9113696108001201F0 /* circle.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

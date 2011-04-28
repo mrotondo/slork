@@ -71,6 +71,8 @@
     [self initQuadrants];
     //[self initTapRecognizer];
     
+    circle.alpha = 0.0;
+    
     # if TARGET_IPHONE_SIMULATOR
     [self createMenuAccess];
     # endif
@@ -309,6 +311,15 @@
     [IPTextField resignFirstResponder];
 }
 
+- (IBAction)circle:(UIButton*)sender
+{
+    [self.view bringSubviewToFront:circle];
+    [UIView beginAnimations:nil context:nil];
+    [UIView setAnimationDuration:0.5];
+    if ( !circle.alpha ) circle.alpha = 1.0;
+    else circle.alpha = 0.0;
+    [UIView commitAnimations];}
+
 - (IBAction)changeIP:(UITextField*)sender
 {
     [IPTextField resignFirstResponder];
@@ -512,9 +523,10 @@ static CGRect swapWidthAndHeight(CGRect rect)
         angle = fmod(fabs(atan2f(p1.y - p2.y, p1.x - p2.x)), M_PI / 2.0);
         
         float normalized_length = MIN(MAX(0, max_line_length - 8000), 180000) / 180000.0;
-        float recursiveness = MIN(lines->total, 50) / 50.0;
+        float recursiveness = MIN(lines->total, 80) / 80.0;
         
-        NSLog(@"angle: %f and maxline: %f total: %f",angle,normalized_length,recursiveness);
+        //NSLog(@"lines: %d",lines->total);
+        //NSLog(@"angle: %f and maxline: %f total: %f",angle,normalized_length,recursiveness);
         [osc sendValue:recursiveness withKey:@"recurse"];
         [osc sendValue:sqrt(normalized_length) withKey:@"line_length"];
         
