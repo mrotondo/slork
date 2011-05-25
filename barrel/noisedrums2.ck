@@ -29,7 +29,18 @@ public class NoiseDrum
     
     1 => e1.keyOff;
     1 => e2.keyOff;
-
+    
+    SndBuf snare => Gain gsnare => r;
+    SndBuf kick  => Gain gkick => r;
+    
+    0.5 => snare.gain => kick.gain;
+    
+    snare.read("snare.aiff");
+    kick.read("kick.wav");
+    snare.samples() - 1 => snare.pos;
+    kick.samples() - 1 => kick.pos;
+    
+    //TriOsc o =>
     
     fun void play(float amplitude)
     {
@@ -37,6 +48,8 @@ public class NoiseDrum
         {  
             <<<"trigger">>>;
             now => last_played;
+            0 => snare.pos;
+            0 => kick.pos;
             // amplitude => e1.target
             1 => e1.keyOn;
             1 => e2.keyOn;
@@ -52,6 +65,11 @@ public class NoiseDrum
         min_frequency + frequency_percent * (max_frequency - min_frequency) => float frequency;
         frequency * 8 => bpf1.freq;
         frequency * 4 => bpf2.freq;
+        
+        1.0 - frequency_percent => gkick.gain;
+        frequency_percent => gsnare.gain;
+        
+        (frequency_percent) + 0.5 => kick.rate => snare.rate;
     }
     
     // TODO: differentiate left movement from right movement

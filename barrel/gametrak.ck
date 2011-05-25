@@ -11,7 +11,8 @@ RunningAverage l_average_y_velocity;
 0.2 => float r_y_velocity_threshold;
 0.2 => float l_y_velocity_threshold;
 
--0.5 => float y_position_threshold;
+-0.5 => float r_y_position_threshold;
+-0.5 => float l_y_position_threshold;
 
 // all joystick values are roughly normalized -1 to 1
 float ax; // left joystick x axis
@@ -62,7 +63,7 @@ fun void GetGameTrakInput() {
                     msg.axisPosition => ay;
                     ay - prev_ay => float diff;
                     
-                    if (ay > y_position_threshold && prev_ay <= y_position_threshold)
+                    if (ay > r_y_position_threshold && prev_ay <= r_y_position_threshold)
                     {
                         spork ~ r_instrument.play(Math.fabs(diff));
                     }
@@ -81,6 +82,9 @@ fun void GetGameTrakInput() {
                     
                     1.0 / ((az + 2) * 12) => r_y_velocity_threshold;
                     
+                    -0.5 + (az * 0.5 + 0.5) * 0.25 => r_y_position_threshold;
+                    <<< r_y_position_threshold >>>;
+                    
                     r_instrument.setFrequency( 1 - ((az + 1) / 2));
                     
                 }
@@ -96,7 +100,7 @@ fun void GetGameTrakInput() {
                     msg.axisPosition => by;
                     by - prev_by => float diff;
                     
-                    if (by > y_position_threshold && prev_by <= y_position_threshold)
+                    if (by > l_y_position_threshold && prev_by <= l_y_position_threshold)
                     {
                         spork ~ l_instrument.play(Math.fabs(diff));    
                     }
@@ -114,6 +118,8 @@ fun void GetGameTrakInput() {
                     msg.axisPosition*-1 => bz;
 
                     1.0 / ((bz + 2) * 12) => l_y_velocity_threshold;
+                    
+                    -0.5 + (az * 0.5 + 0.5) * 0.25 => l_y_position_threshold;
                     
                     l_instrument.setFrequency( 1 - ((bz + 1) / 2));
 
