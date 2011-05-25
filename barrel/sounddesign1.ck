@@ -90,7 +90,7 @@ BlitSaw triR => Gain tR => fR;
 
 0.04 => revL.mix => revR.mix;
 
-[0, 7, 12, 17, 24, 27, 30, 36, 42, 48, 60, 22, 24, 26, 28, 30, 32] @=> int goodNotes[];
+[0, 7, 12, 17, 24, 27, 30, 36, 42, 48, 60, 22, 24, 26, 28, 30, 32, 32,32,32,32,32,32] @=> int goodNotes[];
 
 32 => int base;
 
@@ -102,10 +102,10 @@ fun float bucketFreq(float freq)
 
 // main loop
 while(true) {
-    -ay.val - 0.0 => float newgL;
+    -ay.val => float newgL;
     if ( newgL < 0.0 ) 0.0 => newgL;
     newgL => gL.gain;
-    -by.val - 0.0 =>float newgR;
+    -by.val =>float newgR;
     if ( newgR < 0.0 ) 0.0 => newgR;
     newgR => gR.gain;
     
