@@ -72,6 +72,7 @@
     //[self initTapRecognizer];
     
     circle.alpha = 0.0;
+    inAlpha = 1.0;
     
     # if TARGET_IPHONE_SIMULATOR
     [self createMenuAccess];
@@ -316,7 +317,7 @@
     [self.view bringSubviewToFront:circle];
     [UIView beginAnimations:nil context:nil];
     [UIView setAnimationDuration:0.2];
-    if ( !circle.alpha ) circle.alpha = 1.0;
+    if ( !circle.alpha ) circle.alpha = inAlpha;
     else circle.alpha = 0.0;
     [UIView commitAnimations];
 
@@ -332,6 +333,17 @@
     //if ( !whiteView.alpha ) whiteView.alpha = 1.0;
     whiteView.alpha = 0.0;
     [UIView commitAnimations];
+    
+    [[NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(takeDownAlpha:) userInfo:nil repeats:YES] retain];
+}
+
+- (void)takeDownAlpha:(NSTimer*)timer
+{
+    inAlpha -= 0.002;
+    if ( inAlpha < 0.0 ) {
+        [timer invalidate];
+        NSLog(@"timer done, fade out over, piece is kaput, gj");
+    }
 }
 
 - (IBAction)changeIP:(UITextField*)sender
@@ -709,7 +721,7 @@ didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 {
     CGPoint _center = [[stuff objectAtIndex:0] CGPointValue];
     float vel = 20.0 * [[stuff objectAtIndex:1] floatValue];
-    [[feedborkDoodad alloc] initWithImageNamed:[stuff objectAtIndex:2] superview:self.view center:_center size:CGSizeMake(vel, vel) color:[stuff objectAtIndex:3] delegate:self];
+    [[feedborkDoodad alloc] initWithImageNamed:[stuff objectAtIndex:2] superview:self.view center:_center size:CGSizeMake(vel, vel) color:[stuff objectAtIndex:3] alpha:inAlpha delegate:self];
 }
 
 - (void)makeDoodad:(CGPoint)_center size:(float)vel image:(NSString*)_image color:(UIColor*)_color;
@@ -750,6 +762,7 @@ CGPoint prevTouch;
     prevTouch = touch;
 }
 
+
 const float thresh = 50.0;
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
@@ -779,7 +792,7 @@ const float thresh = 50.0;
     for ( UITouch * touch in touches )
     {
         CGPoint thisPoint = [touch locationInView:self.view];
-        if ( [touches count] > 1 ) [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(25.0,25.0) color:[UIColor yellowColor] delegate:self];
+        if ( [touches count] > 1 ) [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(25.0,25.0) color:[UIColor yellowColor] alpha:inAlpha delegate:self];
         if ( [self point:thisPoint isInside: quadrant[0]] ) 
         {
             if ( thisPoint.x > IPAD_WIDTH - thresh ) [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"random"];
@@ -808,7 +821,7 @@ const float thresh = 50.0;
             {
                 if ( [touches count] == 1 ) 
                 {
-                    [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(100.0,100.0) color:[UIColor greenColor] delegate:self];
+                    [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(100.0,100.0) color:[UIColor greenColor] alpha:inAlpha delegate:self];
                     [osc sendValue:2.0 withKey:@"chord"];
                 }
                 
@@ -817,7 +830,7 @@ const float thresh = 50.0;
             {
                 if ( [touches count] == 1 ) 
                 {
-                    [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(100.0,100.0) color:[UIColor greenColor] delegate:self];
+                    [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(100.0,100.0) color:[UIColor greenColor] alpha:inAlpha delegate:self];
                     [osc sendValue:3.0 withKey:@"chord"];
                 }
             }
@@ -830,7 +843,7 @@ const float thresh = 50.0;
         {
             CGPoint thisPoint = [touch locationInView:self.view];
             xtouch += thisPoint.x; ytouch += thisPoint.y;
-            [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(10.0,10.0) color:[UIColor yellowColor] delegate:self];
+            [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(10.0,10.0) color:[UIColor yellowColor] alpha:inAlpha delegate:self];
         }
         xtouch /= [[event allTouches] count]; ytouch /= [[event allTouches] count];
         CGPoint tapPoint = CGPointMake(xtouch / self.view.bounds.size.width, 1 - (ytouch / self.view.bounds.size.height));
@@ -838,7 +851,7 @@ const float thresh = 50.0;
         {
             [osc sendPoint:tapPoint withKey:@"bassTouchBegan"];
         }
-        [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:CGPointMake(xtouch, ytouch) size:CGSizeMake(70.0,70.0) color:[UIColor orangeColor] delegate:self];
+        [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:CGPointMake(xtouch, ytouch) size:CGSizeMake(70.0,70.0) color:[UIColor orangeColor] alpha:inAlpha delegate:self];
 
     }
 }
@@ -867,7 +880,7 @@ const float thresh = 50.0;
         for ( UITouch * touch in touches )
         {
             CGPoint thisPoint = [touch locationInView:self.view];
-            [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(10.0,10.0) color:[UIColor yellowColor] delegate:self];
+            [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(10.0,10.0) color:[UIColor yellowColor] alpha:inAlpha delegate:self];
             if ( [self point:thisPoint isInside: quadrant[0]] ) 
             {
                 if ( thisPoint.x > IPAD_WIDTH - thresh ) [osc sendDrumControlX:thisPoint.y/11.0 Y:thisPoint.x/8.0 withKey:@"random"];
@@ -893,10 +906,10 @@ const float thresh = 50.0;
         {
             CGPoint thisPoint = [touch locationInView:self.view];
             xtouch += thisPoint.x; ytouch += thisPoint.y;
-            [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(10.0,10.0) color:[UIColor yellowColor] delegate:self];
+            [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(10.0,10.0) color:[UIColor yellowColor] alpha:inAlpha delegate:self];
         }
         xtouch *= 0.25; ytouch *= 0.25;
-        [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:CGPointMake(xtouch, ytouch) size:CGSizeMake(10.0,10.0) color:[UIColor greenColor] delegate:self];
+        [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:CGPointMake(xtouch, ytouch) size:CGSizeMake(10.0,10.0) color:[UIColor greenColor] alpha:inAlpha delegate:self];
         [osc sendDrumControlX:ytouch/11.0 Y:xtouch/8.0 withKey:@"glitch"];
     }
     if ( [[event allTouches] count] == 3 )
@@ -906,10 +919,10 @@ const float thresh = 50.0;
         {
             CGPoint thisPoint = [touch locationInView:self.view];
             xtouch += thisPoint.x; ytouch += thisPoint.y;
-            [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(10.0,10.0) color:[UIColor yellowColor] delegate:self];
+            [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:thisPoint size:CGSizeMake(10.0,10.0) color:[UIColor yellowColor] alpha:inAlpha delegate:self];
         }
         xtouch *= 0.3333; ytouch *= 0.3333;
-        [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:CGPointMake(xtouch, ytouch) size:CGSizeMake(10.0,10.0) color:[UIColor greenColor] delegate:self];
+        [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:CGPointMake(xtouch, ytouch) size:CGSizeMake(10.0,10.0) color:[UIColor greenColor] alpha:inAlpha delegate:self];
         [osc sendDrumControlX:ytouch/11.0 Y:xtouch/8.0 withKey:@"stutter"];
     }
     
@@ -934,7 +947,7 @@ const float thresh = 50.0;
         CGPoint tapPoint = CGPointMake(xtouch / self.view.bounds.size.width, 1 - (ytouch / self.view.bounds.size.height));
         [osc sendPoint:tapPoint withKey:@"bassTouchMoved"];
 
-        [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:CGPointMake(xtouch, ytouch) size:CGSizeMake(10.0,10.0) color:[UIColor orangeColor] delegate:self];
+        [[feedborkDoodad alloc] initWithImageNamed:@"particle.png" superview:self.view center:CGPointMake(xtouch, ytouch) size:CGSizeMake(10.0,10.0) color:[UIColor orangeColor] alpha:inAlpha delegate:self];
     }
 }
 
