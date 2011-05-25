@@ -5,13 +5,16 @@ HidMsg msg;
 // cool great neat slew
 class Slew
 {
-    0.0 => float rate;
+    0.0 => float attack;
+    0.0 => float decay;
     0.0 => float target;
     0.0 => float val;
+    0.0 => float diff;
     
-    fun void setRate(float _rate)
+    fun void setRate(float _attack, float _decay)
     {
-        _rate => rate;
+        _attack => attack;
+        _decay => decay;
     }
     
     fun void setTarget(float _target)
@@ -23,7 +26,11 @@ class Slew
     {
         while (true)
         {
-            (target-val)*rate + val => val;
+            (target-val) => diff;
+            if ( diff > 0 )
+                diff*decay + val => val;
+            else
+                diff*attack + val => val;
             10::samp => now;
         }
     }
@@ -38,9 +45,14 @@ Slew bx; // right joystick x axis
 Slew by; // right joystick y axis
 Slew bz; // right joystick z axis
 
-ax.setRate(0.01); ay.setRate(0.01); az.setRate(0.01);
-bx.setRate(0.01); by.setRate(0.01); bz.setRate(0.01);
+ax.setRate(0.01,0.01); ay.setRate(0.005,0.0001); az.setRate(0.001,0.001);
+bx.setRate(0.01,0.01); by.setRate(0.005,0.0001); bz.setRate(0.001,0.001);
  
+ 
+Slew sfreqR, sfreqL;
+sfreqR.setRate(0.001,0.001);
+sfreqL.setRate(0.001,0.001);
+
 0 => int fp;
 
 
@@ -55,27 +67,49 @@ if( !hi.openJoystick( device ) ) me.exit();
 <<< "joystick '" + hi.name() + "' ready", "" >>>;
 spork ~GetGameTrakInput();
 
-SinOsc sinL => Gain sL => Gain gL => JCRev revL => dac.chan(0);
-SinOsc sinR => Gain sR => Gain gR => JCRev revR => dac.chan(1);
+SqrOsc sinL => Gain sL => Gain gL => JCRev revL => dac.chan(0);
+SqrOsc sinR => Gain sR => Gain gR => JCRev revR => dac.chan(1);
 
-SqrOsc triL => Gain tL => gL;
-SqrOsc triR => Gain tR => gR;
+TriOsc triL => Gain tL => gL;
+TriOsc triR => Gain tR => gR;
 
-0.1 => revL.gain => revR.gain;
+0.5 => triL.gain => triR.gain;
+0.7 => sinL.gain => sinR.gain;
+
+0.1 => revL.mix => revR.mix;
+
+[0, 2, 3, 5, 7, 10, 12, 14, 15, 18, 20, 22, 24, 26, 28, 30, 32] @=> int goodNotes[];
+
+42 => int base;
+
+fun float bucketFreq(float freq)
+{
+    Math.floor(freq) $ int => int which;
+    return Std.mtof(base + goodNotes[which]);
+}
 
 // main loop
 while(true) {
-    az.val => gL.gain;
-    bz.val => gR.gain;
+    -ay.val - 0.4 => float newgL;
+    if ( newgL < 0.0 ) 0.0 => newgL;
+    newgL => gL.gain;
+    -by.val - 0.4 =>float newgR;
+    if ( newgR < 0.0 ) 0.0 => newgR;
+    newgR => gR.gain;
     
-    (ax.val + 1)/1.0 => tL.gain;
-    (bx.val + 1)/1.0 => tR.gain;
+    (ax.val + 1)/2.0 => tL.gain;
+    (bx.val + 1)/2.0 => tR.gain;
     
-    2.0 - tL.gain() => sL.gain;
-    2.0 - tR.gain() => sR.gain;
+    1.0 - tL.gain() => sL.gain;
+    1.0 - tR.gain() => sR.gain;
     
-    (ay.val + 1) * 400.0 => sinL.freq => triL.freq;
-    (by.val + 1) * 400.0 => sinR.freq => triR.freq;
+    if ( -by.target > 0.4 )
+    {
+        bucketFreq( (1.0-az.val) * 9 ) => sfreqL.target;
+        bucketFreq( (1.0-bz.val) * 9 ) => sfreqR.target;
+    }
+    sfreqL.val => sinL.freq => triL.freq;
+    sfreqR.val => sinR.freq => triR.freq;
     
     2::samp => now;
     //<<< ax.val, ay.val, az.val, bx.val, by.val, bz.val >>>;
@@ -96,27 +130,27 @@ fun void GetGameTrakInput() {
             {
                 if( msg.which == 0 )
                 {
-                    msg.axisPosition => ax.target;
+                    msg.axisPosition => bx.target;
                 }
                 else if( msg.which == 1 ) 
                 {
-                    msg.axisPosition => ay.target;
+                    msg.axisPosition => by.target;
                 }
                 else if( msg.which == 2 ) 
                 {
-                    (msg.axisPosition*-1 + 1)/2.0 => az.target;
+                    (msg.axisPosition*-1 + 1)/2.0 => bz.target;
                 }
                 else if( msg.which == 3 ) 
                 {
-                    msg.axisPosition => bx.target;
+                    msg.axisPosition => ax.target;
                 }
                 else if( msg.which == 4 ) 
                 {
-                    msg.axisPosition => by.target;
+                    msg.axisPosition => ay.target;
                 }
                 else if( msg.which == 5 ) 
                 {
-                    (msg.axisPosition*-1 + 1)/2.0 => bz.target;
+                    (msg.axisPosition*-1 + 1)/2.0 => az.target;
                 }
             }
             
