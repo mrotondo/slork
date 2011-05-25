@@ -83,7 +83,6 @@ fun void GetGameTrakInput() {
                     1.0 / ((az + 2) * 12) => r_y_velocity_threshold;
                     
                     -0.5 + (az * 0.5 + 0.5) * 0.25 => r_y_position_threshold;
-                    <<< r_y_position_threshold >>>;
                     
                     r_instrument.setFrequency( 1 - ((az + 1) / 2));
                     
