@@ -1,1 +1,1 @@
-chuck noisedrums2.ck running_average.ck gametrak.ck
+chuck -c8 noisedrums2.ck running_average.ck gametrak.ck
