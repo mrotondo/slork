@@ -3,15 +3,22 @@ public class NoiseDrum
     10 => float min_frequency;
     250 => float max_frequency;
     
+    0 => int isKick;
+    
     200::ms => dur min_time_between_plays;
     now => time last_played;
     
     //Noise n => Gain g => ADSR e1=> dac;
     NRev r => dac;
-    0.05 => r.mix;
+    0.009 => r.mix;
     Noise n1 => BPF bpf1 => Gain g1 => ADSR e1=> r;
     Noise n2 => BPF bpf2 => Gain g2 => ADSR e2=> r;
-    0.8 => g1.gain;
+    SinOsc bassSin => e1;
+    
+    400 => bassSin.freq;
+    0.1 => bassSin.gain;
+    
+    0.4 => g1.gain;
     800 => bpf1.freq;
     8 => bpf1.Q;
     1::ms => e1.attackTime;
@@ -19,13 +26,13 @@ public class NoiseDrum
     0.01 => e1.sustainLevel;
     100::ms => e1.releaseTime;
 
-    0.8 => g1.gain;
-    800 => bpf1.freq;
-    4 => bpf1.Q;
-    0::ms => e1.attackTime;
-    150::ms => e1.decayTime;
-    0.05 => e1.sustainLevel;
-    200::ms => e1.releaseTime;
+    0.4 => g2.gain;
+    800 => bpf2.freq;
+    4 => bpf2.Q;
+    3::ms => e2.attackTime;
+    150::ms => e2.decayTime;
+    0.04 => e2.sustainLevel;
+    200::ms => e2.releaseTime;
     
     1 => e1.keyOff;
     1 => e2.keyOff;
@@ -46,7 +53,15 @@ public class NoiseDrum
     {
         if (now - last_played > min_time_between_plays)
         {  
-            <<<"trigger">>>;
+            <<<"trigger: " + amplitude>>>;
+            
+            amplitude * 9.0 => float temp;
+            if ( temp > 1.0 ) 1.0 => temp;
+            
+            0.7 * temp => snare.gain => kick.gain;
+            0.5 * temp => g1.gain => g2.gain;
+            0.2 * temp => bassSin.gain;
+            
             now => last_played;
             0 => snare.pos;
             0 => kick.pos;
@@ -66,10 +81,24 @@ public class NoiseDrum
         frequency * 8 => bpf1.freq;
         frequency * 4 => bpf2.freq;
         
-        1.0 - frequency_percent => gkick.gain;
-        frequency_percent => gsnare.gain;
+        if ( isKick )
+        {
+            
+            60 + (frequency_percent-0.5)*10 => bassSin.freq;
+            //0.0 => bassSin.gain;
+            1.0 => gkick.gain;
+            0.0 => gsnare.gain;
+            (frequency_percent)/3.0 + 0.8 => kick.rate => snare.rate;
+        }
+        else
+        {
+            400 + (frequency_percent-0.5)*80 => bassSin.freq;
+            1.0 - frequency_percent/6.0 => gsnare.gain;
+            frequency_percent/6.0 => gkick.gain;
+            (frequency_percent) + 0.5 => kick.rate => snare.rate;
+        }
         
-        (frequency_percent) + 0.5 => kick.rate => snare.rate;
+        
     }
     
     // TODO: differentiate left movement from right movement
