@@ -6,6 +6,9 @@ HidMsg msg;
 NoiseDrum r_instrument;
 NoiseDrum l_instrument;
 
+1 => r_instrument.isKick;
+0 => l_instrument.isKick;
+
 RunningAverage r_average_y_velocity;
 RunningAverage l_average_y_velocity;
 0.2 => float r_y_velocity_threshold;
@@ -83,7 +86,7 @@ fun void GetGameTrakInput() {
                     1.0 / ((az + 2) * 12) => r_y_velocity_threshold;
                     
                     -0.5 + (az * 0.5 + 0.5) * 0.25 => r_y_position_threshold;
-                    <<< r_y_position_threshold >>>;
+                    //<<< r_y_position_threshold >>>;
                     
                     r_instrument.setFrequency( 1 - ((az + 1) / 2));
                     
