@@ -1,6 +1,6 @@
 public class NoiseDrum
 {
-    10 => float min_frequency;
+    80 => float min_frequency;
     250 => float max_frequency;
     
     0 => int isKick;
@@ -88,7 +88,7 @@ public class NoiseDrum
             //0.0 => bassSin.gain;
             1.0 => gkick.gain;
             0.0 => gsnare.gain;
-            (frequency_percent)/3.0 + 0.8 => kick.rate => snare.rate;
+            (frequency_percent)/1.5 + 1.0 => kick.rate => snare.rate;
         }
         else
         {
