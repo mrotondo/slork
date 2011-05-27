@@ -140,10 +140,17 @@ masterVolume.setRate(0.0006,0.06);
 1.0 => masterVolume.val;
 
 // chain in to the channels
-ADSR adsr1 => LPF lpfL => Modulate modL => Gain masterL => NRev revL => dac.chan(0);
+ADSR adsr1 => LPF lpfL => Gain masterL => NRev revL => dac.chan(0);
 ADSR adsr2 => LPF lpfR => Gain masterR => NRev revR => dac.chan(1);
 
-Modulate modR => blackhole;
+// chain into more if possible
+if ( dac.channels() == 8 )
+{
+    dac.channels() => int numChannels;
+    revL => dac.chan(numChannels-1) => dac.chan(numChannels-3) => dac.chan(numChannels-5);
+    revR => dac.chan(numChannels-2) => dac.chan(numChannels-4) => dac.chan(numChannels-6);
+
+}
 
 // stereo delay
 Delay dlyL => lpfL;
@@ -163,13 +170,9 @@ dlyR => Gain fbR => dlyR;
 // set some starter parameters to avoid crazy town
 80.0 => lpfL.freq;
 80.0 => lpfR.freq;
-0.1 => revL.mix => revR.mix;
+0.04 => revL.mix => revR.mix;
 adsr1.set(0.05, 0.2, 0.2, 0.1);
 adsr2.set(0.03, 0.1, 0.2, 0.15);
-1.0 => modL.vibratoGain;
-0.0 => modL.randomGain;
-1.0 => modR.vibratoGain;
-0.0 => modR.randomGain;
 
 // here is where we actually assign the saws to stuff
 for ( 0 => int i; i < numSaws; i++ )
@@ -252,13 +255,14 @@ fun void updateParams()
         // update pitch spread
         Math.fabs(ax.val+1)*9 => float rDiff;
         Math.floor(rDiff) $ int => rNoteRange;
-        Math.fabs(rDiff - rNoteRange)*100 => float rPhasey;
-        rPhasey => modR.vibratoRate;
+        //Math.fabs(rDiff - rNoteRange)*100 => float rPhasey;
+        //rPhasey => modR.vibratoRate;
         
         Math.fabs(bx.val+1)*9 => float lDiff;
         Math.floor(lDiff) $ int => lNoteRange;
-        Math.fabs(lDiff - lNoteRange)*100 => float lPhasey;
-        lPhasey => modL.vibratoRate;
+        //Math.fabs(lDiff - lNoteRange)*100 => float lPhasey;
+        //lPhasey => modL.vibratoRate;
+        
         // update number of subdivisions per beat
         bucketSubdivision( Math.fabs( -ay.val + -by.val + 2 )*0.4 ) => numSubdivisions;
         // update master volume

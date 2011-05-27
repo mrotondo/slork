@@ -109,12 +109,10 @@ public class NoiseDrum
         }
         
         
-<<<<<<< HEAD
         (frequency_percent) + 0.5 => kick.rate => snare.rate;
         
         frequency * 2 => o.freq;
-=======
->>>>>>> 38d21160b6f58e4765374ad1e78f28858f9e0dae
+
     }
     
     // TODO: differentiate left movement from right movement
