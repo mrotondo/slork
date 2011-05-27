@@ -11,10 +11,11 @@
 
 @interface feedborkDoodad : UIImageView {
     id <feedborkDoodadDelegate> delegate;
+    float inAlpha;
 }
 
 @property (nonatomic,retain) id <feedborkDoodadDelegate> delegate;
-- (id)initWithImageNamed:(NSString*)_imageName superview:(UIView*)sview center:(CGPoint)_center size:(CGSize)_size color:(UIColor*)_color delegate:(id)_delegate;
+- (id)initWithImageNamed:(NSString*)_imageName superview:(UIView*)sview center:(CGPoint)_center size:(CGSize)_size color:(UIColor*)_color alpha:(float)_alpha delegate:(id)_delegate;
 - (void)animateMe:(CGPoint)originalcenter;
 
 @end

@@ -47,7 +47,15 @@ public class NoiseDrum
     snare.samples() - 1 => snare.pos;
     kick.samples() - 1 => kick.pos;
     
-    //TriOsc o =>
+    TriOsc o => LPF lpf => Gain g3 => ADSR e3 => r;
+    0.1 => g3.gain;
+    200 => lpf.freq;
+    100::ms => e3.attackTime;
+    100::ms => e3.decayTime;
+    0.05 => e3.sustainLevel;
+    300::ms => e3.releaseTime;
+    
+    1 => e3.keyOff;
     
     fun void play(float amplitude)
     {
@@ -68,10 +76,12 @@ public class NoiseDrum
             // amplitude => e1.target
             1 => e1.keyOn;
             1 => e2.keyOn;
-            500::ms => now;
+            1 => e3.keyOn;
+            300::ms => now; // 500 before
             // TODO: Check that it hasn't been less than 500 ms since the last hit
             1 => e1.keyOff;
             1 => e2.keyOff;
+            1 => e3.keyOff;
         }
     }
     
@@ -99,6 +109,12 @@ public class NoiseDrum
         }
         
         
+<<<<<<< HEAD
+        (frequency_percent) + 0.5 => kick.rate => snare.rate;
+        
+        frequency * 2 => o.freq;
+=======
+>>>>>>> 38d21160b6f58e4765374ad1e78f28858f9e0dae
     }
     
     // TODO: differentiate left movement from right movement

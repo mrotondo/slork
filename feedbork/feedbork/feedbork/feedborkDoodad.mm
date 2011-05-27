@@ -14,7 +14,6 @@
 
 - (UIImage*)createParticle:(UIImage*)maskImage withColor:(UIColor*)_color
 {
-
     [self setBackgroundColor:_color];
     UIGraphicsBeginImageContext(self.bounds.size);
     [self.layer renderInContext:UIGraphicsGetCurrentContext()];
@@ -40,11 +39,12 @@
 }
 
 // override init to include setting the IP and port for OSC
-- (id)initWithImageNamed:(NSString*)_imageName superview:(UIView*)sview center:(CGPoint)_center size:(CGSize)_size color:(UIColor*)_color delegate:(id)_delegate
+- (id)initWithImageNamed:(NSString*)_imageName superview:(UIView*)sview center:(CGPoint)_center size:(CGSize)_size color:(UIColor*)_color alpha:(float)_alpha delegate:(id)_delegate
 {
     if ( (self = [super init]) )
     {
         self.frame = CGRectMake(10.0, 10.0, _size.width, _size.height);
+        inAlpha = _alpha;
         self.image = [self createParticle:[UIImage imageNamed:_imageName] withColor:_color];
         [sview addSubview:self];
         self.center = _center;
@@ -65,7 +65,7 @@
                         options:UIViewAnimationOptionAllowUserInteraction
                      animations:^{ 
                          self.transform = CGAffineTransformConcat(CGAffineTransformMakeScale(5.5, 5.5),CGAffineTransformMakeRotation((rand()%10 - 5)*360.0));
-                         self.alpha = 1.0;
+                         self.alpha = inAlpha;
                          
                      } 
                      completion:^(BOOL finished){

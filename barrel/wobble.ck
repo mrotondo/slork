@@ -48,7 +48,6 @@ Slew bz; // right joystick z axis
 ax.setRate(0.01,0.01); ay.setRate(0.005,0.01); az.setRate(0.01,0.01);
 bx.setRate(0.01,0.01); by.setRate(0.005,0.01); bz.setRate(0.01,0.01);
  
- 
 Slew sfreqR, sfreqL;
 sfreqR.setRate(0.001,0.001);
 sfreqL.setRate(0.001,0.001);
@@ -65,8 +64,6 @@ if( !hi.openJoystick( device ) ) me.exit();
 
 <<< "joystick '" + hi.name() + "' ready", "" >>>;
 spork ~GetGameTrakInput();
-
-
 
 40 => float f;
 
