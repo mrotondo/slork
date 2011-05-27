@@ -7,9 +7,9 @@ class Slew
 {
     0.0 => float attack;
     0.0 => float decay;
-    3.0 => float target;
-    3.0 => float val;
-    3.0 => float diff;
+    0.0 => float target;
+    0.0 => float val;
+    0.0 => float diff;
     
     fun void setRate(float _attack, float _decay)
     {
@@ -67,8 +67,8 @@ if( !hi.openJoystick( device ) ) me.exit();
 <<< "joystick '" + hi.name() + "' ready", "" >>>;
 spork ~GetGameTrakInput();
 
-SqrOsc sinL => Gain sL => ResonZ fL => Gain gL => JCRev revL => dac.chan(0);
-SqrOsc sinR => Gain sR => ResonZ fR => Gain gR => JCRev revR => dac.chan(1);
+SqrOsc sinL => Gain sL => ResonZ fL => Gain gL => JCRev revL => dac.chan(0) => dac.chan(2) => dac.chan(4);
+SqrOsc sinR => Gain sR => ResonZ fR => Gain gR => JCRev revR => dac.chan(1) => dac.chan(3) => dac.chan(5);
 
 fL => Delay dlyL => revL;
 dlyL => Gain fbL => dlyL;
@@ -112,14 +112,15 @@ while(true) {
     (ax.val + 1)/2.0 => tL.gain;
     (bx.val + 1)/2.0 => tR.gain;
     
-    (ax.val+1)*50.0 => fL.Q;
-    (bx.val+1)*50.0 => fR.Q;
-    
+    (ax.val+1)*50.0 + 0.1 => fL.Q;
+    (bx.val+1)*50.0 + 0.1 => fR.Q;
+
     1.0 - tL.gain() => sL.gain;
     1.0 - tR.gain() => sR.gain;
     
     ax.val - bx.val + 2.0 => float mod;
-       
+    
+
     if ( -by.target > 0.4 )
     {
         bucketFreq( (1.0-bz.val) * 9 ) => sfreqR.target;
@@ -139,8 +140,8 @@ while(true) {
     -ay.val => float tempAy;
     -by.val => float tempBy;
     
-    if ( tempAy < 0.0003 ) 0.0003 => tempAy;
-    if ( tempBy < 0.0003 ) 0.0003 => tempBy;
+    if ( tempAy < 0.3 ) 0.3 => tempAy;
+    if ( tempBy < 0.3 ) 0.3 => tempBy;
     
     tempAy*3000.0 + sfreqL.val/10.0 => fL.freq;
     tempBy*3000.0 + sfreqR.val/10.0 => fR.freq;

@@ -104,6 +104,14 @@ fun void setLFOFrequency(float freq_percent)
 	f => env.freq;
 }
 
+fun void setGain(float gain_percent)
+{
+	if (gain_percent > 0.5) 
+	{
+		(gain_percent - 0.5) * 2 => g1.gain;
+	}
+}
+
 // main loop
 while(true) {
     1::samp => now;
@@ -115,10 +123,12 @@ while(true) {
     Math.fabs((ax.val - bx.val) / 2) => float x_diff;
     setLFOFrequency(x_diff);
 
+    ((ay.val + by.val) / -2) * 0.5 + 0.5 => float avg_y; // normalize to [0, 1] with 0 being all the way down
+    setGain(avg_y);
+
     1::samp => now;
     //<<< ax.val, ay.val, az.val, bx.val, by.val, bz.val >>>;
 }
-
 
 fun void GetGameTrakInput() {
     while( true )
