@@ -129,7 +129,7 @@ fun void GetGameTrakInput() {
 //----------------------------------------------------------------
 
 // set up the saws
-10 => int numSaws;
+16 => int numSaws;
 BlitSaw bs[numSaws];
 Slew freq[numSaws];
 
