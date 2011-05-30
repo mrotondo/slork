@@ -67,8 +67,8 @@ if( !hi.openJoystick( device ) ) me.exit();
 <<< "joystick '" + hi.name() + "' ready", "" >>>;
 spork ~GetGameTrakInput();
 
-SqrOsc sinL => Gain sL => ResonZ fL => Gain gL => JCRev revL => dac.chan(0) => dac.chan(2) => dac.chan(4);
-SqrOsc sinR => Gain sR => ResonZ fR => Gain gR => JCRev revR => dac.chan(1) => dac.chan(3) => dac.chan(5);
+SqrOsc sinL => Gain sL => ResonZ fL => Gain gL => JCRev revL => dac.chan(0);// => dac.chan(2) => dac.chan(4);
+SqrOsc sinR => Gain sR => ResonZ fR => Gain gR => JCRev revR => dac.chan(1);// => dac.chan(3) => dac.chan(5);
 
 fL => Delay dlyL => revL;
 dlyL => Gain fbL => dlyL;

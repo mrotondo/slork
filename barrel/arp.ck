@@ -53,8 +53,8 @@ Slew bx; // right joystick x axis
 Slew by; // right joystick y axis
 Slew bz; // right joystick z axis
 
-ax.setRate(0.1,0.1); ay.setRate(0.05,0.1); az.setRate(0.001,0.001);
-bx.setRate(0.1,0.1); by.setRate(0.05,0.1); bz.setRate(0.001,0.001);
+ax.setRate(0.5,0.5); ay.setRate(0.1,0.1); az.setRate(0.01,0.01);
+bx.setRate(0.5,0.5); by.setRate(0.1,0.1); bz.setRate(0.01,0.01);
 0 => int fp;
 // which joystick
 0 => int device;
@@ -135,7 +135,7 @@ Slew freq[numSaws];
 
 // master volume
 Slew masterVolume;
-masterVolume.setRate(0.0006,0.06);
+masterVolume.setRate(0.0005,0.0008);
 1.0 => masterVolume.target;
 1.0 => masterVolume.val;
 
@@ -192,7 +192,7 @@ for ( 0 => int i; i < numSaws; i++ )
 }
 
 // 18 total notes for goodNotes
-[0, 2, 4, 7, 9, 11, 12, 14, 16, 19, 21, 23, 24, 26, 28, 31, 33, 35] @=> int goodNotes[];
+[0, 2, 4, 7, 9, 11, 12, 14, 16, 19, 21, 23, 24, 26, 28, 31, 33, 35, 36, 38, 40, 43, 45, 47, 48, 50, 52, 55, 57, 59, 60, 62, 64, 67, 69, 71] @=> int goodNotes[];
 // two octaves of major7
 [0, 4, 7, 11, 12, 14, 16, 19, 23, 24] @=> int maj7[];
 int chord[];
@@ -210,7 +210,7 @@ int chord[];
 
 0 => int tempy;
 1.0 => float numSubdivisions;
-42 => int root;
+30 => int root;
 0 => int melodyNote;
 0 => int prevMelodyNote;
 0.25 => float nearnessThresh;
@@ -221,17 +221,13 @@ fun float arpFreq(int which)
     //if ( noteRange >= 2 ) Math.rand2(0,noteRange/2) => tempy;
     //else 0 => tempy; 
     //return Std.mtof(root + base + octaves[tempy] + maj7[which]);
-    if ( which > 17 ) 17 => which;
+    6 +=> which; // for bass extension
+    if ( which > 35 ) 35 => which;
+    if ( which < 0 ) 0 => which;
     return Std.mtof(root + base + goodNotes[which]);
 
 }
 
-fun int melFreq(float which)
-{
-    Math.floor( which * 3.3 ) $ int => int temp;
-    if ( temp > 12 ) 12 => temp;
-    return goodNotes[temp];
-}
 
 fun float bucketSubdivision(float delta)
 {
@@ -253,12 +249,25 @@ fun void updateParams()
         // update detune spread
         Math.fabs(ay.val-by.val)*spreadRange => spread;
         // update pitch spread
-        Math.fabs(ax.val+1)*9 => float rDiff;
+        Math.fabs(ax.val+1)*10 => float rDiff;
+        Math.floor(rDiff) $ int => rNoteRange;
+
+        if ( az.val > 0.35 && rNoteRange >= 19 ) 
+            (az.val - 0.35)*15 +=> rDiff;
+        else if ( az.val > 0.35 && rNoteRange <= 0 ) 
+            (az.val - 0.35)*15 -=> rDiff;
+        
         Math.floor(rDiff) $ int => rNoteRange;
         //Math.fabs(rDiff - rNoteRange)*100 => float rPhasey;
         //rPhasey => modR.vibratoRate;
         
-        Math.fabs(bx.val+1)*9 => float lDiff;
+        Math.fabs(bx.val+1)*10 => float lDiff;
+        Math.floor(lDiff) $ int => lNoteRange;
+
+        if ( bz.val > 0.35 && lNoteRange >= 19 ) 
+            (bz.val - 0.35)*15 +=> lDiff;
+        else if ( bz.val > 0.35 && lNoteRange <= 0 ) 
+            (bz.val - 0.35)*15 -=> lDiff;
         Math.floor(lDiff) $ int => lNoteRange;
         //Math.fabs(lDiff - lNoteRange)*100 => float lPhasey;
         //lPhasey => modL.vibratoRate;
@@ -296,12 +305,22 @@ while (true)
     0 => int bail;
     while ( randnote == prevrandnote && lNoteRange != rNoteRange )
     {
+        // break if we have crossed streams
+        if ( lNoteRange > rNoteRange + 1 )
+        {
+            killVolume();
+             break;
+         }
+        restoreVolume(); // if it is down
         bail++;
         arpFreq( Math.rand2(lNoteRange,rNoteRange) ) => randnote;
         if (bail > 20 ) break;
     }
-    if ( lNoteRange == rNoteRange )
+    if ( lNoteRange == rNoteRange || lNoteRange == rNoteRange + 1 )
+    {
+        restoreVolume(); // if it is down
         arpFreq( Math.rand2(lNoteRange,rNoteRange) ) => randnote;
+    }
     <<< lNoteRange, "----", rNoteRange >>>;
     randnote => prevrandnote;
     
