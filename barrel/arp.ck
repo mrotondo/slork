@@ -117,7 +117,7 @@ fun void GetGameTrakInput() {
                 <<< "footpedal released " + fp >>>;
                 spork ~ restoreVolume();
                 spork ~ changeChord();
-                                
+               	             
             }
         }
     }
@@ -291,10 +291,14 @@ fun void restoreVolume()
     1.0 => masterVolume.target;
 }
 
+OscSend xmit;
+xmit.setHost("127.0.0.1", 9999);
 fun void changeChord()
 {
     3 +=> base;
     if ( base >= 12 ) 0 => base;
+    xmit.startMsg("/setRoot, i");
+    xmit.addInt(root + base);
 }
 
 spork ~ updateParams();
