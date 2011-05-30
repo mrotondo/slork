@@ -48,10 +48,6 @@ Slew bz; // right joystick z axis
 ax.setRate(0.01,0.01); ay.setRate(0.005,0.01); az.setRate(0.01,0.01);
 bx.setRate(0.01,0.01); by.setRate(0.005,0.01); bz.setRate(0.01,0.01);
  
-Slew sfreqR, sfreqL;
-sfreqR.setRate(0.001,0.001);
-sfreqL.setRate(0.001,0.001);
-
 0 => int fp;
 
 // which joystick
@@ -65,17 +61,43 @@ if( !hi.openJoystick( device ) ) me.exit();
 <<< "joystick '" + hi.name() + "' ready", "" >>>;
 spork ~GetGameTrakInput();
 
-40 => float f;
-
+42 => int chord_root;
+0 => int interval;
 Gain g1 => LPF lf => dac;
 
 SawOsc s1 => g1;
 SawOsc s2 => g1;
 SawOsc s3 => g1;
 
-f * 0.99 => s1.freq;
-f => s2.freq;
-f * 1.01 => s3.freq;
+OscRecv orec;
+9999 => orec.port;
+orec.listen();
+orec.event("/setRoot,i") @=> OscEvent root_event;
+
+
+fun void setFrequency(float f)
+{
+	f * 0.99 => s1.freq;
+	f => s2.freq;
+	f * 1.01 => s3.freq;
+}
+setFrequency(Std.mtof(chord_root));
+
+fun void listenForRoot()
+{
+    while (true)
+    {
+        root_event => now;
+        while( root_event.nextMsg() != 0 )
+        {
+            root_event.getInt() => chord_root;
+        }
+	<<< "Got a root! " + chord_root >>>;
+	Std.mtof(chord_root + interval) => float f;
+	setFrequency(f);
+    }
+}
+spork ~ listenForRoot();
 
 8 => float env_freq;
 SawOsc env => blackhole;
@@ -85,19 +107,12 @@ env_freq => env.freq;
 
 20 => float min_freq;
 100 => float max_freq;
-fun void setFrequency(float freq_percent)
-{
-	min_freq + (max_freq - min_freq) * freq_percent => f;
-	f * 0.99 => s1.freq;
-	f => s2.freq;
-	f * 1.01 => s3.freq;
-}
 
 1 => float min_lfo_freq;
 16 => float max_lfo_freq;
 fun void setLFOFrequency(float freq_percent)
 {
-	min_lfo_freq + (max_lfo_freq - min_lfo_freq) * freq_percent => f;
+	min_lfo_freq + (max_lfo_freq - min_lfo_freq) * freq_percent => float f;
 	f => env.freq;
 }
 
@@ -109,13 +124,32 @@ fun void setGain(float gain_percent)
 	}
 }
 
+fun void setInterval(float percent)
+{
+	<<< percent >>>;
+	if (percent < 0.4)
+	{
+		0 => interval;
+	}
+	if (percent > 0.4 && percent < 0.7)
+	{
+		7 => interval;
+	}
+	else if (percent >= 0.7)
+	{
+		12 => interval;
+	}
+	Std.mtof(chord_root + interval) => float f;
+	setFrequency(f);
+}
+
 // main loop
 while(true) {
     1::samp => now;
     (env.last() * 0.5 + 0.5) * env_mul + env_add => lf.freq;
 
     (bz.val + az.val) / 2 => float avg_z;
-    setFrequency(avg_z);
+    setInterval(avg_z);
 
     Math.fabs((ax.val - bx.val) / 2) => float x_diff;
     setLFOFrequency(x_diff);
