@@ -292,7 +292,7 @@ fun void restoreVolume()
 }
 
 OscSend xmit;
-xmit.setHost("127.0.0.1", 9999);
+xmit.setHost("192.168.179.240", 9999);
 fun void changeChord()
 {
     3 +=> base;
