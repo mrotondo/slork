@@ -47,7 +47,10 @@ Slew bz; // right joystick z axis
 
 ax.setRate(0.01,0.01); ay.setRate(0.005,0.01); az.setRate(0.01,0.01);
 bx.setRate(0.01,0.01); by.setRate(0.005,0.01); bz.setRate(0.01,0.01);
- 
+
+0 => ax.val;
+0 => bx.val; 
+
 0 => int fp;
 
 // which joystick
@@ -154,7 +157,6 @@ fun void setInterval(float percent)
 	1.5 => float scale;
 	scale *=> percent;
 
-	//<<< percent >>>;
 	Math.floor( percent*numNotes ) $ int => int ind;
     if ( ind < 0 ) 0 => ind;
     if ( ind > numNotes-1 ) numNotes-1 => ind;
@@ -162,16 +164,20 @@ fun void setInterval(float percent)
 	Std.mtof(chord_root + goodNotes[ind]) => float f;
 	setFrequency(f);
 }
+1.0 => float offset;
+
 spork ~playNotes();
 1 => int canPlay;
 // main loop
+
 while(true) {
     //(env.last() * 0.5 + 0.5) * env_mul + env_add => lf.freq;
 
     //Math.fabs((ax.val - bx.val) / 2) => float x_diff;
     //setLFOFrequency(x_diff);
+    -(ax.val + bx.val) / 4.0 + 0.5 => offset;
     
-    ((ay.val + by.val) / -2) * 0.5 + 0.5 => float avg_y; // normalize to [0, 1] with 0 being all the way down    
+    ((ay.val + by.val) / -2) * 0.5 + 1.0 => float avg_y; // normalize to [0, 1] with 0 being all the way down    
     (bz.val + az.val) / 2 => float avg_z;
     if ( avg_y > 0.5 ) setInterval(avg_z);
     setGain(avg_y);
@@ -182,14 +188,16 @@ while(true) {
 
 fun void playNotes()
 {
+    150::ms => dur note_length;
     while (true)
     {
+	note_length - ((now + offset * note_length) % note_length) => dur wait;
+
         adsr.keyOn();
         s4.noteOn(1);
-        100::ms => now;
+	wait => now;
         adsr.keyOff();
         s4.noteOff(1);
-        50::ms => now;
     }
 }
 
