@@ -62,6 +62,7 @@ if( !hi.openJoystick( device ) ) me.exit();
 spork ~GetGameTrakInput();
 
 42 => int chord_root;
+0 => int rootOffset;
 0 => int interval;
 Gain g1 => LPF lf => dac;
 
@@ -93,8 +94,10 @@ fun void listenForRoot()
             root_event.getInt() => chord_root;
         }
 	<<< "Got a root! " + chord_root >>>;
-	Std.mtof(chord_root + interval) => float f;
-	setFrequency(f);
+	if ( chord_root == 3 ) 2 => rootOffset;
+    else if ( chord_root == 6 ) 4 => rootOffset;
+    else if ( chord_root == 9 ) 6 => rootOffset;
+    else if ( chord_root == 0 ) 8 => rootOffset;
     }
 }
 spork ~ listenForRoot();
@@ -124,28 +127,22 @@ fun void setGain(float gain_percent)
 	}
 }
 
+7 => int numNotes;
+[-12, -10, -8, -5, -3, -1, 0, 2, 4, 7, 9, 11, 12] @=> int goodNotes[];
+
 fun void setInterval(float percent)
 {
-	<<< percent >>>;
-	if (percent < 0.4)
-	{
-		0 => interval;
-	}
-	if (percent > 0.4 && percent < 0.7)
-	{
-		7 => interval;
-	}
-	else if (percent >= 0.7)
-	{
-		12 => interval;
-	}
-	Std.mtof(chord_root + interval) => float f;
+	//<<< percent >>>;
+	Math.floor( percent*numNotes ) $ int => int ind;
+    if ( ind < 0 ) 0 => ind;
+    if ( ind > numNotes-1 ) numNotes-1 => ind;
+    
+	Std.mtof(chord_root + goodNotes[ind+6-rootOffset]) => float f;
 	setFrequency(f);
 }
 
 // main loop
 while(true) {
-    1::samp => now;
     (env.last() * 0.5 + 0.5) * env_mul + env_add => lf.freq;
 
     (bz.val + az.val) / 2 => float avg_z;
@@ -157,7 +154,7 @@ while(true) {
     ((ay.val + by.val) / -2) * 0.5 + 0.5 => float avg_y; // normalize to [0, 1] with 0 being all the way down
     setGain(avg_y);
 
-    1::samp => now;
+    10::samp => now;
     //<<< ax.val, ay.val, az.val, bx.val, by.val, bz.val >>>;
 }
 
