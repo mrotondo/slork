@@ -5,7 +5,7 @@ HidMsg msg;
 //----------------------------------------------------------------
 // cool great neat slew
 //----------------------------------------------------------------
-class Slew
+class CoolGreatNeatSlew
 {
     0.0 => float attack;
     0.0 => float decay;
@@ -46,12 +46,12 @@ class Slew
 // GameTrak Code
 //----------------------------------------------------------------
 // all joystick values are roughly normalized -1 to 1
-Slew ax; // left joystick x axis
-Slew ay; // left joystick y axis
-Slew az; // left joystick z axis
-Slew bx; // right joystick x axis
-Slew by; // right joystick y axis
-Slew bz; // right joystick z axis
+CoolGreatNeatSlew ax; // left joystick x axis
+CoolGreatNeatSlew ay; // left joystick y axis
+CoolGreatNeatSlew az; // left joystick z axis
+CoolGreatNeatSlew bx; // right joystick x axis
+CoolGreatNeatSlew by; // right joystick y axis
+CoolGreatNeatSlew bz; // right joystick z axis
 
 ax.setRate(0.5,0.5); ay.setRate(0.1,0.1); az.setRate(0.01,0.01);
 bx.setRate(0.5,0.5); by.setRate(0.1,0.1); bz.setRate(0.01,0.01);
@@ -131,10 +131,10 @@ fun void GetGameTrakInput() {
 // set up the saws
 16 => int numSaws;
 BlitSaw bs[numSaws];
-Slew freq[numSaws];
+CoolGreatNeatSlew freq[numSaws];
 
 // master volume
-Slew masterVolume;
+CoolGreatNeatSlew masterVolume;
 masterVolume.setRate(0.0005,0.0008);
 1.0 => masterVolume.target;
 1.0 => masterVolume.val;
@@ -191,7 +191,7 @@ for ( 0 => int i; i < numSaws; i++ )
     freq[i].setRate(0.1,0.1);
 }
 
-// 18 total notes for goodNotes
+// 36 total notes for goodNotes
 [0, 2, 4, 7, 9, 11, 12, 14, 16, 19, 21, 23, 24, 26, 28, 31, 33, 35, 36, 38, 40, 43, 45, 47, 48, 50, 52, 55, 57, 59, 60, 62, 64, 67, 69, 71] @=> int goodNotes[];
 // two octaves of major7
 [0, 4, 7, 11, 12, 14, 16, 19, 23, 24] @=> int maj7[];
@@ -199,7 +199,7 @@ int chord[];
 
 [0, 12, 24, 36, 48] @=> int octaves[];
 
-0 => int base;
+0 => int base => int indexOffset;
 
 0.03 => float spread;
 0.04 => float spreadRange;
@@ -210,7 +210,7 @@ int chord[];
 
 0 => int tempy;
 1.0 => float numSubdivisions;
-30 => int root;
+18 => int root;
 0 => int melodyNote;
 0 => int prevMelodyNote;
 0.25 => float nearnessThresh;
@@ -221,7 +221,9 @@ fun float arpFreq(int which)
     //if ( noteRange >= 2 ) Math.rand2(0,noteRange/2) => tempy;
     //else 0 => tempy; 
     //return Std.mtof(root + base + octaves[tempy] + maj7[which]);
-    6 +=> which; // for bass extension
+    12 +=> which; // for bass extension    
+    which + indexOffset => which; // for index offset    
+    
     if ( which > 35 ) 35 => which;
     if ( which < 0 ) 0 => which;
     return Std.mtof(root + base + goodNotes[which]);
@@ -296,7 +298,9 @@ xmit.setHost("192.168.179.240", 9999);
 fun void changeChord()
 {
     3 +=> base;
+    2 -=> indexOffset;
     if ( base >= 12 ) 0 => base;
+    if ( indexOffset <= -8 ) 0 => indexOffset;
     xmit.startMsg("/setRoot, i");
     xmit.addInt(root + base);
 }
