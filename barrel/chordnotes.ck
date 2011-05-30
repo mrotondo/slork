@@ -61,26 +61,58 @@ if( !hi.openJoystick( device ) ) me.exit();
 <<< "joystick '" + hi.name() + "' ready", "" >>>;
 spork ~GetGameTrakInput();
 
+dac.channels() => int numChans;
+if ( numChans == 8 ) 6 => numChans;
+
 42 => int chord_root;
 0 => int rootOffset;
 0 => int interval;
-Gain g1 => LPF lf => NRev r => ADSR adsr => dac;
+Delay dly[numChans];
+Gain   fb[numChans];
+Gain g1 => LPF lf => NRev r => ADSR adsr;
 
+for ( 0 => int i; i < numChans; i++ )
+{
+    dly[i] => dac.chan(i);
+    dly[i] => fb[i] => dly[i];
+    0.65 => dly[i].gain;
+    0.999 => fb[i].gain;
+    600::ms => dly[i].max;
+    150::ms => dly[i].delay;
+}
+
+-1 => int lastChan;
+0 => int newChan;
+
+fun void assignChannel()
+{
+    Math.rand2(0, numChans-1) => newChan;
+    adsr => blackhole;
+    if ( lastChan >= 0 ) adsr =< dly[lastChan];
+    adsr => dly[newChan];
+    newChan => lastChan;
+}
+
+assignChannel();
+
+0.0 => g1.gain;
 
 Slew gainSlew;
 gainSlew.setRate(0.001,0.1);
+0.0 => gainSlew.target;
+0.0 => gainSlew.val;
 
 adsr.set( 0.01, 0.08, .1, 0.3 ); 
-1800 => lf.freq;
+1500 => lf.freq;
 4 => lf.Q;
-0.08 => r.mix;
+0.09 => r.mix;
 BlitSaw s1 => g1;
-SinOsc s2 => blackhole;//g1;
+SinOsc s2 => g1;
 Blit s3 => g1;
 Wurley s4 => g1;
 0.5 => s4.gain;
 
-
+0.7 => s2.gain;
 0.6 => s1.gain => s3.gain;
 
 OscRecv orec;
@@ -116,54 +148,42 @@ fun void listenForRoot()
 }
 spork ~ listenForRoot();
 
-8 => float env_freq;
-TriOsc env => blackhole;
-//env.harmonics(0);
-env_freq => env.freq;
-40 => float env_add;
-4960 => float env_mul;
-
-20 => float min_freq;
-100 => float max_freq;
-
-1 => float min_lfo_freq;
-16 => float max_lfo_freq;
-fun void setLFOFrequency(float freq_percent)
-{
-	min_lfo_freq + (max_lfo_freq - min_lfo_freq) * freq_percent => float f;
-	f => env.freq;
-}
+1500 => float min_lpf_freq;
+3500 => float max_lpf_freq;
 
 fun void setGain(float gain_percent)
 {
-	if (gain_percent > 0.4) 
+	if (gain_percent > 0.5) 
 	{
-		(gain_percent - 0.4) * 2 => gainSlew.target;
+		(gain_percent - 0.5) * 2 => gainSlew.target;
 
 	}
     else
         0.0 => gainSlew.target;
+        
     gainSlew.val => g1.gain;
 }
 
-7 => int numNotes;
-[0, 2, 4, 7, 9, 11, 12] @=> int goodNotes[];
+fun void setLPF(float gain_percent)
+{
+    (max_lpf_freq - min_lpf_freq)*gainSlew.val + min_lpf_freq => lf.freq;
+
+}
+
+13 => int numNotes;
+[0, 2, 4, 7, 9, 11, 12, 14, 16, 19, 21, 23, 24] @=> int goodNotes[];
 
 fun void setInterval(float percent)
 {
-	1.5 => float scale;
-	scale *=> percent;
-
 	//<<< percent >>>;
 	Math.floor( percent*numNotes ) $ int => int ind;
     if ( ind < 0 ) 0 => ind;
     if ( ind > numNotes-1 ) numNotes-1 => ind;
     
-	Std.mtof(chord_root + goodNotes[ind]) => float f;
+	Std.mtof(chord_root + goodNotes[numNotes-ind-1]) => float f;
 	setFrequency(f);
 }
 spork ~playNotes();
-1 => int canPlay;
 // main loop
 while(true) {
     //(env.last() * 0.5 + 0.5) * env_mul + env_add => lf.freq;
@@ -173,8 +193,9 @@ while(true) {
     
     ((ay.val + by.val) / -2) * 0.5 + 0.5 => float avg_y; // normalize to [0, 1] with 0 being all the way down    
     (bz.val + az.val) / 2 => float avg_z;
-    if ( avg_y > 0.5 ) setInterval(avg_z);
+    if ( avg_y < 0.46 ) setInterval(avg_z);
     setGain(avg_y);
+    setLPF(avg_y);
     
     10::samp => now;
     //<<< ax.val, ay.val, az.val, bx.val, by.val, bz.val >>>;
@@ -184,12 +205,18 @@ fun void playNotes()
 {
     while (true)
     {
-        adsr.keyOn();
-        s4.noteOn(1);
-        100::ms => now;
-        adsr.keyOff();
-        s4.noteOff(1);
-        50::ms => now;
+        assignChannel();
+        ((ay.val + by.val) / -2) * 0.5 + 0.5 => float avg_y; // normalize to [0, 1] with 0 being all the way down    
+        if ( avg_y > 0.5 )
+        {
+            adsr.keyOn();
+            s4.noteOn(1);
+            100::ms => now;
+            adsr.keyOff();
+            s4.noteOff(1);
+            50::ms => now;
+        }
+        else 150::ms => now;
     }
 }
 
