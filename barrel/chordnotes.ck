@@ -121,6 +121,7 @@ OscRecv orec;
 9999 => orec.port;
 orec.listen();
 orec.event("/setRoot,i") @=> OscEvent root_event;
+orec.event("/sync,i") @=> OscEvent sync_event;
 
 
 fun void setFrequency(float f)
@@ -143,12 +144,34 @@ fun void listenForRoot()
         }
 	<<< "Got a root! " + chord_root >>>;
 	if ( chord_root == 3 ) 2 => rootOffset;
-    else if ( chord_root == 6 ) 4 => rootOffset;
-    else if ( chord_root == 9 ) 6 => rootOffset;
-    else if ( chord_root == 0 ) 8 => rootOffset;
+    	else if ( chord_root == 6 ) 4 => rootOffset;
+    	else if ( chord_root == 9 ) 6 => rootOffset;
+    	else if ( chord_root == 0 ) 8 => rootOffset;
     }
 }
 spork ~ listenForRoot();
+
+
+now => time sync_point;
+fun void listenForSync()
+{
+    while (true)
+    {
+        sync_event => now;
+
+	//<<< "Sync!" >>>;
+	//<<< now >>>;
+
+        while( sync_event.nextMsg() != 0 )
+        {
+            sync_event.getInt() => int beat_length_ms;
+        }
+
+	now => sync_point;
+
+    }
+}
+spork ~ listenForSync();
 
 1500 => float min_lpf_freq;
 3500 => float max_lpf_freq;
@@ -169,7 +192,6 @@ fun void setGain(float gain_percent)
 fun void setLPF(float gain_percent)
 {
     (max_lpf_freq - min_lpf_freq)*gainSlew.val + min_lpf_freq => lf.freq;
-
 }
 
 13 => int numNotes;
@@ -191,16 +213,9 @@ fun void setInterval(float percent)
 spork ~playNotes();
 // main loop
 
-0.0 => float offset_normalization;
-
-
 while(true) {
-    //(env.last() * 0.5 + 0.5) * env_mul + env_add => lf.freq;
-
     Math.fabs((ax.val - bx.val) / 2) => float x_diff;
-    //5::ms + (10 * x_diff)::ms => adsr.attackTime;
     70::ms + (100 * x_diff)::ms => adsr.decayTime;
-    -(ax.val + bx.val) / 4.0 + 0.5 => offset;
     
     ((ay.val + by.val) / -2) * 0.5 + 0.5 => float avg_y; // normalize to [0, 1] with 0 being all the way down    
     (bz.val + az.val) / 2 => float avg_z;
@@ -208,24 +223,39 @@ while(true) {
     setGain(avg_y * 0.9);
     setLPF(avg_y);
     
-    10::samp => now;
+    10::ms => now;
     //<<< ax.val, ay.val, az.val, bx.val, by.val, bz.val >>>;
 }
 
 fun void playNotes()
 {
+	300::ms => dur note_length;
+
+	while (true)
+	{
+	        note_length - ((now - sync_point) % note_length) => dur wait;
+		//<<< wait >>>;
+
+		if (wait >= 100::ms)
+		{
+			assignChannel();
+        		((ay.val + by.val) / -2) * 0.5 + 0.5 => float avg_y; // normalize to [0, 1] with 0 being all the way down    
+        		if ( avg_y > 0.5 )
+        		{
+        		    adsr.keyOn();
+        		    s4.noteOn(1);
+        		}
+		}
+		wait => now;
+	}
+}
+
+fun void playNotesNope()
+{
     150::ms => dur note_length;
     while (true)
     {
-    	note_length => dur wait; //placeholder
-	if (fp)
-	{
-            note_length - ((now + offset_normalization * note_length) % note_length) => wait;
-	}
-        else
-	{
-	    note_length - ((now + (offset - offset_normalization) * note_length) % note_length) => wait;
-	}
+        note_length - ((now - sync_point) % note_length) => dur wait;
 	if (wait >= 100::ms)
 	{
 		assignChannel();
@@ -233,8 +263,8 @@ fun void playNotes()
         	if ( avg_y > 0.5 )
         	{
         	    adsr.keyOn();
-        	        s4.noteOn(1);
-        		}
+        	    s4.noteOn(1);
+        	}
 	}
        	wait => now;
 	if (wait >= 100::ms)
@@ -288,13 +318,11 @@ fun void GetGameTrakInput() {
             {
                 1 => fp;
                 <<< "footpedal depressed " + fp >>>;
-		offset => offset_normalization;
             }
             
             else if( msg.isButtonUp() )
             {
                 0 => fp;
-		0.0 => offset;
                 <<< "footpedal released " + fp >>>;
             }
         }
