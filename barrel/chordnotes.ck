@@ -114,7 +114,6 @@ SinOsc s2 => g1;
 Blit s3 => g1;
 Wurley s4 => g1;
 0.5 => s4.gain;
-
 0.7 => s2.gain;
 0.6 => s1.gain => s3.gain;
 
@@ -199,8 +198,8 @@ while(true) {
     //(env.last() * 0.5 + 0.5) * env_mul + env_add => lf.freq;
 
     Math.fabs((ax.val - bx.val) / 2) => float x_diff;
-    5::ms + (10 * x_diff)::ms => adsr.attackTime;
-    5::ms + (100 * x_diff)::ms => adsr.decayTime;
+    //5::ms + (10 * x_diff)::ms => adsr.attackTime;
+    70::ms + (100 * x_diff)::ms => adsr.decayTime;
     -(ax.val + bx.val) / 4.0 + 0.5 => offset;
     
     ((ay.val + by.val) / -2) * 0.5 + 0.5 => float avg_y; // normalize to [0, 1] with 0 being all the way down    
