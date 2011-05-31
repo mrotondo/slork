@@ -322,6 +322,18 @@ fun void waitToLineUp( float notesPerBeat )
     (wait + 1::samp) => now;
 }
 
+//SndBuf test => dac;
+//test.read("snare.aiff");
+//fun void testClick()
+//{
+//    while (true)
+//    {
+//        0 => test.pos;
+//        300::ms => now;
+//    }
+//}
+//spork ~testClick();
+
 while (true)
 {
     0 => int bail;
@@ -354,7 +366,7 @@ while (true)
     //1 => adsr1.keyOn;
     //1 => adsr2.keyOn;
     
-    waitToLineUp(numSubdivisions);
+    //waitToLineUp(numSubdivisions);
 
     sampsPerBeat/numSubdivisions => now;
     
