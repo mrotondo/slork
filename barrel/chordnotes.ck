@@ -105,7 +105,7 @@ gainSlew.setRate(0.001,0.1);
 0.0 => gainSlew.target;
 0.0 => gainSlew.val;
 
-adsr.set( 0.01, 0.08, .1, 0.3 ); 
+adsr.set( 0.01, 0.08, .1, 0.3 ); // .01 .08 .1 .3
 1500 => lf.freq;
 4 => lf.Q;
 0.09 => r.mix;
@@ -192,17 +192,21 @@ fun void setInterval(float percent)
 spork ~playNotes();
 // main loop
 
+0.0 => float offset_normalization;
+
+
 while(true) {
     //(env.last() * 0.5 + 0.5) * env_mul + env_add => lf.freq;
 
-    //Math.fabs((ax.val - bx.val) / 2) => float x_diff;
-    //setLFOFrequency(x_diff);
+    Math.fabs((ax.val - bx.val) / 2) => float x_diff;
+    5::ms + (10 * x_diff)::ms => adsr.attackTime;
+    5::ms + (100 * x_diff)::ms => adsr.decayTime;
     -(ax.val + bx.val) / 4.0 + 0.5 => offset;
     
     ((ay.val + by.val) / -2) * 0.5 + 0.5 => float avg_y; // normalize to [0, 1] with 0 being all the way down    
     (bz.val + az.val) / 2 => float avg_z;
     if ( avg_y < 0.46 ) setInterval(avg_z);
-    setGain(avg_y);
+    setGain(avg_y * 0.9);
     setLPF(avg_y);
     
     10::samp => now;
@@ -214,18 +218,31 @@ fun void playNotes()
     150::ms => dur note_length;
     while (true)
     {
-        note_length - ((now + offset * note_length) % note_length) => dur wait;
-        
-        assignChannel();
-        ((ay.val + by.val) / -2) * 0.5 + 0.5 => float avg_y; // normalize to [0, 1] with 0 being all the way down    
-        if ( avg_y > 0.5 )
-        {
-            adsr.keyOn();
-            s4.noteOn(1);
-        }
-        wait => now;
-        adsr.keyOff();
-        s4.noteOff(1);
+    	note_length => dur wait; //placeholder
+	if (fp)
+	{
+            note_length - ((now + offset_normalization * note_length) % note_length) => wait;
+	}
+        else
+	{
+	    note_length - ((now + (offset - offset_normalization) * note_length) % note_length) => wait;
+	}
+	if (wait >= 100::ms)
+	{
+		assignChannel();
+        	((ay.val + by.val) / -2) * 0.5 + 0.5 => float avg_y; // normalize to [0, 1] with 0 being all the way down    
+        	if ( avg_y > 0.5 )
+        	{
+        	    adsr.keyOn();
+        	        s4.noteOn(1);
+        		}
+	}
+       	wait => now;
+	if (wait >= 100::ms)
+	{
+		adsr.keyOff();
+        	s4.noteOff(1);
+	}
     }
 }
 
@@ -272,11 +289,13 @@ fun void GetGameTrakInput() {
             {
                 1 => fp;
                 <<< "footpedal depressed " + fp >>>;
+		offset => offset_normalization;
             }
             
             else if( msg.isButtonUp() )
             {
                 0 => fp;
+		0.0 => offset;
                 <<< "footpedal released " + fp >>>;
             }
         }

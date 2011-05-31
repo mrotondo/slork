@@ -293,16 +293,26 @@ fun void restoreVolume()
     1.0 => masterVolume.target;
 }
 
-OscSend xmit;
-xmit.setHost("192.168.179.240", 9999);
+OscSend xmits[8];
+xmits[0].setHost("poutine.local", 9999);
+xmits[1].setHost("poutine.local", 9999);
+xmits[2].setHost("poutine.local", 9999);
+xmits[3].setHost("poutine.local", 9999);
+xmits[4].setHost("poutine.local", 9999);
+xmits[5].setHost("poutine.local", 9999);
+xmits[6].setHost("poutine.local", 9999);
+xmits[7].setHost("poutine.local", 9999);
 fun void changeChord()
 {
     3 +=> base;
     2 -=> indexOffset;
     if ( base >= 12 ) 0 => base;
     if ( indexOffset <= -8 ) 0 => indexOffset;
-    xmit.startMsg("/setRoot, i");
-    xmit.addInt(root + base);
+    for (0 => int i; i < 8; i++)
+    {
+        xmits[i].startMsg("/setRoot, i");
+    	xmits[i].addInt(root + base);
+    }
 }
 
 spork ~ updateParams();
