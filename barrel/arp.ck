@@ -191,8 +191,8 @@ for ( 0 => int i; i < numSaws; i++ )
     freq[i].setRate(0.1,0.1);
 }
 
-// 36 total notes for goodNotes
-[0, 2, 4, 7, 9, 11, 12, 14, 16, 19, 21, 23, 24, 26, 28, 31, 33, 35, 36, 38, 40, 43, 45, 47, 48, 50, 52, 55, 57, 59, 60, 62, 64, 67, 69, 71] @=> int goodNotes[];
+// 42 total notes for goodNotes
+[0, 2, 4, 7, 9, 11, 12, 14, 16, 19, 21, 23, 24, 26, 28, 31, 33, 35, 36, 38, 40, 43, 45, 47, 48, 50, 52, 55, 57, 59, 60, 62, 64, 67, 69, 71, 72, 74, 76, 79, 81, 83] @=> int goodNotes[];
 // two octaves of major7
 [0, 4, 7, 11, 12, 14, 16, 19, 23, 24] @=> int maj7[];
 int chord[];
@@ -203,7 +203,7 @@ int chord[];
 
 0.03 => float spread;
 0.04 => float spreadRange;
-7000.0 => float LPFrange;
+3000.0 => float LPFrange;
 5.0 => float LPFbase;
 0 => int lNoteRange;
 1 => int rNoteRange;
@@ -226,7 +226,7 @@ fun float arpFreq(int which)
     12 +=> which; // for bass extension    
     which + indexOffset => which; // for index offset    
     
-    if ( which > 35 ) 35 => which;
+    if ( which > 41 ) 41 => which;
     if ( which < 0 ) 0 => which;
     return Std.mtof(root + base + goodNotes[which]);
 
@@ -249,7 +249,7 @@ fun void updateParams()
             
         }
         // update LPF
-        (Math.fabs(az.val+bz.val)/2.0 + 0.1)*LPFrange + LPFbase => lpfL.freq => lpfR.freq;
+        (Math.fabs(az.val+bz.val)/2.0 + 0.05)*LPFrange + LPFbase => lpfL.freq => lpfR.freq;
         // update detune spread
         Math.fabs(ay.val-by.val)*spreadRange => spread;
         // update pitch spread
@@ -295,26 +295,16 @@ fun void restoreVolume()
     1.0 => masterVolume.target;
 }
 
-OscSend xmits[8];
-xmits[0].setHost("poutine.local", 9999);
-xmits[1].setHost("poutine.local", 9999);
-xmits[2].setHost("poutine.local", 9999);
-xmits[3].setHost("poutine.local", 9999);
-xmits[4].setHost("poutine.local", 9999);
-xmits[5].setHost("poutine.local", 9999);
-xmits[6].setHost("poutine.local", 9999);
-xmits[7].setHost("poutine.local", 9999);
+OscSend xmit;
+xmit.setHost("192.168.179.240", 9999);
 fun void changeChord()
 {
     3 +=> base;
     2 -=> indexOffset;
     if ( base >= 12 ) 0 => base;
     if ( indexOffset <= -8 ) 0 => indexOffset;
-    for (0 => int i; i < 8; i++)
-    {
-        xmits[i].startMsg("/setRoot, i");
-    	xmits[i].addInt(root + base);
-    }
+    xmit.startMsg("/setRoot, i");
+    xmit.addInt(root + base);
 }
 
 spork ~ updateParams();
