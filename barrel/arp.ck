@@ -129,7 +129,7 @@ fun void GetGameTrakInput() {
 //----------------------------------------------------------------
 
 // set up the saws
-16 => int numSaws;
+10 => int numSaws;
 BlitSaw bs[numSaws];
 CoolGreatNeatSlew freq[numSaws];
 
@@ -207,6 +207,8 @@ int chord[];
 5.0 => float LPFbase;
 0 => int lNoteRange;
 1 => int rNoteRange;
+
+300::ms => dur sampsPerBeat;
 
 0 => int tempy;
 1.0 => float numSubdivisions;
@@ -308,6 +310,18 @@ fun void changeChord()
 spork ~ updateParams();
 float randnote, prevrandnote;
 0 => float count;
+
+
+
+now % sampsPerBeat => dur offset;
+fun void waitToLineUp( float notesPerBeat )
+{
+    (now - offset) % (sampsPerBeat/notesPerBeat) => dur mod;
+    // advance time by the quantization size in samps
+    (sampsPerBeat/notesPerBeat) - mod => dur wait;
+    (wait + 1::samp) => now;
+}
+
 while (true)
 {
     0 => int bail;
@@ -337,10 +351,12 @@ while (true)
         randnote*Math.rand2f(1.0 - spread,1.0 + spread) => freq[i].target;
     }
     
-    1 => adsr1.keyOn;
-    1 => adsr2.keyOn;
+    //1 => adsr1.keyOn;
+    //1 => adsr2.keyOn;
+    
+    waitToLineUp(numSubdivisions);
 
-    300::ms/numSubdivisions => now;
+    sampsPerBeat/numSubdivisions => now;
     
     1.0/numSubdivisions +=> count;
    
