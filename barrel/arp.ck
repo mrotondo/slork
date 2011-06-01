@@ -5,14 +5,14 @@ HidMsg msg;
 8 => int totalComputers;
 // setup all computers here-
 OscSend xmit[totalComputers];
-xmit[0].setHost("heartstop.local", 9999);
-xmit[1].setHost("transfat.local", 9999);
-xmit[2].setHost("froyo.local", 9999);
-xmit[3].setHost("xiaolongbao.local", 9999);
-xmit[4].setHost("flavorblasted.local", 9999);
-xmit[5].setHost("dolsotbibimbop.local", 9999);
-xmit[6].setHost("poutine.local", 9999);
-xmit[7].setHost("peanutbutter.local", 9999);
+//xmit[0].setHost("heartstop.local", 9999);
+//xmit[1].setHost("transfat.local", 9999);
+//xmit[2].setHost("froyo.local", 9999);
+//xmit[3].setHost("xiaolongbao.local", 9999);
+//xmit[4].setHost("flavorblasted.local", 9999);
+//xmit[5].setHost("dolsotbibimbop.local", 9999);
+//xmit[6].setHost("poutine.local", 9999);
+//xmit[7].setHost("peanutbutter.local", 9999);
 
 //----------------------------------------------------------------
 // cool great neat slew
@@ -21,9 +21,9 @@ class CoolGreatNeatSlew
 {
     0.0 => float attack;
     0.0 => float decay;
-    3.0 => float target;
-    3.0 => float val;
-    3.0 => float diff;
+    0.0 => float target;
+    0.0 => float val;
+    0.0 => float diff;
     
     // individual rates for attack and decay
     fun void setRate(float _attack, float _decay)
@@ -148,16 +148,16 @@ fun void GetGameTrakInput() {
 //    (wait + 1::samp) => now;
 //}
 
-SndBuf test => dac;
-test.read("snare.aiff");
-fun void testClick()
-{
-    while (true)
-    {
-        0 => test.pos;
-        300::ms => now;
-    }
-}
+//SndBuf test => dac;
+//test.read("snare.aiff");
+//fun void testClick()
+//{
+//    while (true)
+//    {
+//        0 => test.pos;
+//        300::ms => now;
+//    }
+//}
 //spork ~testClick();
 
 0 => int whichComputer;
@@ -175,7 +175,7 @@ fun void sendSyncMessage()
 //----------------------------------------------------------------
 
 // set up the saws
-20 => int numSaws;
+15 => int numSaws;
 BlitSaw bs[numSaws];
 CoolGreatNeatSlew freq[numSaws];
 
@@ -200,6 +200,8 @@ fun void restoreVolume()
 // chain in to the channels
 LPF lpfL => Gain masterL => NRev revL => dac.chan(0);
 LPF lpfR => Gain masterR => NRev revR => dac.chan(1);
+
+0.0 => masterL.gain => masterR.gain;
 
 // chain into more channels if possible
 if ( dac.channels() == 8 )
@@ -233,7 +235,7 @@ dlyR => Gain fbR => dlyR;
 // here is where we actually assign the saws to stuff
 for ( 0 => int i; i < numSaws; i++ )
 {
-    0.2 => bs[i].gain;
+    0.6 => bs[i].gain;
     if ( i % 2 == 0)
     {
         bs[i] => lpfL;
@@ -281,7 +283,7 @@ fun float arpFreq(int which)
 
 fun float bucketSubdivision(float delta)
 {
-    return Math.floor( Math.pow( (Math.fabs(delta+2)/4.0 ), 1.8) * 5.0);
+    return Math.floor( Math.pow( ( Math.fabs(delta+2)/4.0 + 0.1 ), 1.8) * 5.0);
 }
 
 fun void updateParams()
@@ -318,9 +320,6 @@ fun void updateParams()
         bucketSubdivision( ay.val + by.val ) => numSubdivisions;
         // update master volume
         masterVolume.val => masterL.gain => masterR.gain;
-        
-        if ( ay.val + by.val < -1.0 ) killVolume();
-        else restoreVolume();
 
         10::ms => now;
     }
@@ -349,12 +348,12 @@ fun void updateNote()
     while ( randnote == prevrandnote && lNoteRange != rNoteRange )
     {
         // break if we have crossed streams
-        if ( lNoteRange > rNoteRange + 1 )
-        {
-            killVolume();
-            break;
-        }
-        restoreVolume(); // if it is down
+        //if ( lNoteRange > rNoteRange + 1 )
+        //{
+        //    killVolume();
+        //    break;
+        //}
+        //restoreVolume(); // if it is down
         bail++;
         // determine freq for this random note based on width of hands
         arpFreq( Math.rand2(lNoteRange,rNoteRange) ) => randnote;
@@ -363,7 +362,7 @@ fun void updateNote()
     // if we're equal or close to it, just hold the same note
     if ( lNoteRange == rNoteRange || lNoteRange == rNoteRange + 1 )
     {
-        restoreVolume(); // if it is down
+        //restoreVolume(); // if it is down
         arpFreq( Math.rand2(lNoteRange,rNoteRange) ) => randnote;
     }
     //<<< lNoteRange, "----", rNoteRange >>>;
@@ -378,16 +377,21 @@ fun void updateNote()
 // -----------------------------------------------------------------------
 // MAIN LOOP
 // -----------------------------------------------------------------------
-
+1::second => now;
 while (true)
 {
     // store num subs in case it changes
     Math.floor(numSubdivisions)  => float subs;
-    <<< subs >>>;;
+    //<<< subs >>>;;
     // for each subdivision sync and play a note, should always come out in total to sampsPerBeat
     sendSyncMessage();
+    <<< ay.val+ by.val >>>;
+    (ay.val + by.val + 2) => float tempOffset;
+    if ( tempOffset < 1.0 ) Math.max(tempOffset - 0.5,0.0) => masterVolume.target;
+    else 1.0 => masterVolume.target;
+
     // if samps per beat is zero, do nothing
-    if ( subs == 0.0 ) 
+    if ( subs == 0.0 && tempOffset >= 1.0 ) 
     {
         arpFreq( (lNoteRange+rNoteRange)/2 ) => randnote;
         // now we assign that frequency to the saws
@@ -395,6 +399,8 @@ while (true)
             randnote*Math.rand2f(1.0 - spread,1.0 + spread) => freq[i].target;
         sampsPerBeat => now;
     }
+    else if ( tempOffset < 1.0 )
+        sampsPerBeat => now;
     else
     {
         for ( 0 => int i; i < subs; i++ )

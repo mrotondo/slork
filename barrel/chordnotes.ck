@@ -71,15 +71,17 @@ if ( numChans == 8 ) 6 => numChans;
 0 => int rootOffset;
 0 => int interval;
 Delay dly[numChans];
+JCRev rev[numChans];
 Gain   fb[numChans];
 Gain g1 => LPF lf => NRev r => ADSR adsr;
 
 for ( 0 => int i; i < numChans; i++ )
 {
-    dly[i] => dac.chan(i);
+    dly[i] => rev[i] => dac.chan(i);
     dly[i] => fb[i] => dly[i];
     0.65 => dly[i].gain;
-    0.999 => fb[i].gain;
+    0.1 => rev[i].mix;
+    0.9999 => fb[i].gain;
     600::ms => dly[i].max;
     150::ms => dly[i].delay;
 }
@@ -113,7 +115,7 @@ BlitSaw s1 => g1;
 SinOsc s2 => g1;
 Blit s3 => g1;
 Wurley s4 => g1;
-0.5 => s4.gain;
+0.8 => s4.gain;
 0.7 => s2.gain;
 0.6 => s1.gain => s3.gain;
 
@@ -142,11 +144,13 @@ fun void listenForRoot()
         {
             root_event.getInt() + 24 => chord_root;
         }
-	<<< "Got a root! " + chord_root >>>;
-	if ( chord_root == 3 ) 2 => rootOffset;
+        <<< "Got a root! " + chord_root >>>;
+        if ( chord_root == 3 ) 2 => rootOffset;
     	else if ( chord_root == 6 ) 4 => rootOffset;
     	else if ( chord_root == 9 ) 6 => rootOffset;
     	else if ( chord_root == 0 ) 8 => rootOffset;
+        (bz.val + az.val) / 2 => float avg_z;
+        setInterval(avg_z);
     }
 }
 spork ~ listenForRoot();
@@ -173,20 +177,21 @@ fun void listenForSync()
 }
 spork ~ listenForSync();
 
-1500 => float min_lpf_freq;
-3500 => float max_lpf_freq;
+500 => float min_lpf_freq;
+2000 => float max_lpf_freq;
 
 fun void setGain(float gain_percent)
 {
-	if (gain_percent > 0.5) 
+	if (gain_percent > 0.4) 
 	{
-		(gain_percent - 0.5) * 2 => gainSlew.target;
+		(gain_percent - 0.4) * 2 => gainSlew.target;
 
 	}
     else
         0.0 => gainSlew.target;
         
-    gainSlew.val => g1.gain;
+    Math.pow(gainSlew.val,2.0) => float blah;
+    blah => g1.gain;
 }
 
 fun void setLPF(float gain_percent)
@@ -194,8 +199,8 @@ fun void setLPF(float gain_percent)
     (max_lpf_freq - min_lpf_freq)*gainSlew.val + min_lpf_freq => lf.freq;
 }
 
-13 => int numNotes;
-[0, 2, 4, 7, 9, 11, 12, 14, 16, 19, 21, 23, 24] @=> int goodNotes[];
+25 => int numNotes;
+[0, 2, 4, 7, 9, 11, 12, 14, 16, 19, 21, 23, 24, 26, 28, 31, 33, 35, 36, 38, 40, 43, 45, 47, 48] @=> int goodNotes[];
 
 fun void setInterval(float percent)
 {
@@ -223,14 +228,13 @@ while(true) {
     setGain(avg_y * 0.9);
     setLPF(avg_y);
     
-    10::ms => now;
+    30::ms => now;
     //<<< ax.val, ay.val, az.val, bx.val, by.val, bz.val >>>;
 }
 
 fun void playNotes()
 {
 	300::ms => dur note_length;
-
 	while (true)
 	{
 	        note_length - ((now - sync_point) % note_length) => dur wait;
@@ -240,7 +244,7 @@ fun void playNotes()
 		{
 			assignChannel();
         		((ay.val + by.val) / -2) * 0.5 + 0.5 => float avg_y; // normalize to [0, 1] with 0 being all the way down    
-        		if ( avg_y > 0.5 )
+        		if ( avg_y > 0.4 )
         		{
         		    adsr.keyOn();
         		    s4.noteOn(1);
@@ -253,25 +257,26 @@ fun void playNotes()
 fun void playNotesNope()
 {
     150::ms => dur note_length;
+
     while (true)
     {
         note_length - ((now - sync_point) % note_length) => dur wait;
-	if (wait >= 100::ms)
-	{
-		assignChannel();
-        	((ay.val + by.val) / -2) * 0.5 + 0.5 => float avg_y; // normalize to [0, 1] with 0 being all the way down    
-        	if ( avg_y > 0.5 )
-        	{
-        	    adsr.keyOn();
-        	    s4.noteOn(1);
-        	}
-	}
-       	wait => now;
-	if (wait >= 100::ms)
-	{
-		adsr.keyOff();
-        	s4.noteOff(1);
-	}
+        if (wait >= 100::ms)
+        {
+            assignChannel();
+            ((ay.val + by.val) / -2) * 0.5 + 0.5 => float avg_y; // normalize to [0, 1] with 0 being all the way down    
+            if ( avg_y > 0.4 )
+            {
+                adsr.keyOn();
+                s4.noteOn(1);
+            }
+        }
+        wait => now;
+        if (wait >= 100::ms)
+        {
+            adsr.keyOff();
+            s4.noteOff(1);
+        }
     }
 }
 
