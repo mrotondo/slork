@@ -2,6 +2,18 @@
 Hid hi;
 HidMsg msg;
 
+8 => int totalComputers;
+// setup all computers here-
+OscSend xmit[totalComputers];
+xmit[0].setHost("heartstop.local", 9999);
+xmit[1].setHost("transfat.local", 9999);
+xmit[2].setHost("froyo.local", 9999);
+xmit[3].setHost("xiaolongbao.local", 9999);
+xmit[4].setHost("flavorblasted.local", 9999);
+xmit[5].setHost("dolsotbibimbop.local", 9999);
+xmit[6].setHost("poutine.local", 9999);
+xmit[7].setHost("peanutbutter.local", 9999);
+
 //----------------------------------------------------------------
 // cool great neat slew
 //----------------------------------------------------------------
@@ -123,27 +135,73 @@ fun void GetGameTrakInput() {
     }
 }
 
+//----------------------------------------------------------------
+// Odds and Ends
+//----------------------------------------------------------------
+
+//now % sampsPerBeat => dur offset;
+//fun void waitToLineUp( float notesPerBeat )
+//{
+//    (now - offset) % (sampsPerBeat/notesPerBeat) => dur mod;
+//    // advance time by the quantization size in samps
+//    (sampsPerBeat/notesPerBeat) - mod => dur wait;
+//    (wait + 1::samp) => now;
+//}
+
+SndBuf test => dac;
+test.read("snare.aiff");
+fun void testClick()
+{
+    while (true)
+    {
+        0 => test.pos;
+        300::ms => now;
+    }
+}
+//spork ~testClick();
+
+0 => int whichComputer;
+fun void sendSyncMessage()
+{
+    xmit[whichComputer].startMsg("/sync, i");
+    xmit[whichComputer].addInt(1);
+    
+    whichComputer++;
+    if ( whichComputer >= totalComputers ) 0 => whichComputer;
+}
 
 //----------------------------------------------------------------
 // Sound synthesis
 //----------------------------------------------------------------
 
 // set up the saws
-10 => int numSaws;
+20 => int numSaws;
 BlitSaw bs[numSaws];
 CoolGreatNeatSlew freq[numSaws];
 
 // master volume
 CoolGreatNeatSlew masterVolume;
 masterVolume.setRate(0.0005,0.0008);
-1.0 => masterVolume.target;
-1.0 => masterVolume.val;
+0.0 => masterVolume.target;
+0.0 => masterVolume.val;
+
+// just start the slewing process down
+fun void killVolume()
+{
+    0.0 => masterVolume.target;
+}
+
+// bring the volume back up
+fun void restoreVolume()
+{
+    1.0 => masterVolume.target;
+}
 
 // chain in to the channels
-ADSR adsr1 => LPF lpfL => Gain masterL => NRev revL => dac.chan(0);
-ADSR adsr2 => LPF lpfR => Gain masterR => NRev revR => dac.chan(1);
+LPF lpfL => Gain masterL => NRev revL => dac.chan(0);
+LPF lpfR => Gain masterR => NRev revR => dac.chan(1);
 
-// chain into more if possible
+// chain into more channels if possible
 if ( dac.channels() == 8 )
 {
     dac.channels() => int numChannels;
@@ -155,24 +213,22 @@ if ( dac.channels() == 8 )
 // stereo delay
 Delay dlyL => lpfL;
 dlyL => Gain fbL => dlyL;
-0.4 => dlyL.gain;
-0.8 => fbL.gain;
+0.55 => dlyL.gain;
+0.9 => fbL.gain;
 540::ms => dlyL.max;
 280::ms => dlyL.delay;
 
 Delay dlyR => lpfR;
 dlyR => Gain fbR => dlyR;
-0.4 => dlyR.gain;
-0.8 => fbR.gain;
+0.55 => dlyR.gain;
+0.9 => fbR.gain;
 540::ms => dlyR.max;
 260::ms => dlyR.delay;
 
 // set some starter parameters to avoid crazy town
 80.0 => lpfL.freq;
 80.0 => lpfR.freq;
-0.04 => revL.mix => revR.mix;
-adsr1.set(0.05, 0.2, 0.2, 0.1);
-adsr2.set(0.03, 0.1, 0.2, 0.15);
+0.07 => revL.mix => revR.mix;
 
 // here is where we actually assign the saws to stuff
 for ( 0 => int i; i < numSaws; i++ )
@@ -188,22 +244,17 @@ for ( 0 => int i; i < numSaws; i++ )
         bs[i] => lpfR;
         bs[i] => dlyR;
     }
-    freq[i].setRate(0.1,0.1);
+    freq[i].setRate(0.1,0.1); // frequencies slew quite quickly
 }
 
 // 42 total notes for goodNotes
 [0, 2, 4, 7, 9, 11, 12, 14, 16, 19, 21, 23, 24, 26, 28, 31, 33, 35, 36, 38, 40, 43, 45, 47, 48, 50, 52, 55, 57, 59, 60, 62, 64, 67, 69, 71, 72, 74, 76, 79, 81, 83] @=> int goodNotes[];
-// two octaves of major7
-[0, 4, 7, 11, 12, 14, 16, 19, 23, 24] @=> int maj7[];
-int chord[];
-
-[0, 12, 24, 36, 48] @=> int octaves[];
 
 0 => int base => int indexOffset;
 
 0.03 => float spread;
 0.04 => float spreadRange;
-3000.0 => float LPFrange;
+6000.0 => float LPFrange;
 5.0 => float LPFbase;
 0 => int lNoteRange;
 1 => int rNoteRange;
@@ -216,26 +267,21 @@ int chord[];
 0 => int melodyNote;
 0 => int prevMelodyNote;
 0.25 => float nearnessThresh;
+0.35 => float rangeExtendThresh;
 
 fun float arpFreq(int which)
 {
-    // this if statement because rand2 of 0 doesn't work
-    //if ( noteRange >= 2 ) Math.rand2(0,noteRange/2) => tempy;
-    //else 0 => tempy; 
-    //return Std.mtof(root + base + octaves[tempy] + maj7[which]);
     12 +=> which; // for bass extension    
     which + indexOffset => which; // for index offset    
     
     if ( which > 41 ) 41 => which;
     if ( which < 0 ) 0 => which;
     return Std.mtof(root + base + goodNotes[which]);
-
 }
-
 
 fun float bucketSubdivision(float delta)
 {
-    return Math.floor(Math.fabs(delta)*3.0) + 1;
+    return Math.floor( Math.pow( (Math.fabs(delta+2)/4.0 ), 1.8) * 5.0);
 }
 
 fun void updateParams()
@@ -244,10 +290,8 @@ fun void updateParams()
     {
         // update frequency
         for ( 0 => int i; i < numSaws; i++ )
-        {
             freq[i].val => bs[i].freq;
             
-        }
         // update LPF
         (Math.fabs(az.val+bz.val)/2.0 + 0.05)*LPFrange + LPFbase => lpfL.freq => lpfR.freq;
         // update detune spread
@@ -255,121 +299,108 @@ fun void updateParams()
         // update pitch spread
         Math.fabs(ax.val+1)*10 => float rDiff;
         Math.floor(rDiff) $ int => rNoteRange;
-
-        if ( az.val > 0.35 && rNoteRange >= 19 ) 
-            (az.val - 0.35)*15 +=> rDiff;
-        else if ( az.val > 0.35 && rNoteRange <= 0 ) 
-            (az.val - 0.35)*15 -=> rDiff;
-        
+        // extend pitch range beyond actual horizontal travel
+        if ( az.val > rangeExtendThresh && rNoteRange >= 19 ) 
+            (az.val - rangeExtendThresh)*15 +=> rDiff;
+        else if ( az.val > rangeExtendThresh && rNoteRange <= 0 ) 
+            (az.val - rangeExtendThresh)*15 -=> rDiff;
         Math.floor(rDiff) $ int => rNoteRange;
-        //Math.fabs(rDiff - rNoteRange)*100 => float rPhasey;
-        //rPhasey => modR.vibratoRate;
-        
+        // same for the left side
         Math.fabs(bx.val+1)*10 => float lDiff;
         Math.floor(lDiff) $ int => lNoteRange;
-
-        if ( bz.val > 0.35 && lNoteRange >= 19 ) 
-            (bz.val - 0.35)*15 +=> lDiff;
-        else if ( bz.val > 0.35 && lNoteRange <= 0 ) 
-            (bz.val - 0.35)*15 -=> lDiff;
+        if ( bz.val > rangeExtendThresh && lNoteRange >= 19 ) 
+            (bz.val - rangeExtendThresh)*15 +=> lDiff;
+        else if ( bz.val > rangeExtendThresh && lNoteRange <= 0 ) 
+            (bz.val - rangeExtendThresh)*15 -=> lDiff;
         Math.floor(lDiff) $ int => lNoteRange;
-        //Math.fabs(lDiff - lNoteRange)*100 => float lPhasey;
-        //lPhasey => modL.vibratoRate;
         
         // update number of subdivisions per beat
-        bucketSubdivision( Math.fabs( -ay.val + -by.val + 2 )*0.4 ) => numSubdivisions;
+        bucketSubdivision( ay.val + by.val ) => numSubdivisions;
         // update master volume
         masterVolume.val => masterL.gain => masterR.gain;
+        
+        if ( ay.val + by.val < -1.0 ) killVolume();
+        else restoreVolume();
 
         10::ms => now;
     }
 }
 
-fun void killVolume()
-{
-    0.0 => masterVolume.target;
-}
-
-fun void restoreVolume()
-{
-    1.0 => masterVolume.target;
-}
-
-OscSend xmit;
-xmit.setHost("192.168.179.240", 9999);
 fun void changeChord()
 {
     3 +=> base;
     2 -=> indexOffset;
     if ( base >= 12 ) 0 => base;
     if ( indexOffset <= -8 ) 0 => indexOffset;
-    xmit.startMsg("/setRoot, i");
-    xmit.addInt(root + base);
+    for ( 0 => int i; i < totalComputers; i++ )
+    {
+        xmit[i].startMsg("/setRoot, i");
+        xmit[i].addInt(root + base);
+    }
 }
 
 spork ~ updateParams();
 float randnote, prevrandnote;
-0 => float count;
 
-
-
-now % sampsPerBeat => dur offset;
-fun void waitToLineUp( float notesPerBeat )
-{
-    (now - offset) % (sampsPerBeat/notesPerBeat) => dur mod;
-    // advance time by the quantization size in samps
-    (sampsPerBeat/notesPerBeat) - mod => dur wait;
-    (wait + 1::samp) => now;
-}
-
-//SndBuf test => dac;
-//test.read("snare.aiff");
-//fun void testClick()
-//{
-//    while (true)
-//    {
-//        0 => test.pos;
-//        300::ms => now;
-//    }
-//}
-//spork ~testClick();
-
-while (true)
+fun void updateNote()
 {
     0 => int bail;
+    // find a new random note
     while ( randnote == prevrandnote && lNoteRange != rNoteRange )
     {
         // break if we have crossed streams
         if ( lNoteRange > rNoteRange + 1 )
         {
             killVolume();
-             break;
-         }
+            break;
+        }
         restoreVolume(); // if it is down
         bail++;
+        // determine freq for this random note based on width of hands
         arpFreq( Math.rand2(lNoteRange,rNoteRange) ) => randnote;
         if (bail > 20 ) break;
     }
+    // if we're equal or close to it, just hold the same note
     if ( lNoteRange == rNoteRange || lNoteRange == rNoteRange + 1 )
     {
         restoreVolume(); // if it is down
         arpFreq( Math.rand2(lNoteRange,rNoteRange) ) => randnote;
     }
-    <<< lNoteRange, "----", rNoteRange >>>;
+    //<<< lNoteRange, "----", rNoteRange >>>;
     randnote => prevrandnote;
     
+    // now we assign that frequency to the saws
     for ( 0 => int i; i < numSaws; i++ )
-    {
         randnote*Math.rand2f(1.0 - spread,1.0 + spread) => freq[i].target;
-    }
-    
-    //1 => adsr1.keyOn;
-    //1 => adsr2.keyOn;
-    
     //waitToLineUp(numSubdivisions);
+}
 
-    sampsPerBeat/numSubdivisions => now;
-    
-    1.0/numSubdivisions +=> count;
-   
+// -----------------------------------------------------------------------
+// MAIN LOOP
+// -----------------------------------------------------------------------
+
+while (true)
+{
+    // store num subs in case it changes
+    Math.floor(numSubdivisions)  => float subs;
+    <<< subs >>>;;
+    // for each subdivision sync and play a note, should always come out in total to sampsPerBeat
+    sendSyncMessage();
+    // if samps per beat is zero, do nothing
+    if ( subs == 0.0 ) 
+    {
+        arpFreq( (lNoteRange+rNoteRange)/2 ) => randnote;
+        // now we assign that frequency to the saws
+        for ( 0 => int i; i < numSaws; i++ )
+            randnote*Math.rand2f(1.0 - spread,1.0 + spread) => freq[i].target;
+        sampsPerBeat => now;
+    }
+    else
+    {
+        for ( 0 => int i; i < subs; i++ )
+        {
+            updateNote();
+            sampsPerBeat/subs => now;
+        }
+    }
 }
