@@ -24,7 +24,7 @@
 quantizationSize * totalBeatsPerMeasure * totalMeasures => int gridSize;
 // OSC sender
 OscSend xmit;
-xmit.setHost("192.168.176.226", 9998);
+xmit.setHost("192.168.177.211", 9998);
 // create our OSC receiver
 OscRecv orec;
 // port 9999
@@ -98,7 +98,7 @@ now % (totalBeatsPerMeasure * totalMeasures * sampsPerBeat) => dur offset;
 // class for randrumly generated drums
 class Randrum
 {
-    SndBuf sampdrum => Gain g => dac;
+    SndBuf sampdrum => Gain g;
 	NoiseDrum drum;
 	
     int hitsOn[gridSize];
@@ -130,8 +130,14 @@ class Randrum
     ] @=> float d[][];
 
     // setup the filepath for the sample as well as a unique name
-    fun void setup( string _filename, string _name, UGen output )
+    fun void setup( string _filename, string _name, UGen output, int chanNum, int optionalChanNum )
     {
+        g => dac.chan(chanNum);
+        if ( optionalChanNum >= 0 )
+        {
+            g => dac.chan(optionalChanNum);
+        }
+        
         0 => int i;
         if (_name == "kick") 0 => i;
         if (_name == "snare") 1 => i;
@@ -356,13 +362,13 @@ fun void setReverb(float mix)
 // Randrum setups
 Randrum kick,snare,hihat,kickhard,openhat,snarehard,glitch;
 "jason/" => string path;
-kick.setup(path+"kickmed.wav", "kick", d);
-snare.setup(path+"snarerealdry.wav", "snare", d);
-hihat.setup(path+"hihatthin.wav", "hihat", d);
-kickhard.setup(path+"kickbig.wav", "kickhard", d);
-snarehard.setup(path+"snarehigh.wav", "snarehard", d);
-openhat.setup(path+"hihatopen.wav","openhat", d);
-glitch.setup("snare.aiff", "glitch", d);
+kick.setup(path+"kickmed.wav", "kick", d, 0, 4);
+snare.setup(path+"snarerealdry.wav", "snare", d, 1, 7);
+hihat.setup(path+"hihatthin.wav", "hihat", d, 3, 6);
+kickhard.setup(path+"kickbig.wav", "kickhard", d, 5, 2);
+snarehard.setup(path+"snarehigh.wav", "snarehard", d, 4, 0);
+openhat.setup(path+"hihatopen.wav","openhat", d, 6, 1);
+glitch.setup("snare.aiff", "glitch", d, 7, 3);
 [ 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1, 0 ] @=> int kickPattern[];
 [ 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 ] @=> float kickGain[];
 [ 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 ] @=> int snarePattern[];
