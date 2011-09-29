@@ -1,3 +1,9 @@
+
+0 => int drumsound;
+if( me.args() ) me.arg(0) => drumsound;
+
+<<< "drum: ", drumsound >>>;
+
 public class Barrel
 {
     10 => float min_frequency;

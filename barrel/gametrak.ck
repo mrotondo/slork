@@ -1,3 +1,8 @@
+0 => int drumsound;
+if( me.args() ) Std.atoi(me.arg(0)) => drumsound;
+<<< "drum: ", drumsound >>>;
+
+
 // make HidIn and HidMsg
 Hid hi;
 HidMsg msg;
@@ -6,8 +11,22 @@ HidMsg msg;
 NoiseDrum r_instrument;
 NoiseDrum l_instrument;
 
-1 => r_instrument.isKick;
-0 => l_instrument.isKick;
+if ( drumsound == 0 )
+{
+    1 => r_instrument.isKick;
+    0 => l_instrument.isKick;
+}
+if ( drumsound == 1 )
+{
+    0 => r_instrument.isKick;
+    0 => l_instrument.isKick;
+}
+if ( drumsound == 2 )
+{
+    1 => r_instrument.isKick;
+    1 => l_instrument.isKick;
+}
+
 
 RunningAverage r_average_y_velocity;
 RunningAverage l_average_y_velocity;
@@ -29,7 +48,7 @@ float bz; // right joystick z axis
 // which joystick
 0 => int device;
 // get from command line
-if( me.args() ) me.arg(0) => Std.atoi => device;
+//if( me.args() ) me.arg(0) => Std.atoi => device;
 
 // open joystick 0, exit on fail
 if( !hi.openJoystick( device ) ) me.exit();
@@ -86,10 +105,6 @@ fun void GetGameTrakInput() {
                     1.0 / ((az + 2) * 12) => r_y_velocity_threshold;
                     
                     -0.5 + (az * 0.5 + 0.5) * 0.25 => r_y_position_threshold;
-<<<<<<< HEAD
-=======
-                    //<<< r_y_position_threshold >>>;
->>>>>>> 38d21160b6f58e4765374ad1e78f28858f9e0dae
                     
                     r_instrument.setFrequency( 1 - ((az + 1) / 2));
                     
